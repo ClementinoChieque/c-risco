@@ -14,7 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      risk_settings: {
+        Row: {
+          account_balance: number
+          created_at: string
+          id: string
+          max_daily_loss: number
+          max_daily_risk: number
+          max_open_trades: number
+          max_risk_per_trade: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_balance?: number
+          created_at?: string
+          id?: string
+          max_daily_loss?: number
+          max_daily_risk?: number
+          max_open_trades?: number
+          max_risk_per_trade?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_balance?: number
+          created_at?: string
+          id?: string
+          max_daily_loss?: number
+          max_daily_risk?: number
+          max_open_trades?: number
+          max_risk_per_trade?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          direction: string
+          entry_price: number
+          id: string
+          leverage: number | null
+          lot_size: number | null
+          market: string
+          notes: string | null
+          pair: string
+          pip_value: number | null
+          position_size: number
+          potential_profit: number
+          result: number | null
+          risk_amount: number
+          risk_percentage: number
+          risk_reward_ratio: number
+          status: string
+          stop_loss: number
+          take_profit: number
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          direction: string
+          entry_price: number
+          id?: string
+          leverage?: number | null
+          lot_size?: number | null
+          market: string
+          notes?: string | null
+          pair: string
+          pip_value?: number | null
+          position_size: number
+          potential_profit: number
+          result?: number | null
+          risk_amount: number
+          risk_percentage: number
+          risk_reward_ratio: number
+          status?: string
+          stop_loss: number
+          take_profit: number
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          direction?: string
+          entry_price?: number
+          id?: string
+          leverage?: number | null
+          lot_size?: number | null
+          market?: string
+          notes?: string | null
+          pair?: string
+          pip_value?: number | null
+          position_size?: number
+          potential_profit?: number
+          result?: number | null
+          risk_amount?: number
+          risk_percentage?: number
+          risk_reward_ratio?: number
+          status?: string
+          stop_loss?: number
+          take_profit?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

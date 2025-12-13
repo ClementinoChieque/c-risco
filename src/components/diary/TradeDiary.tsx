@@ -15,20 +15,20 @@ export function TradeDiary() {
   const [closeResult, setCloseResult] = useState('');
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
 
-  const handleClose = (id: string) => {
+  const handleClose = async (id: string) => {
     const result = parseFloat(closeResult);
     if (isNaN(result)) {
       toast.error('Digite um valor válido');
       return;
     }
-    closeTrade(id, result);
+    await closeTrade(id, result);
     setCloseResult('');
     setSelectedTradeId(null);
     toast.success('Trade fechado com sucesso!');
   };
 
-  const handleDelete = (id: string) => {
-    deleteTrade(id);
+  const handleDelete = async (id: string) => {
+    await deleteTrade(id);
     toast.success('Trade removido');
   };
 
