@@ -1,15 +1,16 @@
+import { forwardRef } from 'react';
 import { useTrade } from '@/context/TradeContext';
 import { Badge } from '@/components/ui/badge';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function RecentTrades() {
+export const RecentTrades = forwardRef<HTMLDivElement>(function RecentTrades(_, ref) {
   const { trades } = useTrade();
   const recentTrades = trades.slice(0, 5);
 
   if (recentTrades.length === 0) {
     return (
-      <div className="glass-card rounded-xl p-6 animate-fade-in">
+      <div ref={ref} className="glass-card rounded-xl p-6 animate-fade-in">
         <h3 className="stat-label mb-4">Trades Recentes</h3>
         <p className="text-muted-foreground text-sm text-center py-8">
           Nenhum trade registrado ainda
@@ -19,7 +20,7 @@ export function RecentTrades() {
   }
 
   return (
-    <div className="glass-card rounded-xl p-6 animate-fade-in">
+    <div ref={ref} className="glass-card rounded-xl p-6 animate-fade-in">
       <h3 className="stat-label mb-4">Trades Recentes</h3>
       
       <div className="space-y-3">
@@ -66,4 +67,4 @@ export function RecentTrades() {
       </div>
     </div>
   );
-}
+});
