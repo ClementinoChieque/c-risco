@@ -4,15 +4,11 @@ import { MarketSelector } from './MarketSelector';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { TradeDirection } from '@/types/trade';
 import { toast } from 'sonner';
-import { AlertTriangle, TrendingUp, TrendingDown, Calculator, Plus } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const forexPairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'USD/CHF', 'AUD/USD', 'NZD/USD', 'USD/CAD'];
-const cryptoPairs = ['BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT', 'ADA/USDT'];
 
 export function RiskCalculator() {
   const { currentMarket, riskSettings, addTrade, canOpenNewTrade, isBlocked, blockReason } = useTrade();
@@ -26,8 +22,6 @@ export function RiskCalculator() {
   const [leverage, setLeverage] = useState('1');
   const [lotSize, setLotSize] = useState('0.01');
   const [notes, setNotes] = useState('');
-
-  const pairs = currentMarket === 'forex' ? forexPairs : cryptoPairs;
 
   const calculations = useMemo(() => {
     const entry = parseFloat(entryPrice) || 0;
@@ -126,16 +120,13 @@ export function RiskCalculator() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Par</Label>
-            <Select value={pair} onValueChange={setPair}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o par" />
-              </SelectTrigger>
-              <SelectContent>
-                {pairs.map((p) => (
-                  <SelectItem key={p} value={p}>{p}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              type="text"
+              placeholder={currentMarket === 'forex' ? 'Ex: EUR/USD' : 'Ex: BTC/USDT'}
+              value={pair}
+              onChange={(e) => setPair(e.target.value.toUpperCase())}
+              className="font-mono"
+            />
           </div>
 
           <div className="space-y-2">
