@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { Trade, RiskSettings, Market, OverallStats, DailyStats } from '@/types/trade';
+import { useTrades } from '@/hooks/useTrades';
+import { useRiskSettings } from '@/hooks/useRiskSettings';
+import { useAuth } from '@/hooks/useAuth';
+import { User } from '@supabase/supabase-js';
 
 interface TradeContextType {
   trades: Trade[];
@@ -7,32 +11,30 @@ interface TradeContextType {
   currentMarket: Market;
   isBlocked: boolean;
   blockReason: string | null;
-  addTrade: (trade: Omit<Trade, 'id' | 'createdAt'>) => boolean;
-  updateTrade: (id: string, updates: Partial<Trade>) => void;
-  closeTrade: (id: string, result: number) => void;
-  deleteTrade: (id: string) => void;
-  updateRiskSettings: (settings: Partial<RiskSettings>) => void;
+  loading: boolean;
+  user: User | null;
+  addTrade: (trade: Omit<Trade, 'id' | 'createdAt'>) => Promise<boolean>;
+  updateTrade: (id: string, updates: Partial<Trade>) => Promise<void>;
+  closeTrade: (id: string, result: number) => Promise<void>;
+  deleteTrade: (id: string) => Promise<void>;
+  updateRiskSettings: (settings: Partial<RiskSettings>) => Promise<void>;
   setCurrentMarket: (market: Market) => void;
   getOverallStats: () => OverallStats;
   getDailyStats: (date: string) => DailyStats;
   getTodayRiskUsed: () => number;
   canOpenNewTrade: (riskAmount: number) => { allowed: boolean; reason?: string };
+  signOut: () => Promise<{ error: Error | null }>;
 }
-
-const defaultRiskSettings: RiskSettings = {
-  accountBalance: 10000,
-  maxRiskPerTrade: 2,
-  maxDailyRisk: 6,
-  maxOpenTrades: 5,
-  maxDailyLoss: 5,
-};
 
 const TradeContext = createContext<TradeContextType | undefined>(undefined);
 
 export function TradeProvider({ children }: { children: React.ReactNode }) {
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [riskSettings, setRiskSettings] = useState<RiskSettings>(defaultRiskSettings);
+  const { user, loading: authLoading, signOut } = useAuth();
+  const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade, deleteTrade } = useTrades(user);
+  const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings(user);
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
+
+  const loading = authLoading || tradesLoading || settingsLoading;
 
   const getTodayRiskUsed = useCallback(() => {
     const today = new Date().toDateString();
@@ -55,7 +57,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
   const canOpenNewTrade = useCallback((riskAmount: number): { allowed: boolean; reason?: string } => {
     const riskPercentage = (riskAmount / riskSettings.accountBalance) * 100;
 
-    // Check max risk per trade
     if (riskPercentage > riskSettings.maxRiskPerTrade) {
       return {
         allowed: false,
@@ -63,7 +64,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    // Check max open trades
     if (getOpenTradesCount() >= riskSettings.maxOpenTrades) {
       return {
         allowed: false,
@@ -71,7 +71,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    // Check daily risk limit
     const todayRisk = getTodayRiskUsed();
     if (todayRisk + riskPercentage > riskSettings.maxDailyRisk) {
       return {
@@ -80,7 +79,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    // Check daily loss limit
     const todayPnL = getTodayPnL();
     const dailyLossLimit = -(riskSettings.accountBalance * riskSettings.maxDailyLoss) / 100;
     if (todayPnL <= dailyLossLimit) {
@@ -113,42 +111,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
 
     return { isBlocked: false, blockReason: null };
   }, [riskSettings, getTodayPnL, getTodayRiskUsed]);
-
-  const addTrade = useCallback((tradeData: Omit<Trade, 'id' | 'createdAt'>): boolean => {
-    const { allowed, reason } = canOpenNewTrade(tradeData.riskAmount);
-    if (!allowed) {
-      return false;
-    }
-
-    const newTrade: Trade = {
-      ...tradeData,
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-    };
-
-    setTrades(prev => [newTrade, ...prev]);
-    return true;
-  }, [canOpenNewTrade]);
-
-  const updateTrade = useCallback((id: string, updates: Partial<Trade>) => {
-    setTrades(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
-  }, []);
-
-  const closeTrade = useCallback((id: string, result: number) => {
-    setTrades(prev => prev.map(t => 
-      t.id === id 
-        ? { ...t, status: 'closed' as const, result, closedAt: new Date() } 
-        : t
-    ));
-  }, []);
-
-  const deleteTrade = useCallback((id: string) => {
-    setTrades(prev => prev.filter(t => t.id !== id));
-  }, []);
-
-  const updateRiskSettings = useCallback((settings: Partial<RiskSettings>) => {
-    setRiskSettings(prev => ({ ...prev, ...settings }));
-  }, []);
 
   const getOverallStats = useCallback((): OverallStats => {
     const closedTrades = trades.filter(t => t.status === 'closed');
@@ -213,6 +175,8 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
         currentMarket,
         isBlocked,
         blockReason,
+        loading,
+        user,
         addTrade,
         updateTrade,
         closeTrade,
@@ -223,6 +187,7 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
         getDailyStats,
         getTodayRiskUsed,
         canOpenNewTrade,
+        signOut,
       }}
     >
       {children}

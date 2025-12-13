@@ -62,7 +62,7 @@ export function RiskCalculator() {
     };
   }, [entryPrice, stopLoss, takeProfit, riskPercentage, leverage, lotSize, currentMarket, riskSettings.accountBalance, pair]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!pair || !entryPrice || !stopLoss) {
       toast.error('Preencha os campos obrigatórios');
       return;
@@ -76,7 +76,7 @@ export function RiskCalculator() {
       return;
     }
 
-    const success = addTrade({
+    const success = await addTrade({
       market: currentMarket,
       pair,
       direction,
@@ -102,6 +102,8 @@ export function RiskCalculator() {
       setStopLoss('');
       setTakeProfit('');
       setNotes('');
+    } else {
+      toast.error('Erro ao registrar trade');
     }
   };
 

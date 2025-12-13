@@ -8,8 +8,8 @@ import { DollarSign, Percent, Shield, AlertTriangle, Hash } from 'lucide-react';
 export function RiskSettings() {
   const { riskSettings, updateRiskSettings } = useTrade();
 
-  const handleChange = (key: keyof typeof riskSettings, value: number) => {
-    updateRiskSettings({ [key]: value });
+  const handleChange = async (key: keyof typeof riskSettings, value: number) => {
+    await updateRiskSettings({ [key]: value });
     toast.success('Configuração atualizada');
   };
 
