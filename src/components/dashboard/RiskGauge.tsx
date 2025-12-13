@@ -1,7 +1,8 @@
+import { forwardRef } from 'react';
 import { useTrade } from '@/context/TradeContext';
 import { cn } from '@/lib/utils';
 
-export function RiskGauge() {
+export const RiskGauge = forwardRef<HTMLDivElement>(function RiskGauge(_, ref) {
   const { riskSettings, getTodayRiskUsed } = useTrade();
   const riskUsed = getTodayRiskUsed();
   const percentage = Math.min((riskUsed / riskSettings.maxDailyRisk) * 100, 100);
@@ -19,7 +20,7 @@ export function RiskGauge() {
   };
 
   return (
-    <div className="glass-card rounded-xl p-6 animate-fade-in">
+    <div ref={ref} className="glass-card rounded-xl p-6 animate-fade-in">
       <h3 className="stat-label mb-4">Risco Diário Utilizado</h3>
       
       <div className="relative w-full h-4 bg-secondary rounded-full overflow-hidden">
@@ -47,4 +48,4 @@ export function RiskGauge() {
       </div>
     </div>
   );
-}
+});
