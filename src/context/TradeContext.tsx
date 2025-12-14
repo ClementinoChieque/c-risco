@@ -31,13 +31,23 @@ export function TradeProvider({ children }: { children: ReactNode }) {
 
   const loading = tradesLoading || settingsLoading;
 
-  // Close trade and update account balance based on result
+  // Close trade and update account balance based on result and market
   const closeTrade = useCallback(async (id: string, result: number) => {
+    // Find the trade to get its market
+    const trade = trades.find(t => t.id === id);
+    if (!trade) return;
+
     await closeTradeBase(id, result);
-    // Update account balance: add result (positive for win, negative for loss)
-    const newBalance = riskSettings.accountBalance + result;
-    await updateRiskSettings({ accountBalance: newBalance });
-  }, [closeTradeBase, riskSettings.accountBalance, updateRiskSettings]);
+    
+    // Update the correct balance based on market
+    if (trade.market === 'crypto') {
+      const newBalance = riskSettings.cryptoAccountBalance + result;
+      await updateRiskSettings({ cryptoAccountBalance: newBalance });
+    } else {
+      const newBalance = riskSettings.accountBalance + result;
+      await updateRiskSettings({ accountBalance: newBalance });
+    }
+  }, [closeTradeBase, trades, riskSettings.accountBalance, riskSettings.cryptoAccountBalance, updateRiskSettings]);
 
   const getTodayRiskUsed = useCallback(() => {
     const today = new Date().toDateString();
