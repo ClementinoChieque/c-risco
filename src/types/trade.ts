@@ -28,7 +28,8 @@ export interface Trade {
 }
 
 export interface RiskSettings {
-  accountBalance: number;
+  accountBalance: number; // Forex account balance
+  cryptoAccountBalance: number; // Crypto account balance
   maxRiskPerTrade: number; // Percentage
   maxDailyRisk: number; // Percentage
   maxOpenTrades: number;
