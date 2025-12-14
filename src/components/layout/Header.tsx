@@ -1,24 +1,10 @@
 import { useTrade } from '@/context/TradeContext';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { TrendingUp, AlertTriangle, DollarSign, LogOut } from 'lucide-react';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { TrendingUp, AlertTriangle, DollarSign } from 'lucide-react';
 
 export function Header() {
-  const { riskSettings, isBlocked, blockReason, getTodayRiskUsed, user, signOut } = useTrade();
+  const { riskSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
   const todayRisk = getTodayRiskUsed();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    const { error } = await signOut();
-    if (error) {
-      toast.error('Erro ao sair');
-    } else {
-      toast.success('Você saiu da conta');
-      navigate('/auth');
-    }
-  };
 
   return (
     <header className="glass-card sticky top-0 z-50 border-b border-border/50 px-6 py-4">
@@ -57,13 +43,6 @@ export function Header() {
               <AlertTriangle className="h-5 w-5" />
               <span className="text-sm font-medium">{blockReason}</span>
             </div>
-          )}
-
-          {user && (
-            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground">
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
-            </Button>
           )}
         </div>
       </div>
