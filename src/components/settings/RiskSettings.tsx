@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
-import { DollarSign, Percent, Shield, AlertTriangle, Hash } from 'lucide-react';
+import { DollarSign, Percent, Shield, AlertTriangle, Hash, Bitcoin } from 'lucide-react';
 
 export function RiskSettings() {
   const { riskSettings, updateRiskSettings } = useTrade();
@@ -21,14 +21,32 @@ export function RiskSettings() {
             <DollarSign className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold">Saldo da Conta</h3>
-            <p className="text-sm text-muted-foreground">Seu capital total disponível</p>
+            <h3 className="font-semibold">Saldo da Conta FOREX</h3>
+            <p className="text-sm text-muted-foreground">Seu capital disponível para Forex</p>
           </div>
         </div>
         <Input
           type="number"
           value={riskSettings.accountBalance}
           onChange={(e) => handleChange('accountBalance', parseFloat(e.target.value) || 0)}
+          className="font-mono text-xl"
+        />
+      </div>
+
+      <div className="glass-card rounded-xl p-6 animate-fade-in">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 rounded-lg bg-warning/10">
+            <Bitcoin className="h-5 w-5 text-warning" />
+          </div>
+          <div>
+            <h3 className="font-semibold">Saldo da Conta CRIPTO</h3>
+            <p className="text-sm text-muted-foreground">Seu capital disponível para Criptomoedas</p>
+          </div>
+        </div>
+        <Input
+          type="number"
+          value={riskSettings.cryptoAccountBalance}
+          onChange={(e) => handleChange('cryptoAccountBalance', parseFloat(e.target.value) || 0)}
           className="font-mono text-xl"
         />
       </div>

@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           account_balance: number
           created_at: string
+          crypto_account_balance: number
           id: string
           max_daily_loss: number
           max_daily_risk: number
@@ -29,6 +30,7 @@ export type Database = {
         Insert: {
           account_balance?: number
           created_at?: string
+          crypto_account_balance?: number
           id?: string
           max_daily_loss?: number
           max_daily_risk?: number
@@ -40,6 +42,7 @@ export type Database = {
         Update: {
           account_balance?: number
           created_at?: string
+          crypto_account_balance?: number
           id?: string
           max_daily_loss?: number
           max_daily_risk?: number

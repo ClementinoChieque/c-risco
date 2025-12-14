@@ -7,6 +7,7 @@ const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 const defaultRiskSettings: RiskSettings = {
   accountBalance: 10000,
+  cryptoAccountBalance: 10000,
   maxRiskPerTrade: 2,
   maxDailyRisk: 6,
   maxOpenTrades: 5,
@@ -17,6 +18,7 @@ interface DbRiskSettings {
   id: string;
   user_id: string;
   account_balance: number;
+  crypto_account_balance: number;
   max_risk_per_trade: number;
   max_daily_risk: number;
   max_open_trades: number;
@@ -44,6 +46,7 @@ export function useRiskSettings() {
       const dbData = data as DbRiskSettings;
       setRiskSettings({
         accountBalance: Number(dbData.account_balance),
+        cryptoAccountBalance: Number(dbData.crypto_account_balance),
         maxRiskPerTrade: Number(dbData.max_risk_per_trade),
         maxDailyRisk: Number(dbData.max_daily_risk),
         maxOpenTrades: Number(dbData.max_open_trades),
@@ -56,6 +59,7 @@ export function useRiskSettings() {
         .insert({
           user_id: SINGLE_USER_ID,
           account_balance: defaultRiskSettings.accountBalance,
+          crypto_account_balance: defaultRiskSettings.cryptoAccountBalance,
           max_risk_per_trade: defaultRiskSettings.maxRiskPerTrade,
           max_daily_risk: defaultRiskSettings.maxDailyRisk,
           max_open_trades: defaultRiskSettings.maxOpenTrades,
@@ -77,6 +81,7 @@ export function useRiskSettings() {
     const dbUpdates: Record<string, unknown> = {};
     
     if (settings.accountBalance !== undefined) dbUpdates.account_balance = settings.accountBalance;
+    if (settings.cryptoAccountBalance !== undefined) dbUpdates.crypto_account_balance = settings.cryptoAccountBalance;
     if (settings.maxRiskPerTrade !== undefined) dbUpdates.max_risk_per_trade = settings.maxRiskPerTrade;
     if (settings.maxDailyRisk !== undefined) dbUpdates.max_daily_risk = settings.maxDailyRisk;
     if (settings.maxOpenTrades !== undefined) dbUpdates.max_open_trades = settings.maxOpenTrades;
