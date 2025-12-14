@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { Trade, RiskSettings, Market, OverallStats, DailyStats } from '@/types/trade';
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
@@ -24,7 +24,7 @@ interface TradeContextType {
 
 const TradeContext = createContext<TradeContextType | undefined>(undefined);
 
-export function TradeProvider({ children }: { children: React.ReactNode }) {
+export function TradeProvider({ children }: { children: ReactNode }) {
   const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade, deleteTrade } = useTrades();
   const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings();
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
