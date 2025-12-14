@@ -140,8 +140,8 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
         ? closedTrades.reduce((sum, t) => sum + t.riskRewardRatio, 0) / closedTrades.length 
         : 0,
       totalPnL,
-      bestTrade: closedTrades.length > 0 ? Math.max(...closedTrades.map(t => t.result || 0)) : 0,
-      worstTrade: closedTrades.length > 0 ? Math.min(...closedTrades.map(t => t.result || 0)) : 0,
+      bestTrade: wins.length > 0 ? Math.max(...wins.map(t => t.result || 0)) : 0,
+      worstTrade: losses.length > 0 ? Math.min(...losses.map(t => t.result || 0)) : 0,
       consecutiveWins: maxConsecWins,
       consecutiveLosses: maxConsecLosses,
       profitFactor: grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0,
