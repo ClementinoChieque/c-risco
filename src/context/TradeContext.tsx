@@ -25,11 +25,19 @@ interface TradeContextType {
 const TradeContext = createContext<TradeContextType | undefined>(undefined);
 
 export function TradeProvider({ children }: { children: ReactNode }) {
-  const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade, deleteTrade } = useTrades();
+  const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade: closeTradeBase, deleteTrade } = useTrades();
   const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings();
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
 
   const loading = tradesLoading || settingsLoading;
+
+  // Close trade and update account balance based on result
+  const closeTrade = useCallback(async (id: string, result: number) => {
+    await closeTradeBase(id, result);
+    // Update account balance: add result (positive for win, negative for loss)
+    const newBalance = riskSettings.accountBalance + result;
+    await updateRiskSettings({ accountBalance: newBalance });
+  }, [closeTradeBase, riskSettings.accountBalance, updateRiskSettings]);
 
   const getTodayRiskUsed = useCallback(() => {
     const today = new Date().toDateString();
