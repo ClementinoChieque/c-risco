@@ -2,8 +2,6 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 import { Trade, RiskSettings, Market, OverallStats, DailyStats } from '@/types/trade';
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
-import { useAuth } from '@/hooks/useAuth';
-import { User } from '@supabase/supabase-js';
 
 interface TradeContextType {
   trades: Trade[];
@@ -12,7 +10,6 @@ interface TradeContextType {
   isBlocked: boolean;
   blockReason: string | null;
   loading: boolean;
-  user: User | null;
   addTrade: (trade: Omit<Trade, 'id' | 'createdAt'>) => Promise<boolean>;
   updateTrade: (id: string, updates: Partial<Trade>) => Promise<void>;
   closeTrade: (id: string, result: number) => Promise<void>;
@@ -23,18 +20,16 @@ interface TradeContextType {
   getDailyStats: (date: string) => DailyStats;
   getTodayRiskUsed: () => number;
   canOpenNewTrade: (riskAmount: number) => { allowed: boolean; reason?: string };
-  signOut: () => Promise<{ error: Error | null }>;
 }
 
 const TradeContext = createContext<TradeContextType | undefined>(undefined);
 
 export function TradeProvider({ children }: { children: React.ReactNode }) {
-  const { user, loading: authLoading, signOut } = useAuth();
-  const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade, deleteTrade } = useTrades(user);
-  const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings(user);
+  const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade, deleteTrade } = useTrades();
+  const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings();
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
 
-  const loading = authLoading || tradesLoading || settingsLoading;
+  const loading = tradesLoading || settingsLoading;
 
   const getTodayRiskUsed = useCallback(() => {
     const today = new Date().toDateString();
@@ -176,7 +171,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
         isBlocked,
         blockReason,
         loading,
-        user,
         addTrade,
         updateTrade,
         closeTrade,
@@ -187,7 +181,6 @@ export function TradeProvider({ children }: { children: React.ReactNode }) {
         getDailyStats,
         getTodayRiskUsed,
         canOpenNewTrade,
-        signOut,
       }}
     >
       {children}

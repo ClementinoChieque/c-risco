@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trade, Market } from '@/types/trade';
-import { User } from '@supabase/supabase-js';
+
+// Fixed user ID for single-user mode
+const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 interface DbTrade {
   id: string;
@@ -50,17 +52,11 @@ const mapDbToTrade = (dbTrade: DbTrade): Trade => ({
   closedAt: dbTrade.closed_at ? new Date(dbTrade.closed_at) : undefined,
 });
 
-export function useTrades(user: User | null) {
+export function useTrades() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchTrades = useCallback(async () => {
-    if (!user) {
-      setTrades([]);
-      setLoading(false);
-      return;
-    }
-
     const { data, error } = await supabase
       .from('trades')
       .select('*')
@@ -72,19 +68,17 @@ export function useTrades(user: User | null) {
       setTrades((data as DbTrade[]).map(mapDbToTrade));
     }
     setLoading(false);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     fetchTrades();
   }, [fetchTrades]);
 
   const addTrade = useCallback(async (tradeData: Omit<Trade, 'id' | 'createdAt'>): Promise<boolean> => {
-    if (!user) return false;
-
     const { data, error } = await supabase
       .from('trades')
       .insert({
-        user_id: user.id,
+        user_id: SINGLE_USER_ID,
         market: tradeData.market,
         pair: tradeData.pair,
         direction: tradeData.direction,
@@ -112,7 +106,7 @@ export function useTrades(user: User | null) {
 
     setTrades(prev => [mapDbToTrade(data as DbTrade), ...prev]);
     return true;
-  }, [user]);
+  }, []);
 
   const updateTrade = useCallback(async (id: string, updates: Partial<Trade>) => {
     const dbUpdates: Record<string, unknown> = {};
