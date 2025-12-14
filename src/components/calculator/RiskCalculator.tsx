@@ -23,6 +23,11 @@ export function RiskCalculator() {
   const [lotSize, setLotSize] = useState('0.01');
   const [notes, setNotes] = useState('');
 
+  // Get the correct balance based on market
+  const currentBalance = currentMarket === 'crypto' 
+    ? riskSettings.cryptoAccountBalance 
+    : riskSettings.accountBalance;
+
   const calculations = useMemo(() => {
     const entry = parseFloat(entryPrice) || 0;
     const sl = parseFloat(stopLoss) || 0;
@@ -31,7 +36,7 @@ export function RiskCalculator() {
 
     if (!entry || !sl) return null;
 
-    const riskAmount = (riskSettings.accountBalance * riskPct) / 100;
+    const riskAmount = (currentBalance * riskPct) / 100;
     const stopDistance = Math.abs(entry - sl);
     const profitDistance = tp ? Math.abs(tp - entry) : 0;
 
@@ -60,7 +65,7 @@ export function RiskCalculator() {
       stopDistance,
       profitDistance,
     };
-  }, [entryPrice, stopLoss, takeProfit, riskPercentage, leverage, lotSize, currentMarket, riskSettings.accountBalance, pair]);
+  }, [entryPrice, stopLoss, takeProfit, riskPercentage, leverage, lotSize, currentMarket, currentBalance, pair]);
 
   const handleSubmit = async () => {
     if (!pair || !entryPrice || !stopLoss) {
