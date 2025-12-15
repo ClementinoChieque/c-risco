@@ -1,9 +1,20 @@
 import { useTrade } from '@/context/TradeContext';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, AlertTriangle, DollarSign } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+const forexCurrencies = ['USD', 'EUR', 'GBP'];
 
 export function Header() {
   const { riskSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const [currencyIndex, setCurrencyIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrencyIndex((prev) => (prev + 1) % forexCurrencies.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
   const todayRisk = getTodayRiskUsed();
 
   return (
@@ -23,7 +34,7 @@ export function Header() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Forex:</span>
+            <span className="text-xs text-muted-foreground">Forex ({forexCurrencies[currencyIndex]}):</span>
             <span className="font-mono text-sm">
               ${riskSettings.accountBalance.toLocaleString()}
             </span>
