@@ -23,8 +23,17 @@ export function Header() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Forex:</span>
             <span className="font-mono text-sm">
               ${riskSettings.accountBalance.toLocaleString()}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Cripto:</span>
+            <span className="font-mono text-sm">
+              ${riskSettings.cryptoAccountBalance.toLocaleString()}
             </span>
           </div>
 
