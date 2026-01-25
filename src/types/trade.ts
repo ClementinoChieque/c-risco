@@ -1,4 +1,12 @@
-export type Market = 'forex' | 'crypto';
+export type Market = 'forex' | 'crypto' | 'propfirm';
+
+export interface PropFirmSettings {
+  name: string;
+  fundedBalance: number;
+  profitTarget: number;
+  dailyDrawdown: number;
+  maxDrawdown: number;
+}
 
 export type TradeDirection = 'long' | 'short';
 

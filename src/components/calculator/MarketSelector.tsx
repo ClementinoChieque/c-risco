@@ -1,11 +1,12 @@
 import { useTrade } from '@/context/TradeContext';
 import { Market } from '@/types/trade';
 import { cn } from '@/lib/utils';
-import { Coins, DollarSign } from 'lucide-react';
+import { Coins, DollarSign, Building2 } from 'lucide-react';
 
 const markets: { value: Market; label: string; icon: React.ElementType }[] = [
   { value: 'forex', label: 'Forex', icon: DollarSign },
   { value: 'crypto', label: 'Cripto', icon: Coins },
+  { value: 'propfirm', label: 'PropFirm', icon: Building2 },
 ];
 
 export function MarketSelector() {

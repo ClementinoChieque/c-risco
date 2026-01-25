@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useTrade } from '@/context/TradeContext';
 import { MarketSelector } from './MarketSelector';
+import { PropFirmSettings } from './PropFirmSettings';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { TradeDirection } from '@/types/trade';
+import { TradeDirection, PropFirmSettings as PropFirmSettingsType } from '@/types/trade';
 import { toast } from 'sonner';
 import { AlertTriangle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,10 +23,20 @@ export function RiskCalculator() {
   const [leverage, setLeverage] = useState('1');
   const [lotSize, setLotSize] = useState('0.01');
   const [notes, setNotes] = useState('');
-
+  
+  // PropFirm settings state
+  const [propFirmSettings, setPropFirmSettings] = useState<PropFirmSettingsType>({
+    name: '',
+    fundedBalance: 0,
+    profitTarget: 10,
+    dailyDrawdown: 5,
+    maxDrawdown: 10,
+  });
   // Get the correct balance based on market
   const currentBalance = currentMarket === 'crypto' 
     ? riskSettings.cryptoAccountBalance 
+    : currentMarket === 'propfirm'
+    ? propFirmSettings.fundedBalance
     : riskSettings.accountBalance;
 
   const calculations = useMemo(() => {
@@ -43,7 +54,7 @@ export function RiskCalculator() {
     let positionSize = 0;
     let potentialProfit = 0;
 
-    if (currentMarket === 'forex') {
+    if (currentMarket === 'forex' || currentMarket === 'propfirm') {
       const lot = parseFloat(lotSize) || 0.01;
       const pipValue = 10; // Standard pip value for 1 lot
       const pips = stopDistance * (pair?.includes('JPY') ? 100 : 10000);
@@ -115,6 +126,13 @@ export function RiskCalculator() {
   return (
     <div className="space-y-6">
       <MarketSelector />
+
+      {currentMarket === 'propfirm' && (
+        <PropFirmSettings 
+          settings={propFirmSettings} 
+          onSettingsChange={setPropFirmSettings} 
+        />
+      )}
 
       {isBlocked && (
         <div className="flex items-center gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/20 animate-pulse">
@@ -232,7 +250,7 @@ export function RiskCalculator() {
             </div>
           )}
 
-          {currentMarket === 'forex' && (
+          {(currentMarket === 'forex' || currentMarket === 'propfirm') && (
             <div className="space-y-2">
               <Label>Tamanho do Lote</Label>
               <Input
