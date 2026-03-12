@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Clock, AlertTriangle, Bell, Sun, Moon, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { SessionsChart } from './SessionsChart';
 
 interface SessionInfo {
   name: string;
@@ -212,6 +213,9 @@ export function TradingSessions() {
           </p>
         </div>
       )}
+
+      {/* Sessions Chart */}
+      <SessionsChart />
 
       {/* Sessions Grid */}
       <div className="space-y-3">
