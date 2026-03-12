@@ -128,10 +128,12 @@ export function RiskCalculator() {
       <MarketSelector />
 
       {currentMarket === 'propfirm' && (
-        <PropFirmSettings 
-          settings={propFirmSettings} 
-          onSettingsChange={setPropFirmSettings} 
-        />
+        <div className="border-b border-border/40 pb-6">
+          <PropFirmSettings 
+            settings={propFirmSettings} 
+            onSettingsChange={setPropFirmSettings} 
+          />
+        </div>
       )}
 
       {isBlocked && (
