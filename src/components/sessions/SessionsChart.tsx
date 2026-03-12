@@ -101,7 +101,7 @@ export function SessionsChart() {
 
     // Current hour marker line
     const currentHour = getWATHour();
-    const markerSeries = chart.addLineSeries({
+    const markerSeries = chart.addSeries(LineSeries, {
       color: 'hsl(185, 100%, 50%)',
       lineWidth: 2,
       lineStyle: 2,
