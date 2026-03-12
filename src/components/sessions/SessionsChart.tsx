@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { createChart, ColorType, IChartApi } from 'lightweight-charts';
+import { createChart, ColorType, IChartApi, HistogramSeries, LineSeries } from 'lightweight-charts';
 
 function getWATHour(): number {
   const now = new Date();
