@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import CalculatorPage from "./pages/CalculatorPage";
 import DiaryPage from "./pages/DiaryPage";
 import StatsPage from "./pages/StatsPage";
+import SessionsPage from "./pages/SessionsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/calculator" element={<CalculatorPage />} />
+            <Route path="/sessions" element={<SessionsPage />} />
             <Route path="/diary" element={<DiaryPage />} />
             <Route path="/stats" element={<StatsPage />} />
             <Route path="/settings" element={<SettingsPage />} />

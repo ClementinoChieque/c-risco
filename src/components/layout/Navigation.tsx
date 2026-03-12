@@ -1,9 +1,10 @@
 import { NavLink } from '@/components/NavLink';
-import { LayoutDashboard, Calculator, BookOpen, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, Calculator, BookOpen, BarChart3, Settings, Clock } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/calculator', icon: Calculator, label: 'Calculadora' },
+  { to: '/sessions', icon: Clock, label: 'Sessões' },
   { to: '/diary', icon: BookOpen, label: 'Diário' },
   { to: '/stats', icon: BarChart3, label: 'Estatísticas' },
   { to: '/settings', icon: Settings, label: 'Configurações' },
