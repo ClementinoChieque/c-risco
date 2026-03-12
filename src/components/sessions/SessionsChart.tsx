@@ -74,7 +74,7 @@ export function SessionsChart() {
 
     // Add session background markers using histogram series for each session
     sessionBlocks.forEach((session) => {
-      const series = chart.addHistogramSeries({
+      const series = chart.addSeries(HistogramSeries, {
         color: session.color,
         priceFormat: { type: 'volume' },
         priceScaleId: '',
