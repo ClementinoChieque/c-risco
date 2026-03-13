@@ -53,6 +53,33 @@ export type Database = {
         }
         Relationships: []
       }
+      trade_analyses: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          notes: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          notes?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          notes?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trades: {
         Row: {
           closed_at: string | null
