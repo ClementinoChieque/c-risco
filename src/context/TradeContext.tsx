@@ -31,15 +31,19 @@ export function TradeProvider({ children }: { children: ReactNode }) {
 
   const loading = tradesLoading || settingsLoading;
 
+  // Trades filtered by current market
+  const marketTrades = useMemo(() => trades.filter(t => t.market === currentMarket), [trades, currentMarket]);
+
   // Close trade and update account balance based on result and market
   const closeTrade = useCallback(async (id: string, result: number) => {
-    // Find the trade to get its market
     const trade = trades.find(t => t.id === id);
     if (!trade) return;
 
     await closeTradeBase(id, result);
     
-    // Update the correct balance based on market
+    // PropFirm trades don't affect forex/crypto balances
+    if (trade.market === 'propfirm') return;
+
     if (trade.market === 'crypto') {
       const newBalance = riskSettings.cryptoAccountBalance + result;
       await updateRiskSettings({ cryptoAccountBalance: newBalance });
@@ -51,21 +55,21 @@ export function TradeProvider({ children }: { children: ReactNode }) {
 
   const getTodayRiskUsed = useCallback(() => {
     const today = new Date().toDateString();
-    return trades
+    return marketTrades
       .filter(t => new Date(t.createdAt).toDateString() === today)
       .reduce((sum, t) => sum + t.riskPercentage, 0);
-  }, [trades]);
+  }, [marketTrades]);
 
   const getTodayPnL = useCallback(() => {
     const today = new Date().toDateString();
-    return trades
+    return marketTrades
       .filter(t => t.status === 'closed' && t.closedAt && new Date(t.closedAt).toDateString() === today)
       .reduce((sum, t) => sum + (t.result || 0), 0);
-  }, [trades]);
+  }, [marketTrades]);
 
   const getOpenTradesCount = useCallback(() => {
-    return trades.filter(t => t.status === 'open').length;
-  }, [trades]);
+    return marketTrades.filter(t => t.status === 'open').length;
+  }, [marketTrades]);
 
   const canOpenNewTrade = useCallback((riskAmount: number): { allowed: boolean; reason?: string } => {
     const riskPercentage = (riskAmount / riskSettings.accountBalance) * 100;
@@ -126,7 +130,7 @@ export function TradeProvider({ children }: { children: ReactNode }) {
   }, [riskSettings, getTodayPnL, getTodayRiskUsed]);
 
   const getOverallStats = useCallback((): OverallStats => {
-    const closedTrades = trades.filter(t => t.status === 'closed');
+    const closedTrades = marketTrades.filter(t => t.status === 'closed');
     const wins = closedTrades.filter(t => (t.result || 0) > 0);
     const losses = closedTrades.filter(t => (t.result || 0) < 0);
 
@@ -164,10 +168,10 @@ export function TradeProvider({ children }: { children: ReactNode }) {
       consecutiveLosses: maxConsecLosses,
       profitFactor: grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0,
     };
-  }, [trades]);
+  }, [marketTrades]);
 
   const getDailyStats = useCallback((date: string): DailyStats => {
-    const dayTrades = trades.filter(t => new Date(t.createdAt).toDateString() === date);
+    const dayTrades = marketTrades.filter(t => new Date(t.createdAt).toDateString() === date);
     const closedDayTrades = dayTrades.filter(t => t.status === 'closed');
 
     return {
@@ -178,12 +182,12 @@ export function TradeProvider({ children }: { children: ReactNode }) {
       totalPnL: closedDayTrades.reduce((sum, t) => sum + (t.result || 0), 0),
       riskUsed: dayTrades.reduce((sum, t) => sum + t.riskPercentage, 0),
     };
-  }, [trades]);
+  }, [marketTrades]);
 
   return (
     <TradeContext.Provider
       value={{
-        trades,
+        trades: marketTrades,
         riskSettings,
         currentMarket,
         isBlocked,
