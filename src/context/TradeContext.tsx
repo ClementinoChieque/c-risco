@@ -187,7 +187,7 @@ export function TradeProvider({ children }: { children: ReactNode }) {
   return (
     <TradeContext.Provider
       value={{
-        trades,
+        trades: marketTrades,
         riskSettings,
         currentMarket,
         isBlocked,
