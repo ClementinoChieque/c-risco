@@ -31,15 +31,19 @@ export function TradeProvider({ children }: { children: ReactNode }) {
 
   const loading = tradesLoading || settingsLoading;
 
+  // Trades filtered by current market
+  const marketTrades = useMemo(() => trades.filter(t => t.market === currentMarket), [trades, currentMarket]);
+
   // Close trade and update account balance based on result and market
   const closeTrade = useCallback(async (id: string, result: number) => {
-    // Find the trade to get its market
     const trade = trades.find(t => t.id === id);
     if (!trade) return;
 
     await closeTradeBase(id, result);
     
-    // Update the correct balance based on market
+    // PropFirm trades don't affect forex/crypto balances
+    if (trade.market === 'propfirm') return;
+
     if (trade.market === 'crypto') {
       const newBalance = riskSettings.cryptoAccountBalance + result;
       await updateRiskSettings({ cryptoAccountBalance: newBalance });
