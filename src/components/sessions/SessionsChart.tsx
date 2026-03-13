@@ -99,20 +99,18 @@ export function SessionsChart() {
       series.setData(data);
     });
 
-    // Current hour marker line
-    const currentHour = getWATHour();
-    const markerSeries = chart.addSeries(LineSeries, {
+    // Current hour marker - use a histogram bar with distinct color
+    const currentHour = Math.floor(getWATHour());
+    const markerSeries = chart.addSeries(HistogramSeries, {
       color: 'hsl(185, 100%, 50%)',
-      lineWidth: 2,
-      lineStyle: 2,
+      priceFormat: { type: 'volume' },
+      priceScaleId: '',
       lastValueVisible: false,
       priceLineVisible: false,
-      crosshairMarkerVisible: false,
     });
 
     markerSeries.setData([
-      { time: Math.floor(currentHour) as any, value: 0 },
-      { time: Math.floor(currentHour) as any, value: 100 },
+      { time: currentHour as any, value: 100, color: 'rgba(0, 230, 230, 0.4)' },
     ]);
 
     chart.timeScale().fitContent();
