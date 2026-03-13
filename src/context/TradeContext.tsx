@@ -130,7 +130,7 @@ export function TradeProvider({ children }: { children: ReactNode }) {
   }, [riskSettings, getTodayPnL, getTodayRiskUsed]);
 
   const getOverallStats = useCallback((): OverallStats => {
-    const closedTrades = trades.filter(t => t.status === 'closed');
+    const closedTrades = marketTrades.filter(t => t.status === 'closed');
     const wins = closedTrades.filter(t => (t.result || 0) > 0);
     const losses = closedTrades.filter(t => (t.result || 0) < 0);
 
@@ -168,10 +168,10 @@ export function TradeProvider({ children }: { children: ReactNode }) {
       consecutiveLosses: maxConsecLosses,
       profitFactor: grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0,
     };
-  }, [trades]);
+  }, [marketTrades]);
 
   const getDailyStats = useCallback((date: string): DailyStats => {
-    const dayTrades = trades.filter(t => new Date(t.createdAt).toDateString() === date);
+    const dayTrades = marketTrades.filter(t => new Date(t.createdAt).toDateString() === date);
     const closedDayTrades = dayTrades.filter(t => t.status === 'closed');
 
     return {
@@ -182,7 +182,7 @@ export function TradeProvider({ children }: { children: ReactNode }) {
       totalPnL: closedDayTrades.reduce((sum, t) => sum + (t.result || 0), 0),
       riskUsed: dayTrades.reduce((sum, t) => sum + t.riskPercentage, 0),
     };
-  }, [trades]);
+  }, [marketTrades]);
 
   return (
     <TradeContext.Provider
