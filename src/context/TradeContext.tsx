@@ -55,21 +55,21 @@ export function TradeProvider({ children }: { children: ReactNode }) {
 
   const getTodayRiskUsed = useCallback(() => {
     const today = new Date().toDateString();
-    return trades
+    return marketTrades
       .filter(t => new Date(t.createdAt).toDateString() === today)
       .reduce((sum, t) => sum + t.riskPercentage, 0);
-  }, [trades]);
+  }, [marketTrades]);
 
   const getTodayPnL = useCallback(() => {
     const today = new Date().toDateString();
-    return trades
+    return marketTrades
       .filter(t => t.status === 'closed' && t.closedAt && new Date(t.closedAt).toDateString() === today)
       .reduce((sum, t) => sum + (t.result || 0), 0);
-  }, [trades]);
+  }, [marketTrades]);
 
   const getOpenTradesCount = useCallback(() => {
-    return trades.filter(t => t.status === 'open').length;
-  }, [trades]);
+    return marketTrades.filter(t => t.status === 'open').length;
+  }, [marketTrades]);
 
   const canOpenNewTrade = useCallback((riskAmount: number): { allowed: boolean; reason?: string } => {
     const riskPercentage = (riskAmount / riskSettings.accountBalance) * 100;
