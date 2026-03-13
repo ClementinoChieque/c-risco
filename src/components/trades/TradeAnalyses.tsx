@@ -124,6 +124,8 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   const [items, setItems] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editNotes, setEditNotes] = useState('');
 
   const fetchItems = async () => {
     setLoading(true);
@@ -152,6 +154,26 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
     await supabase.from('trade_analyses').delete().eq('id', item.id);
     toast.success('Análise removida');
     fetchItems();
+  };
+
+  const handleEditStart = (item: TradeAnalysis) => {
+    setEditingId(item.id);
+    setEditNotes(item.notes || '');
+  };
+
+  const handleEditSave = async (id: string) => {
+    const { error } = await supabase
+      .from('trade_analyses')
+      .update({ notes: editNotes || null })
+      .eq('id', id);
+
+    if (error) {
+      toast.error('Erro ao guardar notas');
+    } else {
+      toast.success('Notas atualizadas!');
+      setEditingId(null);
+      fetchItems();
+    }
   };
 
   if (loading) {
@@ -202,11 +224,32 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-            {item.notes && (
-              <CardContent className="pt-3 pb-3">
-                <p className="text-sm text-muted-foreground">{item.notes}</p>
-              </CardContent>
-            )}
+            <CardContent className="pt-3 pb-3 space-y-2">
+              {editingId === item.id ? (
+                <div className="space-y-2">
+                  <Textarea
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    rows={3}
+                    placeholder="Descreva o que aprendeu..."
+                  />
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => handleEditSave(item.id)}>Guardar</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                      <X className="h-3 w-3 mr-1" /> Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p
+                  className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors min-h-[1.5rem]"
+                  onClick={() => handleEditStart(item)}
+                  title="Clique para editar"
+                >
+                  {item.notes || 'Clique para adicionar notas...'}
+                </p>
+              )}
+            </CardContent>
             <div className="px-6 pb-3">
               <p className="text-xs text-muted-foreground">
                 {new Date(item.created_at).toLocaleDateString('pt-AO')}
