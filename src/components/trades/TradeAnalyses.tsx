@@ -123,6 +123,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   const [items, setItems] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const fetchItems = async () => {
     setLoading(true);
