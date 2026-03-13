@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -122,6 +123,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   const [items, setItems] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -166,38 +168,54 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {items.map((item) => (
-        <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
-          <div className="relative">
+    <>
+      <Dialog open={!!lightboxUrl} onOpenChange={() => setLightboxUrl(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
+          <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
+          {lightboxUrl && (
             <img
-              src={item.image_url}
-              alt={`Análise ${type}`}
-              className="w-full h-48 object-cover"
-              loading="lazy"
+              src={lightboxUrl}
+              alt="Análise ampliada"
+              className="w-full h-full max-h-[85vh] object-contain rounded-md"
             />
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
-              onClick={() => handleDelete(item)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-          {item.notes && (
-            <CardContent className="pt-3 pb-3">
-              <p className="text-sm text-muted-foreground">{item.notes}</p>
-            </CardContent>
           )}
-          <div className="px-6 pb-3">
-            <p className="text-xs text-muted-foreground">
-              {new Date(item.created_at).toLocaleDateString('pt-AO')}
-            </p>
-          </div>
-        </Card>
-      ))}
-    </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {items.map((item) => (
+          <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
+            <div className="relative">
+              <img
+                src={item.image_url}
+                alt={`Análise ${type}`}
+                className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                loading="lazy"
+                onClick={() => setLightboxUrl(item.image_url)}
+              />
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                onClick={() => handleDelete(item)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            {item.notes && (
+              <CardContent className="pt-3 pb-3">
+                <p className="text-sm text-muted-foreground">{item.notes}</p>
+              </CardContent>
+            )}
+            <div className="px-6 pb-3">
+              <p className="text-xs text-muted-foreground">
+                {new Date(item.created_at).toLocaleDateString('pt-AO')}
+              </p>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </>
   );
 }
 
