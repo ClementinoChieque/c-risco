@@ -246,11 +246,15 @@ export function TradingSessions() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm">{session.name}</p>
-                      {isActive && (
+                      {isWeekend ? (
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
+                          Fechado
+                        </span>
+                      ) : isActive ? (
                         <span className="text-[10px] uppercase tracking-wider font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                           Ativa
                         </span>
-                      )}
+                      ) : null}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>
                   </div>
