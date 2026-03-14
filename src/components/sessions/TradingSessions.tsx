@@ -259,9 +259,24 @@ export function TradingSessions() {
                     <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>
                   </div>
                 </div>
-                <p className="font-mono text-xs text-muted-foreground">
-                  {String(session.startHour).padStart(2, '0')}:00 – {String(session.endHour).padStart(2, '0')}:00
-                </p>
+                <div className="text-right">
+                  <p className="font-mono text-xs text-muted-foreground">
+                    {String(session.startHour).padStart(2, '0')}:00 – {String(session.endHour).padStart(2, '0')}:00
+                  </p>
+                  {!isActive && !isWeekend && (() => {
+                    const nowMin = currentHour * 60 + currentMinute;
+                    const startMin = session.startHour * 60;
+                    let diff = startMin - nowMin;
+                    if (diff <= 0) diff += 1440;
+                    const h = Math.floor(diff / 60);
+                    const m = diff % 60;
+                    return (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        abre em {h}h {m}min
+                      </p>
+                    );
+                  })()}
+                </div>
               </div>
               <div className="flex gap-2 mt-3 flex-wrap">
                 {session.pairs.map((pair) => (
