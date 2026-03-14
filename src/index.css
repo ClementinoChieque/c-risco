@@ -108,7 +108,7 @@
   }
 
   .stat-value {
-    @apply font-mono text-2xl font-bold tracking-tight;
+    @apply font-mono text-lg md:text-2xl font-bold tracking-tight;
   }
 
   .stat-label {
