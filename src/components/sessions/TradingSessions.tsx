@@ -263,9 +263,26 @@ export function TradingSessions() {
                   <p className="font-mono text-xs text-muted-foreground">
                     {String(session.startHour).padStart(2, '0')}:00 – {String(session.endHour).padStart(2, '0')}:00
                   </p>
-                  {!isActive && !isWeekend && (() => {
+                  {!isActive && (() => {
+                    const now = watTime;
                     const nowMin = currentHour * 60 + currentMinute;
                     const startMin = session.startHour * 60;
+
+                    if (isWeekend) {
+                      // Calculate hours until Monday 00:00 + session start
+                      const dow = now.getDay(); // 0=Sun, 6=Sat
+                      let daysUntilMonday = dow === 6 ? 2 : 1; // Sat→2, Sun→1
+                      const minutesUntilMidnight = 1440 - nowMin;
+                      const totalMin = minutesUntilMidnight + (daysUntilMonday - 1) * 1440 + startMin;
+                      const h = Math.floor(totalMin / 60);
+                      const m = totalMin % 60;
+                      return (
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          abre Seg em {h}h {m}min
+                        </p>
+                      );
+                    }
+
                     let diff = startMin - nowMin;
                     if (diff <= 0) diff += 1440;
                     const h = Math.floor(diff / 60);
