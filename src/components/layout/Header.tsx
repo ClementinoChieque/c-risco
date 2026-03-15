@@ -75,6 +75,15 @@ export function Header() {
             </span>
           </div>
 
+          {propFirmSettings.fundedBalance > 0 && (
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="text-[10px] text-muted-foreground">PF:</span>
+              <span className="font-mono text-xs">
+                ${propFirmSettings.fundedBalance.toLocaleString()}
+              </span>
+            </div>
+          )}
+
           <Badge 
             variant={todayRisk > riskSettings.maxDailyRisk * 0.8 ? "destructive" : "secondary"}
             className="font-mono text-[10px] shrink-0"

@@ -24,14 +24,6 @@ export function RiskCalculator() {
   const [lotSize, setLotSize] = useState('0.01');
   const [notes, setNotes] = useState('');
   
-  // PropFirm settings state
-  const [propFirmSettings, setPropFirmSettings] = useState<PropFirmSettingsType>({
-    name: '',
-    fundedBalance: 0,
-    profitTarget: 10,
-    dailyDrawdown: 5,
-    maxDrawdown: 10,
-  });
   // Get the correct balance based on market
   const currentBalance = currentMarket === 'crypto' 
     ? riskSettings.cryptoAccountBalance 
