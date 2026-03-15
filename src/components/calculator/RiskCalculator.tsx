@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { TradeDirection, PropFirmSettings as PropFirmSettingsType } from '@/types/trade';
+import { TradeDirection } from '@/types/trade';
 import { toast } from 'sonner';
 import { AlertTriangle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function RiskCalculator() {
-  const { currentMarket, riskSettings, addTrade, canOpenNewTrade, isBlocked, blockReason } = useTrade();
+  const { currentMarket, riskSettings, propFirmSettings, updatePropFirmSettings, addTrade, canOpenNewTrade, isBlocked, blockReason } = useTrade();
 
   const [pair, setPair] = useState('');
   const [direction, setDirection] = useState<TradeDirection>('long');
@@ -24,14 +24,6 @@ export function RiskCalculator() {
   const [lotSize, setLotSize] = useState('0.01');
   const [notes, setNotes] = useState('');
   
-  // PropFirm settings state
-  const [propFirmSettings, setPropFirmSettings] = useState<PropFirmSettingsType>({
-    name: '',
-    fundedBalance: 0,
-    profitTarget: 10,
-    dailyDrawdown: 5,
-    maxDrawdown: 10,
-  });
   // Get the correct balance based on market
   const currentBalance = currentMarket === 'crypto' 
     ? riskSettings.cryptoAccountBalance 
@@ -131,7 +123,7 @@ export function RiskCalculator() {
         <div className="border-b border-border/40 pb-6">
           <PropFirmSettings 
             settings={propFirmSettings} 
-            onSettingsChange={setPropFirmSettings} 
+            onSettingsChange={updatePropFirmSettings} 
           />
         </div>
       )}

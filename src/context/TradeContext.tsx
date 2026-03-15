@@ -1,7 +1,24 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
-import { Trade, RiskSettings, Market, OverallStats, DailyStats } from '@/types/trade';
+import { Trade, RiskSettings, Market, OverallStats, DailyStats, PropFirmSettings } from '@/types/trade';
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
+
+const defaultPropFirmSettings: PropFirmSettings = {
+  name: '',
+  fundedBalance: 0,
+  profitTarget: 10,
+  dailyDrawdown: 5,
+  maxDrawdown: 10,
+};
+
+function loadPropFirmSettings(): PropFirmSettings {
+  try {
+    const saved = localStorage.getItem('propFirmSettings');
+    return saved ? JSON.parse(saved) : defaultPropFirmSettings;
+  } catch {
+    return defaultPropFirmSettings;
+  }
+}
 
 interface TradeContextType {
   trades: Trade[];
@@ -10,11 +27,13 @@ interface TradeContextType {
   isBlocked: boolean;
   blockReason: string | null;
   loading: boolean;
+  propFirmSettings: PropFirmSettings;
   addTrade: (trade: Omit<Trade, 'id' | 'createdAt'>) => Promise<boolean>;
   updateTrade: (id: string, updates: Partial<Trade>) => Promise<void>;
   closeTrade: (id: string, result: number) => Promise<void>;
   deleteTrade: (id: string) => Promise<void>;
   updateRiskSettings: (settings: Partial<RiskSettings>) => Promise<void>;
+  updatePropFirmSettings: (settings: PropFirmSettings) => void;
   setCurrentMarket: (market: Market) => void;
   getOverallStats: () => OverallStats;
   getDailyStats: (date: string) => DailyStats;
@@ -28,6 +47,12 @@ export function TradeProvider({ children }: { children: ReactNode }) {
   const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade: closeTradeBase, deleteTrade } = useTrades();
   const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings();
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
+  const [propFirmSettings, setPropFirmSettings] = useState<PropFirmSettings>(loadPropFirmSettings);
+
+  const updatePropFirmSettings = useCallback((settings: PropFirmSettings) => {
+    setPropFirmSettings(settings);
+    localStorage.setItem('propFirmSettings', JSON.stringify(settings));
+  }, []);
 
   const loading = tradesLoading || settingsLoading;
 
@@ -193,11 +218,13 @@ export function TradeProvider({ children }: { children: ReactNode }) {
         isBlocked,
         blockReason,
         loading,
+        propFirmSettings,
         addTrade,
         updateTrade,
         closeTrade,
         deleteTrade,
         updateRiskSettings,
+        updatePropFirmSettings,
         setCurrentMarket,
         getOverallStats,
         getDailyStats,

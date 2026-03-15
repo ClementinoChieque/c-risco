@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, AlertTriangle, DollarSign } from 'lucide-react';
 
 export function Header() {
-  const { riskSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
   const todayRisk = getTodayRiskUsed();
 
   return (
@@ -38,6 +38,16 @@ export function Header() {
             </span>
           </div>
 
+          {propFirmSettings.fundedBalance > 0 && (
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">PropFirm:</span>
+              <span className="font-mono text-sm">
+                ${propFirmSettings.fundedBalance.toLocaleString()}
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Risco Diário:</span>
             <Badge 
@@ -64,6 +74,15 @@ export function Header() {
               ${riskSettings.accountBalance.toLocaleString()}
             </span>
           </div>
+
+          {propFirmSettings.fundedBalance > 0 && (
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="text-[10px] text-muted-foreground">PF:</span>
+              <span className="font-mono text-xs">
+                ${propFirmSettings.fundedBalance.toLocaleString()}
+              </span>
+            </div>
+          )}
 
           <Badge 
             variant={todayRisk > riskSettings.maxDailyRisk * 0.8 ? "destructive" : "secondary"}
