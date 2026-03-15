@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, AlertTriangle, DollarSign } from 'lucide-react';
 
 export function Header() {
-  const { riskSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
   const todayRisk = getTodayRiskUsed();
 
   return (
