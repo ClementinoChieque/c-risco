@@ -38,6 +38,16 @@ export function Header() {
             </span>
           </div>
 
+          {propFirmSettings.fundedBalance > 0 && (
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">PropFirm:</span>
+              <span className="font-mono text-sm">
+                ${propFirmSettings.fundedBalance.toLocaleString()}
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Risco Diário:</span>
             <Badge 
