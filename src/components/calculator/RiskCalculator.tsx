@@ -123,7 +123,7 @@ export function RiskCalculator() {
         <div className="border-b border-border/40 pb-6">
           <PropFirmSettings 
             settings={propFirmSettings} 
-            onSettingsChange={setPropFirmSettings} 
+            onSettingsChange={updatePropFirmSettings} 
           />
         </div>
       )}
