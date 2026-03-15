@@ -11,34 +11,94 @@ interface SessionInfo {
   icon: React.ElementType;
   pairs: string[];
   description: string;
+  dst?: boolean;
 }
 
-const sessions: SessionInfo[] = [
-  {
-    name: 'Tóquio / Ásia',
-    startHour: 0,
-    endHour: 8,
-    icon: Moon,
-    pairs: ['USD/JPY', 'AUD/USD', 'NZD/USD'],
-    description: 'Sessão mais calma, bom para ranges.',
-  },
-  {
-    name: 'Londres / Europa',
-    startHour: 8,
-    endHour: 17,
-    icon: Sun,
-    pairs: ['EUR/USD', 'GBP/USD', 'XAU/USD'],
-    description: 'Alta liquidez e volatilidade.',
-  },
-  {
-    name: 'Nova Iorque / América',
-    startHour: 13,
-    endHour: 22,
-    icon: Activity,
-    pairs: ['NAS100', 'US30', 'USD/CAD'],
-    description: 'Overlap com Londres gera volume máximo.',
-  },
-];
+/**
+ * Returns the UTC offset in hours for a given IANA timezone right now.
+ * e.g. "Europe/London" → 0 in winter, 1 in summer.
+ */
+function getTimezoneOffsetHours(tz: string): number {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hour: 'numeric',
+    hour12: false,
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
+  const parts = formatter.formatToParts(now);
+  const localHour = Number(parts.find(p => p.type === 'hour')?.value ?? 0);
+  const localDay = Number(parts.find(p => p.type === 'day')?.value ?? 0);
+
+  const utcFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    hour: 'numeric',
+    hour12: false,
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
+  const utcParts = utcFormatter.formatToParts(now);
+  const utcHour = Number(utcParts.find(p => p.type === 'hour')?.value ?? 0);
+  const utcDay = Number(utcParts.find(p => p.type === 'day')?.value ?? 0);
+
+  let diff = localHour - utcHour + (localDay - utcDay) * 24;
+  if (diff > 12) diff -= 24;
+  if (diff < -12) diff += 24;
+  return diff;
+}
+
+function isDST(tz: string, standardOffset: number): boolean {
+  return getTimezoneOffsetHours(tz) !== standardOffset;
+}
+
+function getSessions(): SessionInfo[] {
+  // WAT = UTC+1 (never changes)
+  // London local session: 08:00-17:00 local time
+  //   Winter (GMT, UTC+0): WAT = local + 1 → 09:00-18:00 WAT ... but traditional forex = 08-17 WAT
+  //   We define base hours in WAT for winter, then shift -1h when DST is active
+  // NY local session: 08:00-17:00 local time
+  //   Winter (EST, UTC-5): in WAT = local + 6 → 14:00-23:00 ... traditional = 13-22 WAT
+  //   Same: shift -1h when DST active
+
+  const londonDST = isDST('Europe/London', 0);
+  const nyDST = isDST('America/New_York', -5);
+
+  return [
+    {
+      name: 'Tóquio / Ásia',
+      startHour: 0,
+      endHour: 8,
+      icon: Moon,
+      pairs: ['USD/JPY', 'AUD/USD', 'NZD/USD'],
+      description: 'Sessão mais calma, bom para ranges.',
+    },
+    {
+      name: 'Londres / Europa',
+      startHour: londonDST ? 7 : 8,
+      endHour: londonDST ? 16 : 17,
+      icon: Sun,
+      pairs: ['EUR/USD', 'GBP/USD', 'XAU/USD'],
+      description: londonDST
+        ? 'Alta liquidez e volatilidade. (Horário de verão ativo)'
+        : 'Alta liquidez e volatilidade.',
+      dst: londonDST,
+    },
+    {
+      name: 'Nova Iorque / América',
+      startHour: nyDST ? 12 : 13,
+      endHour: nyDST ? 21 : 22,
+      icon: Activity,
+      pairs: ['NAS100', 'US30', 'USD/CAD'],
+      description: nyDST
+        ? 'Overlap com Londres gera volume máximo. (Horário de verão ativo)'
+        : 'Overlap com Londres gera volume máximo.',
+      dst: nyDST,
+    },
+  ];
+}
 
 interface ScheduledAlert {
   hour: number;
@@ -143,6 +203,8 @@ export function TradingSessions() {
   const isFridayEvening = dayOfWeek === 5 && currentHour >= 17;
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
+  const sessions = useMemo(() => getSessions(), []);
+
   const activeSessions = useMemo(() => {
     return sessions.filter((s) => {
       if (s.startHour < s.endHour) {
@@ -150,7 +212,7 @@ export function TradingSessions() {
       }
       return currentHour >= s.startHour || currentHour < s.endHour;
     });
-  }, [currentHour]);
+  }, [currentHour, sessions]);
 
   const nextAlert = useMemo(() => {
     const nowMinutes = currentHour * 60 + currentMinute;
