@@ -8,6 +8,26 @@ function getWATHour(): number {
   return wat.getHours() + wat.getMinutes() / 60;
 }
 
+function getTimezoneOffsetHours(tz: string): number {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hour: 'numeric', hour12: false, day: 'numeric', month: 'numeric', year: 'numeric',
+  });
+  const parts = formatter.formatToParts(now);
+  const localHour = Number(parts.find(p => p.type === 'hour')?.value ?? 0);
+  const localDay = Number(parts.find(p => p.type === 'day')?.value ?? 0);
+  const utcFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC', hour: 'numeric', hour12: false, day: 'numeric', month: 'numeric', year: 'numeric',
+  });
+  const utcParts = utcFormatter.formatToParts(now);
+  const utcHour = Number(utcParts.find(p => p.type === 'hour')?.value ?? 0);
+  const utcDay = Number(utcParts.find(p => p.type === 'day')?.value ?? 0);
+  let diff = localHour - utcHour + (localDay - utcDay) * 24;
+  if (diff > 12) diff -= 24;
+  if (diff < -12) diff += 24;
+  return diff;
+}
+
 interface SessionBlock {
   name: string;
   start: number;
@@ -16,11 +36,23 @@ interface SessionBlock {
   opacity: number;
 }
 
-const sessionBlocks: SessionBlock[] = [
-  { name: 'Londres', start: 8, end: 17, color: '#0ea5e9', opacity: 0.25 },
-  { name: 'Nova Iorque', start: 13, end: 22, color: '#a855f7', opacity: 0.25 },
-  { name: 'Overlap', start: 13, end: 17, color: '#22c55e', opacity: 0.35 },
-];
+function getSessionBlocks(): SessionBlock[] {
+  const londonDST = getTimezoneOffsetHours('Europe/London') !== 0;
+  const nyDST = getTimezoneOffsetHours('America/New_York') !== -5;
+
+  const londonStart = londonDST ? 7 : 8;
+  const londonEnd = londonDST ? 16 : 17;
+  const nyStart = nyDST ? 12 : 13;
+  const nyEnd = nyDST ? 21 : 22;
+  const overlapStart = Math.max(londonStart, nyStart);
+  const overlapEnd = Math.min(londonEnd, nyEnd);
+
+  return [
+    { name: 'Londres', start: londonStart, end: londonEnd, color: '#0ea5e9', opacity: 0.25 },
+    { name: 'Nova Iorque', start: nyStart, end: nyEnd, color: '#a855f7', opacity: 0.25 },
+    { name: 'Overlap', start: overlapStart, end: overlapEnd, color: '#22c55e', opacity: 0.35 },
+  ];
+}
 
 // Simulated volume profile per hour (0-23) representing typical activity
 const hourlyVolume: number[] = [
