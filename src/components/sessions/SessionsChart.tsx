@@ -105,6 +105,7 @@ export function SessionsChart() {
     chartRef.current = chart;
 
     // Add session background markers using histogram series for each session
+    const sessionBlocks = getSessionBlocks();
     sessionBlocks.forEach((session) => {
       const series = chart.addSeries(HistogramSeries, {
         color: session.color,
