@@ -3,6 +3,23 @@ import { Trade, RiskSettings, Market, OverallStats, DailyStats, PropFirmSettings
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
 
+const defaultPropFirmSettings: PropFirmSettings = {
+  name: '',
+  fundedBalance: 0,
+  profitTarget: 10,
+  dailyDrawdown: 5,
+  maxDrawdown: 10,
+};
+
+function loadPropFirmSettings(): PropFirmSettings {
+  try {
+    const saved = localStorage.getItem('propFirmSettings');
+    return saved ? JSON.parse(saved) : defaultPropFirmSettings;
+  } catch {
+    return defaultPropFirmSettings;
+  }
+}
+
 interface TradeContextType {
   trades: Trade[];
   riskSettings: RiskSettings;
@@ -10,11 +27,13 @@ interface TradeContextType {
   isBlocked: boolean;
   blockReason: string | null;
   loading: boolean;
+  propFirmSettings: PropFirmSettings;
   addTrade: (trade: Omit<Trade, 'id' | 'createdAt'>) => Promise<boolean>;
   updateTrade: (id: string, updates: Partial<Trade>) => Promise<void>;
   closeTrade: (id: string, result: number) => Promise<void>;
   deleteTrade: (id: string) => Promise<void>;
   updateRiskSettings: (settings: Partial<RiskSettings>) => Promise<void>;
+  updatePropFirmSettings: (settings: PropFirmSettings) => void;
   setCurrentMarket: (market: Market) => void;
   getOverallStats: () => OverallStats;
   getDailyStats: (date: string) => DailyStats;
