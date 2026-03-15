@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
-import { Trade, RiskSettings, Market, OverallStats, DailyStats } from '@/types/trade';
+import { Trade, RiskSettings, Market, OverallStats, DailyStats, PropFirmSettings } from '@/types/trade';
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
 
