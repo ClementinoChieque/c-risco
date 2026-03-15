@@ -12,7 +12,7 @@ import { AlertTriangle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function RiskCalculator() {
-  const { currentMarket, riskSettings, addTrade, canOpenNewTrade, isBlocked, blockReason } = useTrade();
+  const { currentMarket, riskSettings, propFirmSettings, updatePropFirmSettings, addTrade, canOpenNewTrade, isBlocked, blockReason } = useTrade();
 
   const [pair, setPair] = useState('');
   const [direction, setDirection] = useState<TradeDirection>('long');
