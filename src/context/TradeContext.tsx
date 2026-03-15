@@ -47,6 +47,12 @@ export function TradeProvider({ children }: { children: ReactNode }) {
   const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade: closeTradeBase, deleteTrade } = useTrades();
   const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings();
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
+  const [propFirmSettings, setPropFirmSettings] = useState<PropFirmSettings>(loadPropFirmSettings);
+
+  const updatePropFirmSettings = useCallback((settings: PropFirmSettings) => {
+    setPropFirmSettings(settings);
+    localStorage.setItem('propFirmSettings', JSON.stringify(settings));
+  }, []);
 
   const loading = tradesLoading || settingsLoading;
 
