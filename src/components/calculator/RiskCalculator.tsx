@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { TradeDirection, PropFirmSettings as PropFirmSettingsType } from '@/types/trade';
+import { TradeDirection } from '@/types/trade';
 import { toast } from 'sonner';
 import { AlertTriangle, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
