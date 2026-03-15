@@ -203,6 +203,8 @@ export function TradingSessions() {
   const isFridayEvening = dayOfWeek === 5 && currentHour >= 17;
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
+  const sessions = useMemo(() => getSessions(), []);
+
   const activeSessions = useMemo(() => {
     return sessions.filter((s) => {
       if (s.startHour < s.endHour) {
@@ -210,7 +212,7 @@ export function TradingSessions() {
       }
       return currentHour >= s.startHour || currentHour < s.endHour;
     });
-  }, [currentHour]);
+  }, [currentHour, sessions]);
 
   const nextAlert = useMemo(() => {
     const nowMinutes = currentHour * 60 + currentMinute;
