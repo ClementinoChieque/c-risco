@@ -67,18 +67,25 @@ export function Header() {
         </div>
 
         {/* Mobile: compact info */}
-        <div className="flex md:hidden items-center gap-3 overflow-x-auto">
+        <div className="flex md:hidden flex-wrap items-center justify-end gap-x-3 gap-y-1">
           <div className="flex items-center gap-1 shrink-0">
-            <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="font-mono text-xs">
+            <span className="text-[10px] text-muted-foreground">FX:</span>
+            <span className="font-mono text-[11px]">
               ${riskSettings.accountBalance.toLocaleString()}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="text-[10px] text-muted-foreground">CR:</span>
+            <span className="font-mono text-[11px]">
+              ${riskSettings.cryptoAccountBalance.toLocaleString()}
             </span>
           </div>
 
           {propFirmSettings.fundedBalance > 0 && (
             <div className="flex items-center gap-1 shrink-0">
               <span className="text-[10px] text-muted-foreground">PF:</span>
-              <span className="font-mono text-xs">
+              <span className="font-mono text-[11px]">
                 ${propFirmSettings.fundedBalance.toLocaleString()}
               </span>
             </div>
@@ -88,7 +95,7 @@ export function Header() {
             variant={todayRisk > riskSettings.maxDailyRisk * 0.8 ? "destructive" : "secondary"}
             className="font-mono text-[10px] shrink-0"
           >
-            {todayRisk.toFixed(1)}%
+            {todayRisk.toFixed(1)}% / {riskSettings.maxDailyRisk}%
           </Badge>
 
           {isBlocked && (
