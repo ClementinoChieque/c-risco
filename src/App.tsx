@@ -10,7 +10,7 @@ import DiaryPage from "./pages/DiaryPage";
 import StatsPage from "./pages/StatsPage";
 import SessionsPage from "./pages/SessionsPage";
 import TradesPage from "./pages/TradesPage";
-import SettingsPage from "./pages/SettingsPage";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,7 +29,7 @@ const App = () => (
             <Route path="/trades" element={<TradesPage />} />
             <Route path="/diary" element={<DiaryPage />} />
             <Route path="/stats" element={<StatsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
