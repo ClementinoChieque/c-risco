@@ -55,7 +55,35 @@ export default function CalculatorPage() {
               onChange={(e) => handleChange('cryptoAccountBalance', parseFloat(e.target.value) || 0)}
               className="font-mono"
             />
+        </div>
+
+        <div className="glass-card rounded-xl p-4 animate-fade-in">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-lg bg-destructive/10">
+              <Shield className="h-4 w-4 text-destructive" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm">Risco Diário Máximo</h3>
+              <p className="text-xs text-muted-foreground">Limite de risco total por dia</p>
+            </div>
           </div>
+          <div className="space-y-3">
+            <Slider
+              value={[riskSettings.maxDailyRisk]}
+              onValueChange={([value]) => handleChange('maxDailyRisk', value)}
+              min={1}
+              max={20}
+              step={1}
+            />
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">1%</span>
+              <span className="font-mono text-lg font-bold text-destructive">
+                {riskSettings.maxDailyRisk}%
+              </span>
+              <span className="text-muted-foreground">20%</span>
+            </div>
+          </div>
+        </div>
         </div>
 
         <RiskCalculator />
