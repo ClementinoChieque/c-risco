@@ -1,3 +1,4 @@
+import { useState, useRef, useCallback } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { RiskCalculator } from '@/components/calculator/RiskCalculator';
 import { useTrade } from '@/context/TradeContext';
@@ -8,11 +9,23 @@ import { toast } from 'sonner';
 
 export default function CalculatorPage() {
   const { riskSettings, updateRiskSettings } = useTrade();
+  const [localDailyRisk, setLocalDailyRisk] = useState<number | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handleChange = async (key: keyof typeof riskSettings, value: number) => {
     await updateRiskSettings({ [key]: value });
     toast.success('Saldo atualizado');
   };
+
+  const handleDailyRiskChange = useCallback(([value]: number[]) => {
+    setLocalDailyRisk(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      await updateRiskSettings({ maxDailyRisk: value });
+      setLocalDailyRisk(null);
+      toast.success('Risco diário atualizado');
+    }, 500);
+  }, [updateRiskSettings]);
 
   return (
     <MainLayout>
@@ -69,8 +82,8 @@ export default function CalculatorPage() {
           </div>
           <div className="space-y-3">
             <Slider
-              value={[riskSettings.maxDailyRisk]}
-              onValueChange={([value]) => handleChange('maxDailyRisk', value)}
+              value={[localDailyRisk ?? riskSettings.maxDailyRisk]}
+              onValueChange={handleDailyRiskChange}
               min={1}
               max={20}
               step={1}
@@ -78,7 +91,7 @@ export default function CalculatorPage() {
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">1%</span>
               <span className="font-mono text-lg font-bold text-destructive">
-                {riskSettings.maxDailyRisk}%
+                {localDailyRisk ?? riskSettings.maxDailyRisk}%
               </span>
               <span className="text-muted-foreground">20%</span>
             </div>
