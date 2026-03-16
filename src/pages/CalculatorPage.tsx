@@ -82,8 +82,8 @@ export default function CalculatorPage() {
           </div>
           <div className="space-y-3">
             <Slider
-              value={[riskSettings.maxDailyRisk]}
-              onValueChange={([value]) => handleChange('maxDailyRisk', value)}
+              value={[localDailyRisk ?? riskSettings.maxDailyRisk]}
+              onValueChange={handleDailyRiskChange}
               min={1}
               max={20}
               step={1}
@@ -91,7 +91,7 @@ export default function CalculatorPage() {
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">1%</span>
               <span className="font-mono text-lg font-bold text-destructive">
-                {riskSettings.maxDailyRisk}%
+                {localDailyRisk ?? riskSettings.maxDailyRisk}%
               </span>
               <span className="text-muted-foreground">20%</span>
             </div>
