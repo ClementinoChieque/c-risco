@@ -1,3 +1,4 @@
+import { useState, useRef, useCallback } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { RiskCalculator } from '@/components/calculator/RiskCalculator';
 import { useTrade } from '@/context/TradeContext';
@@ -8,11 +9,23 @@ import { toast } from 'sonner';
 
 export default function CalculatorPage() {
   const { riskSettings, updateRiskSettings } = useTrade();
+  const [localDailyRisk, setLocalDailyRisk] = useState<number | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handleChange = async (key: keyof typeof riskSettings, value: number) => {
     await updateRiskSettings({ [key]: value });
     toast.success('Saldo atualizado');
   };
+
+  const handleDailyRiskChange = useCallback(([value]: number[]) => {
+    setLocalDailyRisk(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      await updateRiskSettings({ maxDailyRisk: value });
+      setLocalDailyRisk(null);
+      toast.success('Risco diário atualizado');
+    }, 500);
+  }, [updateRiskSettings]);
 
   return (
     <MainLayout>
