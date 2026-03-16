@@ -29,7 +29,7 @@ const App = () => (
             <Route path="/trades" element={<TradesPage />} />
             <Route path="/diary" element={<DiaryPage />} />
             <Route path="/stats" element={<StatsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
