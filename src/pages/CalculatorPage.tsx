@@ -2,7 +2,8 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { RiskCalculator } from '@/components/calculator/RiskCalculator';
 import { useTrade } from '@/context/TradeContext';
 import { Input } from '@/components/ui/input';
-import { DollarSign, Bitcoin } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { DollarSign, Bitcoin, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function CalculatorPage() {
