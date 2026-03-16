@@ -10,7 +10,7 @@ import DiaryPage from "./pages/DiaryPage";
 import StatsPage from "./pages/StatsPage";
 import SessionsPage from "./pages/SessionsPage";
 import TradesPage from "./pages/TradesPage";
-import SettingsPage from "./pages/SettingsPage";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
