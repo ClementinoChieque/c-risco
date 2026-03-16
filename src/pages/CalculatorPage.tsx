@@ -1,5 +1,6 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { RiskCalculator } from '@/components/calculator/RiskCalculator';
+import { RiskSettings } from '@/components/settings/RiskSettings';
 
 export default function CalculatorPage() {
   return (
@@ -11,6 +12,11 @@ export default function CalculatorPage() {
         </div>
 
         <RiskCalculator />
+
+        <div className="border-t border-border/40 pt-6">
+          <h2 className="text-lg font-semibold mb-4">Configurações de Risco</h2>
+          <RiskSettings />
+        </div>
       </div>
     </MainLayout>
   );
