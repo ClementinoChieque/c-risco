@@ -279,12 +279,22 @@ function WidgetsManager() {
     localStorage.setItem('broker-widgets', JSON.stringify(updated));
   };
 
+  const extractSrcFromEmbed = (input: string): string => {
+    const trimmed = input.trim();
+    // If it's an iframe embed code, extract the src
+    const srcMatch = trimmed.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+    if (srcMatch) return srcMatch[1];
+    // Otherwise treat as direct URL
+    return trimmed;
+  };
+
   const handleAdd = () => {
     if (!name.trim() || !embedUrl.trim()) {
       toast.error('Preencha o nome e o link do widget');
       return;
     }
-    const newWidget = { id: Date.now().toString(), name: name.trim(), embedUrl: embedUrl.trim() };
+    const resolvedUrl = extractSrcFromEmbed(embedUrl.trim());
+    const newWidget = { id: Date.now().toString(), name: name.trim(), embedUrl: resolvedUrl };
     saveWidgets([...widgets, newWidget]);
     setName('');
     setEmbedUrl('');
