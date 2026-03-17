@@ -319,11 +319,12 @@ function WidgetsManager() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Link do Widget (URL ou embed)</Label>
-            <Input
-              placeholder="https://www.tradingview.com/widget/..."
+            <Label>Link do Widget (URL ou código embed)</Label>
+            <Textarea
+              placeholder="Cole a URL do widget ou o código embed (<iframe ...>)"
               value={embedUrl}
               onChange={(e) => setEmbedUrl(e.target.value)}
+              rows={3}
             />
           </div>
           <Button onClick={handleAdd} className="w-full">
