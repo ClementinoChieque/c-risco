@@ -279,12 +279,22 @@ function WidgetsManager() {
     localStorage.setItem('broker-widgets', JSON.stringify(updated));
   };
 
+  const extractSrcFromEmbed = (input: string): string => {
+    const trimmed = input.trim();
+    // If it's an iframe embed code, extract the src
+    const srcMatch = trimmed.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+    if (srcMatch) return srcMatch[1];
+    // Otherwise treat as direct URL
+    return trimmed;
+  };
+
   const handleAdd = () => {
     if (!name.trim() || !embedUrl.trim()) {
       toast.error('Preencha o nome e o link do widget');
       return;
     }
-    const newWidget = { id: Date.now().toString(), name: name.trim(), embedUrl: embedUrl.trim() };
+    const resolvedUrl = extractSrcFromEmbed(embedUrl.trim());
+    const newWidget = { id: Date.now().toString(), name: name.trim(), embedUrl: resolvedUrl };
     saveWidgets([...widgets, newWidget]);
     setName('');
     setEmbedUrl('');
@@ -309,11 +319,12 @@ function WidgetsManager() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Link do Widget (URL ou embed)</Label>
-            <Input
-              placeholder="https://www.tradingview.com/widget/..."
+            <Label>Link do Widget (URL ou código embed)</Label>
+            <Textarea
+              placeholder="Cole a URL do widget ou o código embed (<iframe ...>)"
               value={embedUrl}
               onChange={(e) => setEmbedUrl(e.target.value)}
+              rows={3}
             />
           </div>
           <Button onClick={handleAdd} className="w-full">
@@ -349,7 +360,8 @@ function WidgetsManager() {
                     src={widget.embedUrl}
                     className="w-full h-[400px]"
                     title={widget.name}
-                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
                     loading="lazy"
                   />
                 </div>
