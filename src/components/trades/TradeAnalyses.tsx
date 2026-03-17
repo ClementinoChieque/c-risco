@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, LayoutGrid } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
