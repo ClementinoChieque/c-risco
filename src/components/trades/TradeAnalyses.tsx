@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, LayoutGrid } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
@@ -262,124 +262,12 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   );
 }
 
-function WidgetsManager() {
-  const [widgets, setWidgets] = useState<{ id: string; name: string; embedUrl: string }[]>(() => {
-    try {
-      const saved = localStorage.getItem('broker-widgets');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-  const [name, setName] = useState('');
-  const [embedUrl, setEmbedUrl] = useState('');
-
-  const saveWidgets = (updated: typeof widgets) => {
-    setWidgets(updated);
-    localStorage.setItem('broker-widgets', JSON.stringify(updated));
-  };
-
-  const extractSrcFromEmbed = (input: string): string => {
-    const trimmed = input.trim();
-    // If it's an iframe embed code, extract the src
-    const srcMatch = trimmed.match(/<iframe[^>]+src=["']([^"']+)["']/i);
-    if (srcMatch) return srcMatch[1];
-    // Otherwise treat as direct URL
-    return trimmed;
-  };
-
-  const handleAdd = () => {
-    if (!name.trim() || !embedUrl.trim()) {
-      toast.error('Preencha o nome e o link do widget');
-      return;
-    }
-    const resolvedUrl = extractSrcFromEmbed(embedUrl.trim());
-    const newWidget = { id: Date.now().toString(), name: name.trim(), embedUrl: resolvedUrl };
-    saveWidgets([...widgets, newWidget]);
-    setName('');
-    setEmbedUrl('');
-    toast.success('Widget adicionado!');
-  };
-
-  const handleDelete = (id: string) => {
-    saveWidgets(widgets.filter(w => w.id !== id));
-    toast.success('Widget removido');
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card className="glass-card border-border/40">
-        <CardContent className="pt-6 space-y-4">
-          <div className="space-y-2">
-            <Label>Nome do Widget</Label>
-            <Input
-              placeholder="Ex: TradingView, Myfxbook..."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Link do Widget (URL ou código embed)</Label>
-            <Textarea
-              placeholder="Cole a URL do widget ou o código embed (<iframe ...>)"
-              value={embedUrl}
-              onChange={(e) => setEmbedUrl(e.target.value)}
-              rows={3}
-            />
-          </div>
-          <Button onClick={handleAdd} className="w-full">
-            Adicionar Widget
-          </Button>
-        </CardContent>
-      </Card>
-
-      {widgets.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-          <LayoutGrid className="h-10 w-10" />
-          <p className="text-sm">Nenhum widget adicionado ainda</p>
-          <p className="text-xs">Adicione widgets da sua corretora acima</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {widgets.map((widget) => (
-            <Card key={widget.id} className="glass-card border-border/40 overflow-hidden">
-              <CardContent className="pt-4 pb-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm">{widget.name}</h3>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => handleDelete(widget.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-                <div className="rounded-lg overflow-hidden border border-border/40 bg-background">
-                  <iframe
-                    src={widget.embedUrl}
-                    className="w-full h-[400px]"
-                    title={widget.name}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function TradeAnalyses() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
     <Tabs defaultValue="wins" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="wins" className="gap-2">
           <TrendingUp className="h-4 w-4" />
           Gains
@@ -387,10 +275,6 @@ export function TradeAnalyses() {
         <TabsTrigger value="losses" className="gap-2">
           <TrendingDown className="h-4 w-4" />
           Losses
-        </TabsTrigger>
-        <TabsTrigger value="widgets" className="gap-2">
-          <LayoutGrid className="h-4 w-4" />
-          Widgets
         </TabsTrigger>
       </TabsList>
 
@@ -402,10 +286,6 @@ export function TradeAnalyses() {
       <TabsContent value="losses" className="space-y-6">
         <AnalysisUploader type="loss" onUploaded={() => setRefreshKey((k) => k + 1)} />
         <AnalysisGrid key={`loss-${refreshKey}`} type="loss" />
-      </TabsContent>
-
-      <TabsContent value="widgets" className="space-y-6">
-        <WidgetsManager />
       </TabsContent>
     </Tabs>
   );
