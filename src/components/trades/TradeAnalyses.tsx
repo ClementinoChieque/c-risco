@@ -267,7 +267,7 @@ export function TradeAnalyses() {
 
   return (
     <Tabs defaultValue="wins" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="wins" className="gap-2">
           <TrendingUp className="h-4 w-4" />
           Gains
@@ -275,6 +275,10 @@ export function TradeAnalyses() {
         <TabsTrigger value="losses" className="gap-2">
           <TrendingDown className="h-4 w-4" />
           Losses
+        </TabsTrigger>
+        <TabsTrigger value="widgets" className="gap-2">
+          <LayoutGrid className="h-4 w-4" />
+          Widgets
         </TabsTrigger>
       </TabsList>
 
@@ -286,6 +290,10 @@ export function TradeAnalyses() {
       <TabsContent value="losses" className="space-y-6">
         <AnalysisUploader type="loss" onUploaded={() => setRefreshKey((k) => k + 1)} />
         <AnalysisGrid key={`loss-${refreshKey}`} type="loss" />
+      </TabsContent>
+
+      <TabsContent value="widgets" className="space-y-6">
+        <WidgetsManager />
       </TabsContent>
     </Tabs>
   );
