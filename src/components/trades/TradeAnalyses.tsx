@@ -360,7 +360,8 @@ function WidgetsManager() {
                     src={widget.embedUrl}
                     className="w-full h-[400px]"
                     title={widget.name}
-                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
                     loading="lazy"
                   />
                 </div>
