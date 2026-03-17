@@ -262,6 +262,106 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   );
 }
 
+function WidgetsManager() {
+  const [widgets, setWidgets] = useState<{ id: string; name: string; embedUrl: string }[]>(() => {
+    try {
+      const saved = localStorage.getItem('broker-widgets');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [name, setName] = useState('');
+  const [embedUrl, setEmbedUrl] = useState('');
+
+  const saveWidgets = (updated: typeof widgets) => {
+    setWidgets(updated);
+    localStorage.setItem('broker-widgets', JSON.stringify(updated));
+  };
+
+  const handleAdd = () => {
+    if (!name.trim() || !embedUrl.trim()) {
+      toast.error('Preencha o nome e o link do widget');
+      return;
+    }
+    const newWidget = { id: Date.now().toString(), name: name.trim(), embedUrl: embedUrl.trim() };
+    saveWidgets([...widgets, newWidget]);
+    setName('');
+    setEmbedUrl('');
+    toast.success('Widget adicionado!');
+  };
+
+  const handleDelete = (id: string) => {
+    saveWidgets(widgets.filter(w => w.id !== id));
+    toast.success('Widget removido');
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card className="glass-card border-border/40">
+        <CardContent className="pt-6 space-y-4">
+          <div className="space-y-2">
+            <Label>Nome do Widget</Label>
+            <Input
+              placeholder="Ex: TradingView, Myfxbook..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Link do Widget (URL ou embed)</Label>
+            <Input
+              placeholder="https://www.tradingview.com/widget/..."
+              value={embedUrl}
+              onChange={(e) => setEmbedUrl(e.target.value)}
+            />
+          </div>
+          <Button onClick={handleAdd} className="w-full">
+            Adicionar Widget
+          </Button>
+        </CardContent>
+      </Card>
+
+      {widgets.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+          <LayoutGrid className="h-10 w-10" />
+          <p className="text-sm">Nenhum widget adicionado ainda</p>
+          <p className="text-xs">Adicione widgets da sua corretora acima</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {widgets.map((widget) => (
+            <Card key={widget.id} className="glass-card border-border/40 overflow-hidden">
+              <CardContent className="pt-4 pb-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-sm">{widget.name}</h3>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => handleDelete(widget.id)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <div className="rounded-lg overflow-hidden border border-border/40 bg-background">
+                  <iframe
+                    src={widget.embedUrl}
+                    className="w-full h-[400px]"
+                    title={widget.name}
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    loading="lazy"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function TradeAnalyses() {
   const [refreshKey, setRefreshKey] = useState(0);
 
