@@ -262,13 +262,13 @@ export function TradingSessions() {
 
       {/* Next Alert */}
       {nextAlert && (
-        <div className="glass-card rounded-xl p-4 animate-fade-in">
-          <div className="flex items-center gap-2 mb-2">
-            <Bell className="h-4 w-4 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Próximo Alerta</p>
+        <div className="glass-card rounded-xl p-3 md:p-4 animate-fade-in">
+          <div className="flex items-center gap-2 mb-1.5 md:mb-2">
+            <Bell className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+            <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">Próximo Alerta</p>
           </div>
-          <p className="text-sm font-medium">{nextAlert.message}</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs md:text-sm font-medium leading-snug">{nextAlert.message}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
             em {Math.floor(nextAlert.minutesUntil / 60)}h {nextAlert.minutesUntil % 60}min
             {' — '}
             {String(nextAlert.hour).padStart(2, '0')}:{String(nextAlert.minute).padStart(2, '0')} WAT
