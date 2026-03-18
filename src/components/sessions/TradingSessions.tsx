@@ -379,8 +379,8 @@ export function TradingSessions() {
       </div>
 
       {/* Scheduled Alerts List */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+      <div className="space-y-2 md:space-y-3">
+        <h3 className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Alertas Programados (WAT)
         </h3>
         <div className="glass-card rounded-xl divide-y divide-border/40">
@@ -393,13 +393,13 @@ export function TradingSessions() {
               <div
                 key={i}
                 className={cn(
-                  'flex items-center gap-3 p-3 transition-opacity',
+                  'flex items-start gap-2 md:gap-3 p-2.5 md:p-3 transition-opacity',
                   isPast && 'opacity-40'
                 )}
               >
                 <Clock
                   className={cn(
-                    'h-4 w-4 shrink-0',
+                    'h-3.5 w-3.5 md:h-4 md:w-4 shrink-0 mt-0.5',
                     alert.type === 'critical'
                       ? 'text-destructive'
                       : alert.type === 'warning'
@@ -408,9 +408,9 @@ export function TradingSessions() {
                   )}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate">{alert.message}</p>
+                  <p className="text-xs md:text-sm leading-snug">{alert.message}</p>
                 </div>
-                <span className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                <span className="font-mono text-[10px] md:text-xs text-muted-foreground whitespace-nowrap shrink-0">
                   {String(alert.hour).padStart(2, '0')}:{String(alert.minute).padStart(2, '0')}
                 </span>
               </div>
