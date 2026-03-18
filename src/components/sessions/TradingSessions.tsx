@@ -363,11 +363,11 @@ export function TradingSessions() {
                   })()}
                 </div>
               </div>
-              <div className="flex gap-2 mt-3 flex-wrap">
+              <div className="flex gap-1.5 md:gap-2 mt-2 md:mt-3 flex-wrap">
                 {session.pairs.map((pair) => (
                   <span
                     key={pair}
-                    className="text-[11px] font-mono bg-secondary/60 text-muted-foreground px-2 py-1 rounded-md"
+                    className="text-[10px] md:text-[11px] font-mono bg-secondary/60 text-muted-foreground px-1.5 md:px-2 py-0.5 md:py-1 rounded-md"
                   >
                     {pair}
                   </span>
