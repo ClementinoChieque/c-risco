@@ -291,23 +291,23 @@ export function TradingSessions() {
             <div
               key={session.name}
               className={cn(
-                'glass-card rounded-xl p-4 transition-all duration-300 animate-fade-in',
+                'glass-card rounded-xl p-3 md:p-4 transition-all duration-300 animate-fade-in',
                 isActive && 'ring-1 ring-primary/40 bg-primary/5'
               )}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 md:gap-3 min-w-0">
                   <div
                     className={cn(
-                      'p-2 rounded-lg',
+                      'p-1.5 md:p-2 rounded-lg shrink-0',
                       isActive ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-sm">{session.name}</p>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
+                      <p className="font-medium text-xs md:text-sm">{session.name}</p>
                       {isWeekend ? (
                         <span className="text-[10px] uppercase tracking-wider font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
                           Fechado
