@@ -236,14 +236,14 @@ export function TradingSessions() {
   return (
     <div className="space-y-6">
       {/* Clock Header */}
-      <div className="glass-card rounded-xl p-6 text-center animate-fade-in">
-        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">
+      <div className="glass-card rounded-xl p-4 md:p-6 text-center animate-fade-in">
+        <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest mb-1">
           Horário de Angola (WAT)
         </p>
-        <p className="font-mono text-4xl font-bold text-primary tracking-wider">
+        <p className="font-mono text-3xl md:text-4xl font-bold text-primary tracking-wider">
           {formatTime(watTime)}
         </p>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-xs md:text-sm text-muted-foreground mt-1">
           {getDayName(watTime)}
         </p>
       </div>
