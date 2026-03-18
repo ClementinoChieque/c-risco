@@ -236,14 +236,14 @@ export function TradingSessions() {
   return (
     <div className="space-y-6">
       {/* Clock Header */}
-      <div className="glass-card rounded-xl p-6 text-center animate-fade-in">
-        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">
+      <div className="glass-card rounded-xl p-4 md:p-6 text-center animate-fade-in">
+        <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest mb-1">
           Horário de Angola (WAT)
         </p>
-        <p className="font-mono text-4xl font-bold text-primary tracking-wider">
+        <p className="font-mono text-3xl md:text-4xl font-bold text-primary tracking-wider">
           {formatTime(watTime)}
         </p>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-xs md:text-sm text-muted-foreground mt-1">
           {getDayName(watTime)}
         </p>
       </div>
@@ -262,13 +262,13 @@ export function TradingSessions() {
 
       {/* Next Alert */}
       {nextAlert && (
-        <div className="glass-card rounded-xl p-4 animate-fade-in">
-          <div className="flex items-center gap-2 mb-2">
-            <Bell className="h-4 w-4 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Próximo Alerta</p>
+        <div className="glass-card rounded-xl p-3 md:p-4 animate-fade-in">
+          <div className="flex items-center gap-2 mb-1.5 md:mb-2">
+            <Bell className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+            <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-wider">Próximo Alerta</p>
           </div>
-          <p className="text-sm font-medium">{nextAlert.message}</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs md:text-sm font-medium leading-snug">{nextAlert.message}</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
             em {Math.floor(nextAlert.minutesUntil / 60)}h {nextAlert.minutesUntil % 60}min
             {' — '}
             {String(nextAlert.hour).padStart(2, '0')}:{String(nextAlert.minute).padStart(2, '0')} WAT
@@ -291,23 +291,23 @@ export function TradingSessions() {
             <div
               key={session.name}
               className={cn(
-                'glass-card rounded-xl p-4 transition-all duration-300 animate-fade-in',
+                'glass-card rounded-xl p-3 md:p-4 transition-all duration-300 animate-fade-in',
                 isActive && 'ring-1 ring-primary/40 bg-primary/5'
               )}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2 md:gap-3 min-w-0">
                   <div
                     className={cn(
-                      'p-2 rounded-lg',
+                      'p-1.5 md:p-2 rounded-lg shrink-0',
                       isActive ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-sm">{session.name}</p>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
+                      <p className="font-medium text-xs md:text-sm">{session.name}</p>
                       {isWeekend ? (
                         <span className="text-[10px] uppercase tracking-wider font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
                           Fechado
@@ -324,11 +324,11 @@ export function TradingSessions() {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 leading-snug">{session.description}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-mono text-xs text-muted-foreground">
+                <div className="text-right shrink-0">
+                  <p className="font-mono text-[10px] md:text-xs text-muted-foreground">
                     {String(session.startHour).padStart(2, '0')}:00 – {String(session.endHour).padStart(2, '0')}:00
                   </p>
                   {!isActive && (() => {
@@ -363,11 +363,11 @@ export function TradingSessions() {
                   })()}
                 </div>
               </div>
-              <div className="flex gap-2 mt-3 flex-wrap">
+              <div className="flex gap-1.5 md:gap-2 mt-2 md:mt-3 flex-wrap">
                 {session.pairs.map((pair) => (
                   <span
                     key={pair}
-                    className="text-[11px] font-mono bg-secondary/60 text-muted-foreground px-2 py-1 rounded-md"
+                    className="text-[10px] md:text-[11px] font-mono bg-secondary/60 text-muted-foreground px-1.5 md:px-2 py-0.5 md:py-1 rounded-md"
                   >
                     {pair}
                   </span>
@@ -379,8 +379,8 @@ export function TradingSessions() {
       </div>
 
       {/* Scheduled Alerts List */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+      <div className="space-y-2 md:space-y-3">
+        <h3 className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Alertas Programados (WAT)
         </h3>
         <div className="glass-card rounded-xl divide-y divide-border/40">
@@ -393,13 +393,13 @@ export function TradingSessions() {
               <div
                 key={i}
                 className={cn(
-                  'flex items-center gap-3 p-3 transition-opacity',
+                  'flex items-start gap-2 md:gap-3 p-2.5 md:p-3 transition-opacity',
                   isPast && 'opacity-40'
                 )}
               >
                 <Clock
                   className={cn(
-                    'h-4 w-4 shrink-0',
+                    'h-3.5 w-3.5 md:h-4 md:w-4 shrink-0 mt-0.5',
                     alert.type === 'critical'
                       ? 'text-destructive'
                       : alert.type === 'warning'
@@ -408,9 +408,9 @@ export function TradingSessions() {
                   )}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate">{alert.message}</p>
+                  <p className="text-xs md:text-sm leading-snug">{alert.message}</p>
                 </div>
-                <span className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                <span className="font-mono text-[10px] md:text-xs text-muted-foreground whitespace-nowrap shrink-0">
                   {String(alert.hour).padStart(2, '0')}:{String(alert.minute).padStart(2, '0')}
                 </span>
               </div>
