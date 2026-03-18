@@ -327,8 +327,8 @@ export function TradingSessions() {
                     <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 leading-snug">{session.description}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-mono text-xs text-muted-foreground">
+                <div className="text-right shrink-0">
+                  <p className="font-mono text-[10px] md:text-xs text-muted-foreground">
                     {String(session.startHour).padStart(2, '0')}:00 – {String(session.endHour).padStart(2, '0')}:00
                   </p>
                   {!isActive && (() => {
