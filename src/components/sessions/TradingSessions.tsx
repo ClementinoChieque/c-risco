@@ -324,7 +324,7 @@ export function TradingSessions() {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{session.description}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 leading-snug">{session.description}</p>
                   </div>
                 </div>
                 <div className="text-right">
