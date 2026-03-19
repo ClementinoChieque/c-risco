@@ -69,16 +69,16 @@ function getSessions(): SessionInfo[] {
   return [
     {
       name: 'Tóquio / Ásia',
-      startHour: 0,
-      endHour: 8,
+      startHour: 1,
+      endHour: 9,
       icon: Moon,
       pairs: ['USD/JPY', 'AUD/USD', 'NZD/USD'],
       description: 'Sessão mais calma, bom para ranges.',
     },
     {
       name: 'Londres / Europa',
-      startHour: londonDST ? 7 : 8,
-      endHour: londonDST ? 16 : 17,
+      startHour: londonDST ? 8 : 9,
+      endHour: londonDST ? 17 : 18,
       icon: Sun,
       pairs: ['EUR/USD', 'GBP/USD', 'XAU/USD'],
       description: londonDST
@@ -88,8 +88,8 @@ function getSessions(): SessionInfo[] {
     },
     {
       name: 'Nova Iorque / América',
-      startHour: nyDST ? 12 : 13,
-      endHour: nyDST ? 21 : 22,
+      startHour: nyDST ? 13 : 14,
+      endHour: nyDST ? 22 : 23,
       icon: Activity,
       pairs: ['NAS100', 'US30', 'USD/CAD'],
       description: nyDST
