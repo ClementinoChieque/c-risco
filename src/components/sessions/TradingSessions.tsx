@@ -66,7 +66,20 @@ function getSessions(): SessionInfo[] {
   const londonDST = isDST('Europe/London', 0);
   const nyDST = isDST('America/New_York', -5);
 
+  const sydneyDST = isDST('Australia/Sydney', 11);
+
   return [
+    {
+      name: 'Sydney / Oceania',
+      startHour: sydneyDST ? 0 : 23,
+      endHour: sydneyDST ? 8 : 7,
+      icon: Moon,
+      pairs: ['AUD/USD', 'NZD/USD', 'AUD/JPY'],
+      description: sydneyDST
+        ? 'Primeira sessão a abrir. Baixa volatilidade. (Horário de verão ativo)'
+        : 'Primeira sessão a abrir. Baixa volatilidade.',
+      dst: sydneyDST,
+    },
     {
       name: 'Tóquio / Ásia',
       startHour: 1,
