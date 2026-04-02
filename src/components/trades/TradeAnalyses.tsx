@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -17,12 +18,18 @@ interface TradeAnalysis {
   type: 'win' | 'loss';
   image_url: string;
   notes: string | null;
+  amount: number;
+  asset_pair: string;
+  risk_reward: number;
   created_at: string;
 }
 
 function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
+  const [amount, setAmount] = useState('');
+  const [assetPair, setAssetPair] = useState('');
+  const [riskReward, setRiskReward] = useState('');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -36,6 +43,10 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
   const handleUpload = async () => {
     if (!file) return;
+    if (!amount || !assetPair || !riskReward) {
+      toast.error('Preencha o valor, ativo e RR antes de guardar.');
+      return;
+    }
     setUploading(true);
 
     try {
@@ -59,6 +70,9 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           type,
           image_url: urlData.publicUrl,
           notes: notes || null,
+          amount: parseFloat(amount),
+          asset_pair: assetPair.trim(),
+          risk_reward: parseFloat(riskReward),
         });
 
       if (dbError) throw dbError;
@@ -66,6 +80,9 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       toast.success(type === 'win' ? 'Análise Win adicionada!' : 'Análise Loss adicionada!');
       setFile(null);
       setNotes('');
+      setAmount('');
+      setAssetPair('');
+      setRiskReward('');
       setPreview(null);
       onUploaded();
     } catch (err: any) {
@@ -80,25 +97,49 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       <CardContent className="pt-6 space-y-4">
         <div className="space-y-2">
           <Label>Imagem da Análise</Label>
-          <div className="flex items-center gap-3">
-            <label className="flex-1 cursor-pointer">
-              <div className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border/60 p-6 hover:border-primary/50 transition-colors">
-                {preview ? (
-                  <img src={preview} alt="Preview" className="max-h-40 rounded-md object-contain" />
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Upload className="h-8 w-8" />
-                    <span className="text-sm">Clique para selecionar</span>
-                  </div>
-                )}
-              </div>
-              <Input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </label>
+          <label className="block cursor-pointer">
+            <div className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border/60 p-6 hover:border-primary/50 transition-colors">
+              {preview ? (
+                <img src={preview} alt="Preview" className="max-h-40 rounded-md object-contain" />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <Upload className="h-8 w-8" />
+                  <span className="text-sm">Clique para selecionar</span>
+                </div>
+              )}
+            </div>
+            <Input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label>{type === 'win' ? 'Valor Ganho ($)' : 'Valor Perdido ($)'}</Label>
+            <Input
+              type="number"
+              step="0.01"
+              placeholder="Ex: 150.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>Ativo / Par</Label>
+            <Input
+              placeholder="Ex: EUR/USD"
+              value={assetPair}
+              onChange={(e) => setAssetPair(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>RR (Risco/Recompensa)</Label>
+            <Input
+              type="number"
+              step="0.1"
+              placeholder="Ex: 2.5"
+              value={riskReward}
+              onChange={(e) => setRiskReward(e.target.value)}
+            />
           </div>
         </div>
 
@@ -137,7 +178,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setItems(data as TradeAnalysis[]);
+      setItems(data as unknown as TradeAnalysis[]);
     }
     setLoading(false);
   };
@@ -225,6 +266,22 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
               </Button>
             </div>
             <CardContent className="pt-3 pb-3 space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={type === 'win' ? 'default' : 'destructive'} className="font-mono text-xs">
+                  {type === 'win' ? '+' : '-'}${Math.abs(item.amount || 0).toFixed(2)}
+                </Badge>
+                {item.asset_pair && (
+                  <Badge variant="secondary" className="text-xs">
+                    {item.asset_pair}
+                  </Badge>
+                )}
+                {item.risk_reward > 0 && (
+                  <Badge variant="outline" className="text-xs font-mono">
+                    RR {item.risk_reward.toFixed(1)}
+                  </Badge>
+                )}
+              </div>
+
               {editingId === item.id ? (
                 <div className="space-y-2">
                   <Textarea
