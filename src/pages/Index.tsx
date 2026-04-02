@@ -2,6 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RiskGauge } from '@/components/dashboard/RiskGauge';
 import { RecentTrades } from '@/components/dashboard/RecentTrades';
+import { AnalysesSummary } from '@/components/dashboard/AnalysesSummary';
 import { useTrade } from '@/context/TradeContext';
 import { TrendingUp, Target, DollarSign, Activity } from 'lucide-react';
 
@@ -43,9 +44,10 @@ export default function Dashboard() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <RiskGauge />
           <RecentTrades />
+          <AnalysesSummary />
         </div>
       </div>
     </MainLayout>

@@ -55,26 +55,35 @@ export type Database = {
       }
       trade_analyses: {
         Row: {
+          amount: number | null
+          asset_pair: string | null
           created_at: string
           id: string
           image_url: string
           notes: string | null
+          risk_reward: number | null
           type: string
           user_id: string
         }
         Insert: {
+          amount?: number | null
+          asset_pair?: string | null
           created_at?: string
           id?: string
           image_url: string
           notes?: string | null
+          risk_reward?: number | null
           type: string
           user_id: string
         }
         Update: {
+          amount?: number | null
+          asset_pair?: string | null
           created_at?: string
           id?: string
           image_url?: string
           notes?: string | null
+          risk_reward?: number | null
           type?: string
           user_id?: string
         }
