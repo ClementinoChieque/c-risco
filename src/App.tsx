@@ -7,7 +7,7 @@ import { TradeProvider } from "@/context/TradeContext";
 import Index from "./pages/Index";
 
 import DiaryPage from "./pages/DiaryPage";
-import StatsPage from "./pages/StatsPage";
+
 import SessionsPage from "./pages/SessionsPage";
 import TradesPage from "./pages/TradesPage";
 
@@ -28,7 +28,7 @@ const App = () => (
             <Route path="/sessions" element={<SessionsPage />} />
             <Route path="/trades" element={<TradesPage />} />
             <Route path="/diary" element={<DiaryPage />} />
-            <Route path="/stats" element={<StatsPage />} />
+            
             
             <Route path="*" element={<NotFound />} />
           </Routes>
