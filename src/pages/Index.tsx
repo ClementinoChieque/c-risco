@@ -2,6 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RiskGauge } from '@/components/dashboard/RiskGauge';
 import { RecentTrades } from '@/components/dashboard/RecentTrades';
+import { AnalysesSummary } from '@/components/dashboard/AnalysesSummary';
 import { useTrade } from '@/context/TradeContext';
 import { TrendingUp, Target, DollarSign, Activity } from 'lucide-react';
 
