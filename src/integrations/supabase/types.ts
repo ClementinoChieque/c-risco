@@ -60,7 +60,10 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          lot_size: number | null
+          market: string
           notes: string | null
+          risk_percentage: number | null
           risk_reward: number | null
           type: string
           user_id: string
@@ -71,7 +74,10 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          lot_size?: number | null
+          market?: string
           notes?: string | null
+          risk_percentage?: number | null
           risk_reward?: number | null
           type: string
           user_id: string
@@ -82,7 +88,10 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          lot_size?: number | null
+          market?: string
           notes?: string | null
+          risk_percentage?: number | null
           risk_reward?: number | null
           type?: string
           user_id?: string
