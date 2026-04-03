@@ -92,16 +92,24 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       if (dbError) throw dbError;
 
       // Update balance based on market
-      const delta = type === 'win' ? parsedAmount : -parsedAmount;
+      const delta = type === 'win' ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
+
+      console.log('[Balance Update]', { type, market, parsedAmount, delta, currentForex: riskSettings.accountBalance, currentCrypto: riskSettings.cryptoAccountBalance });
 
       if (market === 'forex') {
-        await updateRiskSettings({ accountBalance: riskSettings.accountBalance + delta });
+        const newBalance = riskSettings.accountBalance + delta;
+        console.log('[Forex] New balance:', newBalance);
+        await updateRiskSettings({ accountBalance: newBalance });
       } else if (market === 'crypto') {
-        await updateRiskSettings({ cryptoAccountBalance: riskSettings.cryptoAccountBalance + delta });
+        const newBalance = riskSettings.cryptoAccountBalance + delta;
+        console.log('[Crypto] New balance:', newBalance);
+        await updateRiskSettings({ cryptoAccountBalance: newBalance });
       } else if (market === 'propfirm') {
+        const newBalance = propFirmSettings.fundedBalance + delta;
+        console.log('[PropFirm] New balance:', newBalance);
         updatePropFirmSettings({
           ...propFirmSettings,
-          fundedBalance: propFirmSettings.fundedBalance + delta,
+          fundedBalance: newBalance,
         });
       }
 
