@@ -57,6 +57,7 @@ export type Database = {
         Row: {
           amount: number | null
           asset_pair: string | null
+          broker_name: string | null
           created_at: string
           id: string
           image_url: string
@@ -71,6 +72,7 @@ export type Database = {
         Insert: {
           amount?: number | null
           asset_pair?: string | null
+          broker_name?: string | null
           created_at?: string
           id?: string
           image_url: string
@@ -85,6 +87,7 @@ export type Database = {
         Update: {
           amount?: number | null
           asset_pair?: string | null
+          broker_name?: string | null
           created_at?: string
           id?: string
           image_url?: string

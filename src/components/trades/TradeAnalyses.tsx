@@ -39,6 +39,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
   const [lotSize, setLotSize] = useState('');
   const [riskPct, setRiskPct] = useState('');
   const [market, setMarket] = useState<string>('forex');
+  const [brokerName, setBrokerName] = useState('');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
