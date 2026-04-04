@@ -26,6 +26,7 @@ interface TradeAnalysis {
   lot_size: number;
   risk_percentage: number;
   market: string;
+  broker_name: string;
   created_at: string;
 }
 
