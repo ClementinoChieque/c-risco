@@ -332,7 +332,9 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                   <Badge variant="outline" className="text-xs font-mono">{item.risk_percentage}%</Badge>
                 )}
                 <Badge variant="secondary" className="text-xs">{marketLabel(item.market)}</Badge>
-              </div>
+                {item.broker_name && (
+                  <Badge variant="outline" className="text-xs">{item.broker_name}</Badge>
+                )}
 
               {editingId === item.id ? (
                 <div className="space-y-2">
