@@ -123,6 +123,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       setRiskReward('');
       setLotSize('');
       setRiskPct('');
+      setBrokerName('');
       setPreview(null);
       onUploaded();
     } catch (err: any) {
