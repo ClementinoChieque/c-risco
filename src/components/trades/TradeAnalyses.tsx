@@ -335,6 +335,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 {item.broker_name && (
                   <Badge variant="outline" className="text-xs">{item.broker_name}</Badge>
                 )}
+              </div>
 
               {editingId === item.id ? (
                 <div className="space-y-2">
