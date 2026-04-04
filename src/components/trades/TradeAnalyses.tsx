@@ -88,6 +88,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           lot_size: lotSize ? parseFloat(lotSize) : 0,
           risk_percentage: riskPct ? parseFloat(riskPct) : 0,
           market,
+          broker_name: brokerName.trim() || '',
         });
 
       if (dbError) throw dbError;
