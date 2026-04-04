@@ -1,0 +1,1 @@
+ALTER TABLE public.trade_analyses ADD COLUMN broker_name text DEFAULT '';

@@ -26,6 +26,7 @@ interface TradeAnalysis {
   lot_size: number;
   risk_percentage: number;
   market: string;
+  broker_name: string;
   created_at: string;
 }
 
@@ -39,6 +40,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
   const [lotSize, setLotSize] = useState('');
   const [riskPct, setRiskPct] = useState('');
   const [market, setMarket] = useState<string>('forex');
+  const [brokerName, setBrokerName] = useState('');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -87,6 +89,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           lot_size: lotSize ? parseFloat(lotSize) : 0,
           risk_percentage: riskPct ? parseFloat(riskPct) : 0,
           market,
+          broker_name: brokerName.trim() || '',
         });
 
       if (dbError) throw dbError;
@@ -121,6 +124,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       setRiskReward('');
       setLotSize('');
       setRiskPct('');
+      setBrokerName('');
       setPreview(null);
       onUploaded();
     } catch (err: any) {
@@ -183,6 +187,10 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
                 <SelectItem value="propfirm">PropFirm</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-1">
+            <Label>Corretora</Label>
+            <Input placeholder="Ex: IC Markets" value={brokerName} onChange={(e) => setBrokerName(e.target.value)} />
           </div>
         </div>
 
@@ -324,6 +332,9 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                   <Badge variant="outline" className="text-xs font-mono">{item.risk_percentage}%</Badge>
                 )}
                 <Badge variant="secondary" className="text-xs">{marketLabel(item.market)}</Badge>
+                {item.broker_name && (
+                  <Badge variant="outline" className="text-xs">{item.broker_name}</Badge>
+                )}
               </div>
 
               {editingId === item.id ? (
