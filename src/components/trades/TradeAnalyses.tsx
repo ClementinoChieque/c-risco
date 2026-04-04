@@ -187,6 +187,10 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-1">
+            <Label>Corretora</Label>
+            <Input placeholder="Ex: IC Markets" value={brokerName} onChange={(e) => setBrokerName(e.target.value)} />
+          </div>
         </div>
 
         <div className="space-y-2">
