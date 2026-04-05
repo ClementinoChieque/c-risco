@@ -10,14 +10,7 @@ export function Header() {
     <header className="glass-card sticky top-0 z-50 border-b border-border/50 px-4 py-3 md:px-6 md:py-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
-          <div className="relative">
-            <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <div className="absolute -top-1 -right-1 h-2.5 w-2.5 md:h-3 md:w-3 rounded-full bg-success animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-base md:text-xl font-bold gradient-text">RiskMaster</h1>
-            <p className="text-[10px] md:text-xs text-muted-foreground hidden sm:block">Trade Risk Management</p>
-          </div>
+          <img src={logo} alt="CRisco - Gestão de Trades" className="h-8 md:h-10 w-auto" />
         </div>
 
         {/* Desktop: full info */}
