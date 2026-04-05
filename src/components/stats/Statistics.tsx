@@ -107,8 +107,30 @@ export function Statistics() {
   const marketData = Object.entries(marketCounts).map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value }));
   const MARKET_COLORS = ['hsl(185, 100%, 50%)', 'hsl(142, 76%, 36%)', 'hsl(45, 93%, 47%)'];
 
+  const filterOptions = [
+    { value: 'all', label: 'Todos' },
+    { value: 'forex', label: 'Forex' },
+    { value: 'crypto', label: 'Cripto' },
+    { value: 'propfirm', label: 'PropFirm' },
+  ];
+
   return (
     <div className="space-y-6">
+      <div className="flex gap-2 flex-wrap">
+        {filterOptions.map(opt => (
+          <button
+            key={opt.value}
+            onClick={() => setMarketFilter(opt.value)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              marketFilter === opt.value
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-accent'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           label="Total de Trades"
