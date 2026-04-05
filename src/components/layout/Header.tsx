@@ -1,6 +1,6 @@
 import { useTrade } from '@/context/TradeContext';
-import { Badge } from '@/components/ui/badge';
-import { TrendingUp, AlertTriangle, DollarSign } from 'lucide-react';
+import { AlertTriangle, DollarSign } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 export function Header() {
   const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
