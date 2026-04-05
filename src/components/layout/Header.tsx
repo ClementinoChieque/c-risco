@@ -82,12 +82,6 @@ export function Header() {
             </div>
           )}
 
-          <Badge 
-            variant={todayRisk > riskSettings.maxDailyRisk * 0.8 ? "destructive" : "secondary"}
-            className="font-mono text-[10px] shrink-0"
-          >
-            {todayRisk.toFixed(1)}% / {riskSettings.maxDailyRisk}%
-          </Badge>
 
           {isBlocked && (
             <AlertTriangle className="h-4 w-4 text-destructive animate-pulse shrink-0" />
