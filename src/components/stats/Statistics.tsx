@@ -232,10 +232,10 @@ export function Statistics() {
             {marketData.length > 0 && (
               <div className="glass-card rounded-xl p-6 animate-fade-in">
                 <h3 className="stat-label mb-4">Distribuição por Mercado</h3>
-                <div className="h-[300px]">
+                <div className="h-[250px] sm:h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={marketData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                      <Pie data={marketData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={5} dataKey="value" label={false}>
                         {marketData.map((_, index) => (
                           <Cell key={`cell-${index}`} fill={MARKET_COLORS[index % MARKET_COLORS.length]} />
                         ))}
@@ -243,9 +243,22 @@ export function Statistics() {
                       <Tooltip 
                         contentStyle={{ backgroundColor: 'hsl(222, 47%, 10%)', border: '1px solid hsl(222, 30%, 18%)', borderRadius: '8px' }}
                         labelStyle={{ color: 'hsl(210, 40%, 98%)' }}
+                        formatter={(value: number, name: string) => [`${value} trades`, name]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
+                </div>
+                <div className="flex flex-wrap justify-center gap-3 mt-3">
+                  {marketData.map((entry, index) => {
+                    const total = marketData.reduce((s, d) => s + d.value, 0);
+                    const pct = total > 0 ? ((entry.value / total) * 100).toFixed(0) : '0';
+                    return (
+                      <div key={entry.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: MARKET_COLORS[index % MARKET_COLORS.length] }} />
+                        <span>{entry.name} {pct}%</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
