@@ -31,7 +31,8 @@ interface TradeAnalysis {
 }
 
 export function Statistics() {
-  const [analyses, setAnalyses] = useState<TradeAnalysis[]>([]);
+  const [allAnalyses, setAllAnalyses] = useState<TradeAnalysis[]>([]);
+  const [marketFilter, setMarketFilter] = useState<string>('all');
 
   useEffect(() => {
     async function fetchData() {
@@ -41,10 +42,12 @@ export function Statistics() {
         .eq('user_id', SINGLE_USER_ID)
         .order('created_at', { ascending: true });
 
-      if (data) setAnalyses(data as TradeAnalysis[]);
+      if (data) setAllAnalyses(data as TradeAnalysis[]);
     }
     fetchData();
   }, []);
+
+  const analyses = marketFilter === 'all' ? allAnalyses : allAnalyses.filter(a => a.market === marketFilter);
 
   const wins = analyses.filter(a => a.type === 'win');
   const losses = analyses.filter(a => a.type === 'loss');
