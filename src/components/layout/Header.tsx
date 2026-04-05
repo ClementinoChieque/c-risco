@@ -48,15 +48,6 @@ export function Header() {
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Risco Diário:</span>
-            <Badge 
-              variant={todayRisk > riskSettings.maxDailyRisk * 0.8 ? "destructive" : "secondary"}
-              className="font-mono"
-            >
-              {todayRisk.toFixed(1)}% / {riskSettings.maxDailyRisk}%
-            </Badge>
-          </div>
 
           {isBlocked && (
             <div className="flex items-center gap-2 text-destructive animate-pulse">
