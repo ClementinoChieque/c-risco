@@ -101,6 +101,33 @@ export type Database = {
         }
         Relationships: []
       }
+      trade_reviews: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trades: {
         Row: {
           closed_at: string | null

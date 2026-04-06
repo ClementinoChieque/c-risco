@@ -1,10 +1,11 @@
 import { NavLink } from '@/components/NavLink';
-import { LayoutDashboard, BookOpen, Clock, FolderOpen } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Clock, FolderOpen, Search } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/sessions', icon: Clock, label: 'Sessões' },
   { to: '/trades', icon: FolderOpen, label: 'Negociações' },
+  { to: '/analyses', icon: Search, label: 'Análises' },
   { to: '/diary', icon: BookOpen, label: 'Diário' },
 ];
 
