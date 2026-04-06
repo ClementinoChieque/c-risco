@@ -10,6 +10,7 @@ import DiaryPage from "./pages/DiaryPage";
 
 import SessionsPage from "./pages/SessionsPage";
 import TradesPage from "./pages/TradesPage";
+import AnalysesPage from "./pages/AnalysesPage";
 
 import NotFound from "./pages/NotFound";
 
