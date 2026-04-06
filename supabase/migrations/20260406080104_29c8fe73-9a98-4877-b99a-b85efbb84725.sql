@@ -1,0 +1,1 @@
+ALTER TABLE public.trade_reviews ADD COLUMN market text NOT NULL DEFAULT 'forex' CHECK (market IN ('forex', 'crypto', 'propfirm'));

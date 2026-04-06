@@ -10,20 +10,32 @@ import { toast } from 'sonner';
 import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+
+type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
+
+const MARKET_LABELS: Record<string, string> = {
+  all: 'Todos',
+  forex: 'Forex',
+  crypto: 'Cripto',
+  propfirm: 'PropFirm',
+};
 
 interface TradeReview {
   id: string;
   type: 'win' | 'loss';
   image_url: string;
   caption: string | null;
+  market: string;
   created_at: string;
 }
 
 function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
+  const [market, setMarket] = useState<string>('forex');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -60,6 +72,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
           type,
           image_url: urlData.publicUrl,
           caption: caption || null,
+          market,
         });
 
       if (dbError) throw dbError;
@@ -68,6 +81,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
       setFile(null);
       setCaption('');
       setPreview(null);
+      setMarket('forex');
       onUploaded();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + err.message);
@@ -97,6 +111,20 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
         </div>
 
         <div className="space-y-2">
+          <Label>Mercado</Label>
+          <Select value={market} onValueChange={setMarket}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="forex">Forex</SelectItem>
+              <SelectItem value="crypto">Cripto</SelectItem>
+              <SelectItem value="propfirm">PropFirm</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
           <Label>{type === 'win' ? 'Motivo do Acerto' : 'Motivo do Erro'}</Label>
           <Textarea
             placeholder={type === 'win' ? 'Descreva porque acertou nesta operação...' : 'Descreva o que correu mal nesta operação...'}
@@ -114,7 +142,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
   );
 }
 
-function ReviewGrid({ type, refreshKey }: { type: 'win' | 'loss'; refreshKey: number }) {
+function ReviewGrid({ type, refreshKey, marketFilter }: { type: 'win' | 'loss'; refreshKey: number; marketFilter: MarketFilter }) {
   const [items, setItems] = useState<TradeReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -123,12 +151,18 @@ function ReviewGrid({ type, refreshKey }: { type: 'win' | 'loss'; refreshKey: nu
 
   const fetchItems = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    let query = supabase
       .from('trade_reviews')
       .select('*')
       .eq('type', type)
       .eq('user_id', SINGLE_USER_ID)
       .order('created_at', { ascending: false });
+
+    if (marketFilter !== 'all') {
+      query = query.eq('market', marketFilter);
+    }
+
+    const { data, error } = await query;
 
     if (!error && data) {
       setItems(data as unknown as TradeReview[]);
@@ -138,7 +172,7 @@ function ReviewGrid({ type, refreshKey }: { type: 'win' | 'loss'; refreshKey: nu
 
   useEffect(() => {
     fetchItems();
-  }, [type, refreshKey]);
+  }, [type, refreshKey, marketFilter]);
 
   const handleDelete = async (item: TradeReview) => {
     const path = item.image_url.split('/trade-analyses/')[1];
@@ -173,7 +207,7 @@ function ReviewGrid({ type, refreshKey }: { type: 'win' | 'loss'; refreshKey: nu
     return (
       <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
         <ImageIcon className="h-10 w-10" />
-        <p className="text-sm">Nenhuma análise {type === 'win' ? 'de acerto' : 'de erro'} ainda</p>
+        <p className="text-sm">Nenhuma análise {type === 'win' ? 'de acerto' : 'de erro'} {marketFilter !== 'all' ? `em ${MARKET_LABELS[marketFilter]}` : ''} ainda</p>
       </div>
     );
   }
@@ -210,9 +244,12 @@ function ReviewGrid({ type, refreshKey }: { type: 'win' | 'loss'; refreshKey: nu
               </Button>
             </div>
             <CardContent className="pt-3 pb-3 space-y-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant={type === 'win' ? 'default' : 'destructive'} className="text-xs">
                   {type === 'win' ? 'Acerto' : 'Erro'}
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {MARKET_LABELS[item.market] || item.market}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
                   {new Date(item.created_at).toLocaleDateString('pt-AO')}
@@ -254,29 +291,45 @@ function ReviewGrid({ type, refreshKey }: { type: 'win' | 'loss'; refreshKey: nu
 
 export function TradeReviews() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [marketFilter, setMarketFilter] = useState<MarketFilter>('all');
 
   return (
-    <Tabs defaultValue="wins" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="wins" className="gap-2">
-          <TrendingUp className="h-4 w-4" />
-          Acertos
-        </TabsTrigger>
-        <TabsTrigger value="losses" className="gap-2">
-          <TrendingDown className="h-4 w-4" />
-          Erros
-        </TabsTrigger>
-      </TabsList>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        {(['all', 'forex', 'crypto', 'propfirm'] as MarketFilter[]).map((m) => (
+          <Button
+            key={m}
+            size="sm"
+            variant={marketFilter === m ? 'default' : 'outline'}
+            onClick={() => setMarketFilter(m)}
+          >
+            {MARKET_LABELS[m]}
+          </Button>
+        ))}
+      </div>
 
-      <TabsContent value="wins" className="space-y-6">
-        <ReviewUploader type="win" onUploaded={() => setRefreshKey((k) => k + 1)} />
-        <ReviewGrid type="win" refreshKey={refreshKey} />
-      </TabsContent>
+      <Tabs defaultValue="wins" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="wins" className="gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Acertos
+          </TabsTrigger>
+          <TabsTrigger value="losses" className="gap-2">
+            <TrendingDown className="h-4 w-4" />
+            Erros
+          </TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="losses" className="space-y-6">
-        <ReviewUploader type="loss" onUploaded={() => setRefreshKey((k) => k + 1)} />
-        <ReviewGrid type="loss" refreshKey={refreshKey} />
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="wins" className="space-y-6">
+          <ReviewUploader type="win" onUploaded={() => setRefreshKey((k) => k + 1)} />
+          <ReviewGrid type="win" refreshKey={refreshKey} marketFilter={marketFilter} />
+        </TabsContent>
+
+        <TabsContent value="losses" className="space-y-6">
+          <ReviewUploader type="loss" onUploaded={() => setRefreshKey((k) => k + 1)} />
+          <ReviewGrid type="loss" refreshKey={refreshKey} marketFilter={marketFilter} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
