@@ -1,5 +1,7 @@
 import { useTrade } from '@/context/TradeContext';
-import { AlertTriangle, DollarSign } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { AlertTriangle, DollarSign, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.png';
 
 export function Header() {
