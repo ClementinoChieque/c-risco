@@ -30,6 +30,7 @@ interface TradeAnalysis {
 }
 
 export function Statistics() {
+  const { user } = useAuth();
   const [allAnalyses, setAllAnalyses] = useState<TradeAnalysis[]>([]);
   const [marketFilter, setMarketFilter] = useState<string>('all');
 
