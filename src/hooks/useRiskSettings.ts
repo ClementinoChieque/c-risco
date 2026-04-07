@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RiskSettings } from '@/types/trade';
-
-// Fixed user ID for single-user mode
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 const defaultRiskSettings: RiskSettings = {
   accountBalance: 10000,
@@ -26,14 +24,16 @@ interface DbRiskSettings {
 }
 
 export function useRiskSettings() {
+  const { user } = useAuth();
   const [riskSettings, setRiskSettings] = useState<RiskSettings>(defaultRiskSettings);
   const [loading, setLoading] = useState(true);
 
   const fetchSettings = useCallback(async () => {
+    if (!user) return;
     const { data, error } = await supabase
       .from('risk_settings')
       .select('*')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (error) {
@@ -53,11 +53,10 @@ export function useRiskSettings() {
         maxDailyLoss: Number(dbData.max_daily_loss),
       });
     } else {
-      // Create default settings for single user
       const { error: insertError } = await supabase
         .from('risk_settings')
         .insert({
-          user_id: SINGLE_USER_ID,
+          user_id: user.id,
           account_balance: defaultRiskSettings.accountBalance,
           crypto_account_balance: defaultRiskSettings.cryptoAccountBalance,
           max_risk_per_trade: defaultRiskSettings.maxRiskPerTrade,
@@ -71,13 +70,14 @@ export function useRiskSettings() {
       }
     }
     setLoading(false);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
 
   const updateRiskSettings = useCallback(async (settings: Partial<RiskSettings>) => {
+    if (!user) return;
     const dbUpdates: Record<string, unknown> = {};
     
     if (settings.accountBalance !== undefined) dbUpdates.account_balance = settings.accountBalance;
@@ -90,7 +90,7 @@ export function useRiskSettings() {
     const { error } = await supabase
       .from('risk_settings')
       .update(dbUpdates)
-      .eq('user_id', SINGLE_USER_ID);
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error updating risk settings:', error);
@@ -98,7 +98,7 @@ export function useRiskSettings() {
     }
 
     setRiskSettings(prev => ({ ...prev, ...settings }));
-  }, []);
+  }, [user]);
 
   return {
     riskSettings,
