@@ -32,6 +32,7 @@ interface TradeReview {
 }
 
 function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
   const [market, setMarket] = useState<string>('forex');
