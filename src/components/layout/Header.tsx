@@ -6,6 +6,7 @@ import logo from '@/assets/logo.png';
 
 export function Header() {
   const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const { signOut } = useAuth();
   const todayRisk = getTodayRiskUsed();
 
   return (
