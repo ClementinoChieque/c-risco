@@ -11,8 +11,7 @@ import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil } from '
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 
