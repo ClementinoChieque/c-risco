@@ -64,7 +64,7 @@ export function TradeCalendar() {
     const { data, error } = await supabase
       .from('trade_analyses')
       .select('type, amount, created_at')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .gte('created_at', startOfMonth)
       .lte('created_at', endOfMonth);
 
