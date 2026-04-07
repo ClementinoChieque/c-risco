@@ -29,6 +29,7 @@ const marketLabel = (m: string) => {
 };
 
 export function TradeDiary() {
+  const { user } = useAuth();
   const [analyses, setAnalyses] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
