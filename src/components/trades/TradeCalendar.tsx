@@ -6,8 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, X } from 'lucide-react';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface TradeDay {
   date: string;
