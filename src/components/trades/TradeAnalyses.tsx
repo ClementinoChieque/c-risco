@@ -31,6 +31,7 @@ interface TradeAnalysis {
 
 function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings } = useTrade();
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
   const [amount, setAmount] = useState('');
