@@ -220,7 +220,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
       .from('trade_analyses')
       .select('*')
       .eq('type', type)
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
