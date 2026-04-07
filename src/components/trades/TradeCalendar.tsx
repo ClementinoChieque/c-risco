@@ -41,6 +41,7 @@ const MARKET_LABELS: Record<string, string> = {
 };
 
 export function TradeCalendar() {
+  const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tradeDays, setTradeDays] = useState<Map<string, TradeDay>>(new Map());
   const [loading, setLoading] = useState(true);
