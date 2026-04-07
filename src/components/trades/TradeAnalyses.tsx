@@ -79,7 +79,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       const { error: dbError } = await supabase
         .from('trade_analyses')
         .insert({
-          user_id: SINGLE_USER_ID,
+          user_id: user!.id,
           type,
           image_url: urlData.publicUrl,
           notes: notes || null,
