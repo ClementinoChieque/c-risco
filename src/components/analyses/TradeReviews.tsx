@@ -68,7 +68,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
       const { error: dbError } = await supabase
         .from('trade_reviews')
         .insert({
-          user_id: SINGLE_USER_ID,
+          user_id: user!.id,
           type,
           image_url: urlData.publicUrl,
           caption: caption || null,
