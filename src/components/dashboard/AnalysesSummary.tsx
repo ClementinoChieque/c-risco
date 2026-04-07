@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface AnalysisStats {
   totalGains: number;
