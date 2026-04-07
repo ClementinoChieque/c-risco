@@ -14,6 +14,7 @@ interface AnalysisStats {
 }
 
 export function AnalysesSummary() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<AnalysisStats>({
     totalGains: 0, totalLosses: 0, netPnL: 0, winCount: 0, lossCount: 0, avgRR: 0,
   });
