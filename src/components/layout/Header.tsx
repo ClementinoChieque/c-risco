@@ -51,6 +51,9 @@ export function Header() {
               <span className="text-sm font-medium">{blockReason}</span>
             </div>
           )}
+          <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-8 w-8">
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Mobile: compact info */}
