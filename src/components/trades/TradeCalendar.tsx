@@ -95,7 +95,7 @@ export function TradeCalendar() {
     const { data, error } = await supabase
       .from('trade_analyses')
       .select('id, type, amount, asset_pair, risk_reward, lot_size, risk_percentage, market, broker_name, created_at')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .gte('created_at', startOfDay)
       .lte('created_at', endOfDay)
       .order('created_at', { ascending: false });

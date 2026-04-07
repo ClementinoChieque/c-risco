@@ -39,7 +39,7 @@ export function Statistics() {
       const { data } = await supabase
         .from('trade_analyses')
         .select('id, type, amount, risk_reward, lot_size, risk_percentage, market, asset_pair, broker_name, created_at')
-        .eq('user_id', SINGLE_USER_ID)
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: true });
 
       if (data) setAllAnalyses(data as TradeAnalysis[]);

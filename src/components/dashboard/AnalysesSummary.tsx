@@ -24,7 +24,7 @@ export function AnalysesSummary() {
       const { data } = await supabase
         .from('trade_analyses')
         .select('type, amount, risk_reward')
-        .eq('user_id', SINGLE_USER_ID);
+        .eq('user_id', user!.id);
 
       if (!data) return;
 

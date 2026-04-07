@@ -43,7 +43,7 @@ export function TradeDiary() {
     const { data, error } = await supabase
       .from('trade_analyses')
       .select('*')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
