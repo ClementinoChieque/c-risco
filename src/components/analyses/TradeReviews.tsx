@@ -143,6 +143,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
 }
 
 function ReviewGrid({ type, refreshKey, marketFilter }: { type: 'win' | 'loss'; refreshKey: number; marketFilter: MarketFilter }) {
+  const { user } = useAuth();
   const [items, setItems] = useState<TradeReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
