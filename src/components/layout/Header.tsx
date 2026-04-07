@@ -85,6 +85,9 @@ export function Header() {
           {isBlocked && (
             <AlertTriangle className="h-4 w-4 text-destructive animate-pulse shrink-0" />
           )}
+          <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-7 w-7">
+            <LogOut className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
     </header>
