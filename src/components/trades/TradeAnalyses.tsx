@@ -12,8 +12,7 @@ import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-r
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useTrade } from '@/context/TradeContext';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface TradeAnalysis {
   id: string;
@@ -32,6 +31,7 @@ interface TradeAnalysis {
 
 function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings } = useTrade();
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
   const [amount, setAmount] = useState('');
@@ -79,7 +79,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       const { error: dbError } = await supabase
         .from('trade_analyses')
         .insert({
-          user_id: SINGLE_USER_ID,
+          user_id: user!.id,
           type,
           image_url: urlData.publicUrl,
           notes: notes || null,
@@ -208,6 +208,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 }
 
 function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
+  const { user } = useAuth();
   const [items, setItems] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -220,7 +221,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
       .from('trade_analyses')
       .select('*')
       .eq('type', type)
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
 
     if (!error && data) {

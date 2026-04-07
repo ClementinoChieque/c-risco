@@ -1,9 +1,12 @@
 import { useTrade } from '@/context/TradeContext';
-import { AlertTriangle, DollarSign } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { AlertTriangle, DollarSign, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.png';
 
 export function Header() {
   const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const { signOut } = useAuth();
   const todayRisk = getTodayRiskUsed();
 
   return (
@@ -48,6 +51,9 @@ export function Header() {
               <span className="text-sm font-medium">{blockReason}</span>
             </div>
           )}
+          <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-8 w-8">
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Mobile: compact info */}
@@ -79,6 +85,9 @@ export function Header() {
           {isBlocked && (
             <AlertTriangle className="h-4 w-4 text-destructive animate-pulse shrink-0" />
           )}
+          <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-7 w-7">
+            <LogOut className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
     </header>

@@ -6,8 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, X } from 'lucide-react';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface TradeDay {
   date: string;
@@ -42,6 +41,7 @@ const MARKET_LABELS: Record<string, string> = {
 };
 
 export function TradeCalendar() {
+  const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tradeDays, setTradeDays] = useState<Map<string, TradeDay>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ export function TradeCalendar() {
     const { data, error } = await supabase
       .from('trade_analyses')
       .select('type, amount, created_at')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .gte('created_at', startOfMonth)
       .lte('created_at', endOfMonth);
 
@@ -95,7 +95,7 @@ export function TradeCalendar() {
     const { data, error } = await supabase
       .from('trade_analyses')
       .select('id, type, amount, asset_pair, risk_reward, lot_size, risk_percentage, market, broker_name, created_at')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .gte('created_at', startOfDay)
       .lte('created_at', endOfDay)
       .order('created_at', { ascending: false });

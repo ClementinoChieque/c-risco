@@ -14,8 +14,7 @@ import {
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format, subDays, isSameDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface TradeAnalysis {
   id: string;
@@ -31,6 +30,7 @@ interface TradeAnalysis {
 }
 
 export function Statistics() {
+  const { user } = useAuth();
   const [allAnalyses, setAllAnalyses] = useState<TradeAnalysis[]>([]);
   const [marketFilter, setMarketFilter] = useState<string>('all');
 
@@ -39,7 +39,7 @@ export function Statistics() {
       const { data } = await supabase
         .from('trade_analyses')
         .select('id, type, amount, risk_reward, lot_size, risk_percentage, market, asset_pair, broker_name, created_at')
-        .eq('user_id', SINGLE_USER_ID)
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: true });
 
       if (data) setAllAnalyses(data as TradeAnalysis[]);

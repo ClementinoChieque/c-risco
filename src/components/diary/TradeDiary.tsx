@@ -4,8 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowUpRight, ArrowDownRight, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface TradeAnalysis {
   id: string;
@@ -30,6 +29,7 @@ const marketLabel = (m: string) => {
 };
 
 export function TradeDiary() {
+  const { user } = useAuth();
   const [analyses, setAnalyses] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export function TradeDiary() {
     const { data, error } = await supabase
       .from('trade_analyses')
       .select('*')
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
 
     if (!error && data) {

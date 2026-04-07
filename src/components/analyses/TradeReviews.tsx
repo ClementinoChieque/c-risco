@@ -11,8 +11,7 @@ import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil } from '
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 
@@ -33,6 +32,7 @@ interface TradeReview {
 }
 
 function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
   const [market, setMarket] = useState<string>('forex');
@@ -68,7 +68,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
       const { error: dbError } = await supabase
         .from('trade_reviews')
         .insert({
-          user_id: SINGLE_USER_ID,
+          user_id: user!.id,
           type,
           image_url: urlData.publicUrl,
           caption: caption || null,
@@ -143,6 +143,7 @@ function ReviewUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded
 }
 
 function ReviewGrid({ type, refreshKey, marketFilter }: { type: 'win' | 'loss'; refreshKey: number; marketFilter: MarketFilter }) {
+  const { user } = useAuth();
   const [items, setItems] = useState<TradeReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -155,7 +156,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: 'win' | 'loss'; 
       .from('trade_reviews')
       .select('*')
       .eq('type', type)
-      .eq('user_id', SINGLE_USER_ID)
+      .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
 
     if (marketFilter !== 'all') {

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface AnalysisStats {
   totalGains: number;
@@ -15,6 +14,7 @@ interface AnalysisStats {
 }
 
 export function AnalysesSummary() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<AnalysisStats>({
     totalGains: 0, totalLosses: 0, netPnL: 0, winCount: 0, lossCount: 0, avgRR: 0,
   });
@@ -24,7 +24,7 @@ export function AnalysesSummary() {
       const { data } = await supabase
         .from('trade_analyses')
         .select('type, amount, risk_reward')
-        .eq('user_id', SINGLE_USER_ID);
+        .eq('user_id', user!.id);
 
       if (!data) return;
 
