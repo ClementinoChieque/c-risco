@@ -12,8 +12,7 @@ import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-r
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useTrade } from '@/context/TradeContext';
-
-const SINGLE_USER_ID = '00000000-0000-0000-0000-000000000001';
+import { useAuth } from '@/context/AuthContext';
 
 interface TradeAnalysis {
   id: string;
