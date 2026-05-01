@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/context/AuthContext';
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
-type ReviewType = 'win' | 'loss' | 'before_after';
+type ReviewType = 'win' | 'loss';
+type UploadMode = 'single' | 'before_after';
 
 const MARKET_LABELS: Record<string, string> = {
   all: 'Todos',
@@ -35,6 +36,7 @@ interface TradeReview {
 
 function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: () => void }) {
   const { user } = useAuth();
+  const [mode, setMode] = useState<UploadMode>('single');
   const [file, setFile] = useState<File | null>(null);
   const [fileAfter, setFileAfter] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
@@ -43,7 +45,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
   const [preview, setPreview] = useState<string | null>(null);
   const [previewAfter, setPreviewAfter] = useState<string | null>(null);
 
-  const isBeforeAfter = type === 'before_after';
+  const isBeforeAfter = mode === 'before_after';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, which: 'before' | 'after') => {
     const selected = e.target.files?.[0];
@@ -92,9 +94,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
       if (dbError) throw dbError;
 
       toast.success(
-        type === 'win' ? 'Análise de acerto adicionada!'
-        : type === 'loss' ? 'Análise de erro adicionada!'
-        : 'Antes e Depois adicionado!'
+        type === 'win' ? 'Análise de acerto adicionada!' : 'Análise de erro adicionada!'
       );
       setFile(null);
       setFileAfter(null);
@@ -132,6 +132,27 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
   return (
     <Card className="glass-card border-border/40">
       <CardContent className="pt-6 space-y-4">
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={mode === 'single' ? 'default' : 'outline'}
+            onClick={() => setMode('single')}
+            className="flex-1"
+          >
+            Imagem única
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={mode === 'before_after' ? 'default' : 'outline'}
+            onClick={() => setMode('before_after')}
+            className="flex-1"
+          >
+            Antes e Depois
+          </Button>
+        </div>
+
         {isBeforeAfter ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FilePicker label="Antes (Entrada)" previewUrl={preview} which="before" />
@@ -156,17 +177,9 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
         </div>
 
         <div className="space-y-2">
-          <Label>
-            {type === 'win' ? 'Motivo do Acerto'
-              : type === 'loss' ? 'Motivo do Erro'
-              : 'Observações da Operação'}
-          </Label>
+          <Label>{type === 'win' ? 'Motivo do Acerto' : 'Motivo do Erro'}</Label>
           <Textarea
-            placeholder={
-              type === 'win' ? 'Descreva porque acertou nesta operação...'
-              : type === 'loss' ? 'Descreva o que correu mal nesta operação...'
-              : 'Descreva o setup, gestão e resultado da operação...'
-            }
+            placeholder={type === 'win' ? 'Descreva porque acertou nesta operação...' : 'Descreva o que correu mal nesta operação...'}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             rows={3}
@@ -248,7 +261,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   }
 
   if (items.length === 0) {
-    const label = type === 'win' ? 'de acerto' : type === 'loss' ? 'de erro' : 'de antes e depois';
+    const label = type === 'win' ? 'de acerto' : 'de erro';
     return (
       <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
         <ImageIcon className="h-10 w-10" />
@@ -259,8 +272,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
 
   const typeBadge = (t: ReviewType) =>
     t === 'win' ? { variant: 'default' as const, label: 'Acerto' }
-    : t === 'loss' ? { variant: 'destructive' as const, label: 'Erro' }
-    : { variant: 'secondary' as const, label: 'Antes/Depois' };
+    : { variant: 'destructive' as const, label: 'Erro' };
 
   return (
     <>
@@ -273,10 +285,10 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
         </DialogContent>
       </Dialog>
 
-      <div className={`grid grid-cols-1 ${type === 'before_after' ? '' : 'sm:grid-cols-2'} gap-4`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {items.map((item) => {
           const badge = typeBadge(item.type);
-          const isBA = item.type === 'before_after' && item.image_url_after;
+          const isBA = !!item.image_url_after;
           return (
             <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
               <div className="relative">
@@ -385,7 +397,7 @@ export function TradeReviews() {
       </div>
 
       <Tabs defaultValue="wins" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="wins" className="gap-2">
             <TrendingUp className="h-4 w-4" />
             Acertos
@@ -393,10 +405,6 @@ export function TradeReviews() {
           <TabsTrigger value="losses" className="gap-2">
             <TrendingDown className="h-4 w-4" />
             Erros
-          </TabsTrigger>
-          <TabsTrigger value="before_after" className="gap-2">
-            <GitCompareArrows className="h-4 w-4" />
-            Antes/Depois
           </TabsTrigger>
         </TabsList>
 
@@ -408,11 +416,6 @@ export function TradeReviews() {
         <TabsContent value="losses" className="space-y-6">
           <ReviewUploader type="loss" onUploaded={() => setRefreshKey((k) => k + 1)} />
           <ReviewGrid type="loss" refreshKey={refreshKey} marketFilter={marketFilter} />
-        </TabsContent>
-
-        <TabsContent value="before_after" className="space-y-6">
-          <ReviewUploader type="before_after" onUploaded={() => setRefreshKey((k) => k + 1)} />
-          <ReviewGrid type="before_after" refreshKey={refreshKey} marketFilter={marketFilter} />
         </TabsContent>
       </Tabs>
     </div>
