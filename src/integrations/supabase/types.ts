@@ -131,6 +131,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          image_url_after: string | null
           market: string
           type: string
           user_id: string
@@ -140,6 +141,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          image_url_after?: string | null
           market?: string
           type: string
           user_id: string
@@ -149,6 +151,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          image_url_after?: string | null
           market?: string
           type?: string
           user_id?: string
