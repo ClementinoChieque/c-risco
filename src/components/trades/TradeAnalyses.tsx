@@ -62,7 +62,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
     try {
       const ext = file.name.split('.').pop();
-      const fileName = `${type}/${Date.now()}.${ext}`;
+      const fileName = `${user!.id}/${type}/${Date.now()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('trade-analyses')
