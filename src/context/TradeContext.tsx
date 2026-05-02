@@ -2,23 +2,7 @@ import { createContext, useContext, useState, useCallback, useMemo, type ReactNo
 import { Trade, RiskSettings, Market, OverallStats, DailyStats, PropFirmSettings } from '@/types/trade';
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
-
-const defaultPropFirmSettings: PropFirmSettings = {
-  name: '',
-  fundedBalance: 0,
-  profitTarget: 10,
-  dailyDrawdown: 5,
-  maxDrawdown: 10,
-};
-
-function loadPropFirmSettings(): PropFirmSettings {
-  try {
-    const saved = localStorage.getItem('propFirmSettings');
-    return saved ? JSON.parse(saved) : defaultPropFirmSettings;
-  } catch {
-    return defaultPropFirmSettings;
-  }
-}
+import { usePropFirmSettings } from '@/hooks/usePropFirmSettings';
 
 interface TradeContextType {
   trades: Trade[];
