@@ -84,7 +84,6 @@ export function ExportPDF() {
     const accountData = [
       ['Saldo Forex', `$${riskSettings.accountBalance.toLocaleString()}`],
       ['Saldo Cripto', `$${riskSettings.cryptoAccountBalance.toLocaleString()}`],
-      ['Risco Diário Max.', `${riskSettings.maxDailyRisk}%`],
     ];
 
     autoTable(doc, {
