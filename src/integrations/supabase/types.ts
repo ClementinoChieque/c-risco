@@ -38,6 +38,42 @@ export type Database = {
         }
         Relationships: []
       }
+      propfirm_settings: {
+        Row: {
+          created_at: string
+          daily_drawdown: number
+          funded_balance: number
+          id: string
+          max_drawdown: number
+          name: string
+          profit_target: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_drawdown?: number
+          funded_balance?: number
+          id?: string
+          max_drawdown?: number
+          name?: string
+          profit_target?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_drawdown?: number
+          funded_balance?: number
+          id?: string
+          max_drawdown?: number
+          name?: string
+          profit_target?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       risk_settings: {
         Row: {
           account_balance: number

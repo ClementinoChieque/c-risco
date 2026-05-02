@@ -2,23 +2,7 @@ import { createContext, useContext, useState, useCallback, useMemo, type ReactNo
 import { Trade, RiskSettings, Market, OverallStats, DailyStats, PropFirmSettings } from '@/types/trade';
 import { useTrades } from '@/hooks/useTrades';
 import { useRiskSettings } from '@/hooks/useRiskSettings';
-
-const defaultPropFirmSettings: PropFirmSettings = {
-  name: '',
-  fundedBalance: 0,
-  profitTarget: 10,
-  dailyDrawdown: 5,
-  maxDrawdown: 10,
-};
-
-function loadPropFirmSettings(): PropFirmSettings {
-  try {
-    const saved = localStorage.getItem('propFirmSettings');
-    return saved ? JSON.parse(saved) : defaultPropFirmSettings;
-  } catch {
-    return defaultPropFirmSettings;
-  }
-}
+import { usePropFirmSettings } from '@/hooks/usePropFirmSettings';
 
 interface TradeContextType {
   trades: Trade[];
@@ -33,7 +17,7 @@ interface TradeContextType {
   closeTrade: (id: string, result: number) => Promise<void>;
   deleteTrade: (id: string) => Promise<void>;
   updateRiskSettings: (settings: Partial<RiskSettings>) => Promise<void>;
-  updatePropFirmSettings: (settings: PropFirmSettings) => void;
+  updatePropFirmSettings: (settings: PropFirmSettings) => Promise<void> | void;
   setCurrentMarket: (market: Market) => void;
   getOverallStats: () => OverallStats;
   getDailyStats: (date: string) => DailyStats;
@@ -46,15 +30,10 @@ const TradeContext = createContext<TradeContextType | undefined>(undefined);
 export function TradeProvider({ children }: { children: ReactNode }) {
   const { trades, loading: tradesLoading, addTrade, updateTrade, closeTrade: closeTradeBase, deleteTrade } = useTrades();
   const { riskSettings, loading: settingsLoading, updateRiskSettings } = useRiskSettings();
+  const { propFirmSettings, updatePropFirmSettings, loading: pfLoading } = usePropFirmSettings();
   const [currentMarket, setCurrentMarket] = useState<Market>('forex');
-  const [propFirmSettings, setPropFirmSettings] = useState<PropFirmSettings>(loadPropFirmSettings);
 
-  const updatePropFirmSettings = useCallback((settings: PropFirmSettings) => {
-    setPropFirmSettings(settings);
-    localStorage.setItem('propFirmSettings', JSON.stringify(settings));
-  }, []);
-
-  const loading = tradesLoading || settingsLoading;
+  const loading = tradesLoading || settingsLoading || pfLoading;
 
   // Trades filtered by current market
   const marketTrades = useMemo(() => trades.filter(t => t.market === currentMarket), [trades, currentMarket]);
