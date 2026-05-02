@@ -68,7 +68,7 @@ export function ExportPDF() {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('RiskMaster', 20, 25);
+    doc.text('C-Risco', 20, 25);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Relatório gerado em ${format(new Date(), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}`, pageWidth - 20, 25, { align: 'right' });
