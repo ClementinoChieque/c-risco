@@ -17,7 +17,7 @@ interface TradeContextType {
   closeTrade: (id: string, result: number) => Promise<void>;
   deleteTrade: (id: string) => Promise<void>;
   updateRiskSettings: (settings: Partial<RiskSettings>) => Promise<void>;
-  updatePropFirmSettings: (settings: PropFirmSettings) => void;
+  updatePropFirmSettings: (settings: PropFirmSettings) => Promise<void> | void;
   setCurrentMarket: (market: Market) => void;
   getOverallStats: () => OverallStats;
   getDailyStats: (date: string) => DailyStats;
