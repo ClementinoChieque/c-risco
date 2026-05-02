@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,11 +8,22 @@ import { toast } from 'sonner';
 import { useTrade } from '@/context/TradeContext';
 
 export function BalanceManager() {
-  const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings } = useTrade();
-  const [forex, setForex] = useState(riskSettings.accountBalance.toString());
-  const [crypto, setCrypto] = useState(riskSettings.cryptoAccountBalance.toString());
-  const [propfirm, setPropfirm] = useState(propFirmSettings.fundedBalance.toString());
+  const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings, loading } = useTrade();
+  const [forex, setForex] = useState('');
+  const [crypto, setCrypto] = useState('');
+  const [propfirm, setPropfirm] = useState('');
   const [saving, setSaving] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Sync inputs once async data is loaded from Supabase
+  useEffect(() => {
+    if (!loading && !hydrated) {
+      setForex(riskSettings.accountBalance.toString());
+      setCrypto(riskSettings.cryptoAccountBalance.toString());
+      setPropfirm(propFirmSettings.fundedBalance.toString());
+      setHydrated(true);
+    }
+  }, [loading, hydrated, riskSettings.accountBalance, riskSettings.cryptoAccountBalance, propFirmSettings.fundedBalance]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -21,7 +32,7 @@ export function BalanceManager() {
         accountBalance: parseFloat(forex) || 0,
         cryptoAccountBalance: parseFloat(crypto) || 0,
       });
-      updatePropFirmSettings({
+      await updatePropFirmSettings({
         ...propFirmSettings,
         fundedBalance: parseFloat(propfirm) || 0,
       });
