@@ -84,7 +84,7 @@ export function ExportPDF() {
     const accountData = [
       ['Saldo Forex', `$${riskSettings.accountBalance.toLocaleString()}`],
       ['Saldo Cripto', `$${riskSettings.cryptoAccountBalance.toLocaleString()}`],
-      ['Risco Diario Max.', `${riskSettings.maxDailyRisk}%`],
+      ['Risco Diário Max.', `${riskSettings.maxDailyRisk}%`],
     ];
 
     autoTable(doc, {
@@ -101,7 +101,7 @@ export function ExportPDF() {
     let currentY = (doc as any).lastAutoTable.finalY + 15;
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Estatisticas de Performance', 20, currentY);
+    doc.text('Estatísticas de Performance', 20, currentY);
     doc.line(20, currentY + 3, pageWidth - 20, currentY + 3);
 
     const performanceData = [
@@ -154,7 +154,7 @@ export function ExportPDF() {
     currentY = (doc as any).lastAutoTable.finalY + 15;
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Resumo dos Ultimos 7 Dias', 20, currentY);
+    doc.text('Resumo dos Últimos 7 Dias', 20, currentY);
     doc.line(20, currentY + 3, pageWidth - 20, currentY + 3);
 
     const last7Days = Array.from({ length: 7 }, (_, i) => {
