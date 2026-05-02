@@ -71,7 +71,7 @@ export function ExportPDF() {
     doc.text('RiskMaster', 20, 25);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Relatorio gerado em ${format(new Date(), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}`, pageWidth - 20, 25, { align: 'right' });
+    doc.text(`Relatório gerado em ${format(new Date(), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}`, pageWidth - 20, 25, { align: 'right' });
 
     // === Resumo da Conta ===
     doc.setTextColor(30, 41, 59);
@@ -194,7 +194,7 @@ export function ExportPDF() {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text('Historico de Negociacoes', 20, 20);
+      doc.text('Histórico de Negociações', 20, 20);
       doc.setTextColor(30, 41, 59);
 
       const tradeData = analyses.slice(0, 50).map(a => [
@@ -227,16 +227,16 @@ export function ExportPDF() {
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.text(
-        `Pagina ${i} de ${pageCount} | RiskMaster - Gerenciamento de Risco`,
+        `Pagina ${i} de ${pageCount} | C-Risco - Gerenciamento de Risco`,
         pageWidth / 2,
         doc.internal.pageSize.getHeight() - 10,
         { align: 'center' }
       );
     }
 
-    const fileName = `riskmaster-relatorio-${format(new Date(), 'yyyy-MM-dd-HHmm')}.pdf`;
+    const fileName = `C-Risco-relatório-${format(new Date(), 'yyyy-MM-dd-HHmm')}.pdf`;
     doc.save(fileName);
-    toast.success('Relatorio exportado com sucesso!');
+    toast.success('Relatório exportado com sucesso!');
   };
 
   return (
