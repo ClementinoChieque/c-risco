@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       execution_checklist: {
         Row: {
+          category: string
           checked: boolean
           created_at: string
           id: string
@@ -26,6 +27,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: string
           checked?: boolean
           created_at?: string
           id?: string
@@ -36,6 +38,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: string
           checked?: boolean
           created_at?: string
           id?: string
