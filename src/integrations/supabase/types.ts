@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      execution_checklist: {
+        Row: {
+          checked: boolean
+          created_at: string
+          id: string
+          market: string
+          position: number
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checked?: boolean
+          created_at?: string
+          id?: string
+          market?: string
+          position?: number
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checked?: boolean
+          created_at?: string
+          id?: string
+          market?: string
+          position?: number
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
