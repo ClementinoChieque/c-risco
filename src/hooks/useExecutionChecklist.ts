@@ -3,9 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Market } from '@/types/trade';
 
+export type ChecklistCategory = 'context' | 'structure' | 'triggers';
+
 export interface ChecklistItem {
   id: string;
   market: Market;
+  category: ChecklistCategory;
   text: string;
   checked: boolean;
   position: number;
@@ -33,6 +36,7 @@ export function useExecutionChecklist() {
       (data || []).map((d: any) => ({
         id: d.id,
         market: d.market as Market,
+        category: (d.category || 'context') as ChecklistCategory,
         text: d.text,
         checked: d.checked,
         position: d.position,
@@ -46,18 +50,25 @@ export function useExecutionChecklist() {
   }, [load]);
 
   const addItem = useCallback(
-    async (market: Market, text: string) => {
+    async (market: Market, category: ChecklistCategory, text: string) => {
       if (!user || !text.trim()) return;
-      const position = items.filter(i => i.market === market).length;
+      const position = items.filter(i => i.market === market && i.category === category).length;
       const { data } = await (supabase as any)
         .from('execution_checklist')
-        .insert({ user_id: user.id, market, text: text.trim(), position })
+        .insert({ user_id: user.id, market, category, text: text.trim(), position })
         .select()
         .single();
       if (data) {
         setItems(prev => [
           ...prev,
-          { id: data.id, market, text: data.text, checked: data.checked, position: data.position },
+          {
+            id: data.id,
+            market,
+            category,
+            text: data.text,
+            checked: data.checked,
+            position: data.position,
+          },
         ]);
       }
     },

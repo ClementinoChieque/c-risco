@@ -1,0 +1,1 @@
+ALTER TABLE public.execution_checklist ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'context';
