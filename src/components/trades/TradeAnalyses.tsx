@@ -210,7 +210,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           </div>
           <div className="space-y-1">
             <Label>Mercado</Label>
-            <Select value={market} onValueChange={setMarket}>
+            <Select value={market} onValueChange={(v) => { setMarket(v); setSelectedRuleIds([]); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
