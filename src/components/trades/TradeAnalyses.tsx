@@ -52,6 +52,14 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
   const [brokerName, setBrokerName] = useState('');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const { items: rulesItems } = useExecutionChecklist();
+  const [selectedRuleIds, setSelectedRuleIds] = useState<string[]>([]);
+
+  const marketRules = rulesItems.filter(r => r.market === market);
+
+  const toggleRule = (id: string) =>
+    setSelectedRuleIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
