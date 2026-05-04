@@ -169,7 +169,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
   return (
     <Card className="glass-card border-border/40">
-      <CardContent className="pt-6 space-y-4">
+      <CardContent className="pt-5 sm:pt-6 px-3 sm:px-6 pb-4 sm:pb-6 space-y-4">
         <div className="space-y-2">
           <Label>Imagem da Análise</Label>
           <label className="block cursor-pointer">
