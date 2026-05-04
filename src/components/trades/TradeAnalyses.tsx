@@ -456,13 +456,13 @@ export function TradeAnalyses() {
 
   return (
     <Tabs defaultValue="wins" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="wins" className="gap-2">
-          <TrendingUp className="h-4 w-4" />
+      <TabsList className="grid w-full grid-cols-2 h-auto">
+        <TabsTrigger value="wins" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+          <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Gains
         </TabsTrigger>
-        <TabsTrigger value="losses" className="gap-2">
-          <TrendingDown className="h-4 w-4" />
+        <TabsTrigger value="losses" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+          <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Losses
         </TabsTrigger>
       </TabsList>
