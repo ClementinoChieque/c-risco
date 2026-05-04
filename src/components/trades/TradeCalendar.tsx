@@ -229,14 +229,14 @@ export function TradeCalendar() {
                 })}
               </div>
 
-              <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 text-[10px] sm:text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-sm bg-emerald-500/20 border border-emerald-500/30" />
-                  <span>Dia positivo</span>
+                  <span>Positivo</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-sm bg-red-500/20 border border-red-500/30" />
-                  <span>Dia negativo</span>
+                  <span>Negativo</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-sm border border-primary bg-primary/10" />
