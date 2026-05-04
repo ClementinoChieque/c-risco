@@ -227,6 +227,54 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           </div>
         </div>
 
+        <div className="space-y-3 rounded-lg border border-border/50 bg-secondary/10 p-3">
+          <div className="flex items-center gap-2">
+            <Brain className="h-4 w-4 text-primary" />
+            <Label className="text-sm font-semibold">Regras de Execução aplicadas</Label>
+            {selectedRuleIds.length > 0 && (
+              <span className="ml-auto text-xs font-mono text-muted-foreground">
+                {selectedRuleIds.length} selecionada(s)
+              </span>
+            )}
+          </div>
+          {marketRules.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              Nenhuma regra cadastrada para este mercado. Adicione em "Regras".
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {RULE_CATEGORIES.map(cat => {
+                const list = marketRules.filter(r => r.category === cat.value);
+                if (list.length === 0) return null;
+                const Icon = cat.icon;
+                return (
+                  <div key={cat.value} className="space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5" />
+                      {cat.label}
+                    </div>
+                    <div className="space-y-1">
+                      {list.map(r => (
+                        <label
+                          key={r.id}
+                          className="flex items-start gap-2 p-1.5 rounded hover:bg-background/40 cursor-pointer text-sm"
+                        >
+                          <Checkbox
+                            checked={selectedRuleIds.includes(r.id)}
+                            onCheckedChange={() => toggleRule(r.id)}
+                            className="mt-0.5"
+                          />
+                          <span>{r.text}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         <div className="space-y-2">
           <Label>Notas (opcional)</Label>
           <Textarea placeholder="Descreva o que aprendeu com esta operação..." value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
