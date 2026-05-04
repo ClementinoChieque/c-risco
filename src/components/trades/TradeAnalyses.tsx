@@ -93,13 +93,28 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
       const parsedAmount = parseFloat(amount);
 
+      const selectedRules = rulesItems.filter(r => selectedRuleIds.includes(r.id));
+      let notesWithRules = notes.trim();
+      if (selectedRules.length > 0) {
+        const grouped = RULE_CATEGORIES.map(cat => {
+          const list = selectedRules.filter(r => r.category === cat.value);
+          if (list.length === 0) return null;
+          return `${cat.label}:\n${list.map(r => `• ${r.text}`).join('\n')}`;
+        })
+          .filter(Boolean)
+          .join('\n\n');
+        notesWithRules = notesWithRules
+          ? `${notesWithRules}\n\n— Regras de Execução —\n${grouped}`
+          : `— Regras de Execução —\n${grouped}`;
+      }
+
       const { error: dbError } = await supabase
         .from('trade_analyses')
         .insert({
           user_id: user!.id,
           type,
           image_url: urlData.publicUrl,
-          notes: notes || null,
+          notes: notesWithRules || null,
           amount: parsedAmount,
           asset_pair: assetPair.trim(),
           risk_reward: parseFloat(riskReward),
