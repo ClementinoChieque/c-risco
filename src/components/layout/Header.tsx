@@ -6,14 +6,27 @@ import logo from '@/assets/logo.png';
 
 export function Header() {
   const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const todayRisk = getTodayRiskUsed();
+  const displayName =
+    (user?.user_metadata as any)?.full_name ||
+    (user?.user_metadata as any)?.name ||
+    user?.email?.split('@')[0] ||
+    '';
 
   return (
     <header className="glass-card sticky top-0 z-50 border-b border-border/50 px-4 py-3 md:px-6 md:py-4">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 shrink-0 min-w-0">
           <img src={logo} alt="CRisco - Gestão de Trades" className="h-8 md:h-10 w-auto" />
+          {displayName && (
+            <span
+              className="truncate text-xs md:text-sm font-medium text-foreground/90 max-w-[120px] md:max-w-none"
+              title={displayName}
+            >
+              {displayName}
+            </span>
+          )}
         </div>
 
         {/* Desktop: full info */}
