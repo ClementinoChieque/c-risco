@@ -158,6 +158,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       setRiskPct('');
       setBrokerName('');
       setPreview(null);
+      setSelectedRuleIds([]);
       onUploaded();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + err.message);
