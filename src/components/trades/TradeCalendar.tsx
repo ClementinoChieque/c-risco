@@ -151,14 +151,14 @@ export function TradeCalendar() {
   return (
     <>
       <Card className="glass-card border-border/40">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Calendário de Trades</CardTitle>
-            <div className="flex items-center gap-2">
+        <CardHeader className="pb-3 px-3 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="text-base sm:text-lg">Calendário de Trades</CardTitle>
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto">
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevMonth}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm font-medium min-w-[140px] text-center">
+              <span className="text-xs sm:text-sm font-medium min-w-[110px] sm:min-w-[140px] text-center">
                 {MONTHS[month]} {year}
               </span>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextMonth}>
@@ -167,7 +167,7 @@ export function TradeCalendar() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           {loading ? (
             <p className="text-muted-foreground text-sm text-center py-8">A carregar...</p>
           ) : (
