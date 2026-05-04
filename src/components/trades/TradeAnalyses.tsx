@@ -169,7 +169,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
   return (
     <Card className="glass-card border-border/40">
-      <CardContent className="pt-6 space-y-4">
+      <CardContent className="pt-5 sm:pt-6 px-3 sm:px-6 pb-4 sm:pb-6 space-y-4">
         <div className="space-y-2">
           <Label>Imagem da Análise</Label>
           <label className="block cursor-pointer">
@@ -396,7 +396,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-            <CardContent className="pt-3 pb-3 space-y-2">
+            <CardContent className="pt-3 pb-3 px-3 sm:px-6 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={type === 'win' ? 'default' : 'destructive'} className="font-mono text-xs">
                   {type === 'win' ? '+' : '-'}${Math.abs(item.amount || 0).toFixed(2)}
@@ -439,7 +439,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 </p>
               )}
             </CardContent>
-            <div className="px-6 pb-3">
+            <div className="px-3 sm:px-6 pb-3">
               <p className="text-xs text-muted-foreground">
                 {new Date(item.created_at).toLocaleDateString('pt-AO')}
               </p>
@@ -456,13 +456,13 @@ export function TradeAnalyses() {
 
   return (
     <Tabs defaultValue="wins" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="wins" className="gap-2">
-          <TrendingUp className="h-4 w-4" />
+      <TabsList className="grid w-full grid-cols-2 h-auto">
+        <TabsTrigger value="wins" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+          <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Gains
         </TabsTrigger>
-        <TabsTrigger value="losses" className="gap-2">
-          <TrendingDown className="h-4 w-4" />
+        <TabsTrigger value="losses" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+          <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Losses
         </TabsTrigger>
       </TabsList>

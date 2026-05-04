@@ -151,14 +151,14 @@ export function TradeCalendar() {
   return (
     <>
       <Card className="glass-card border-border/40">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Calendário de Trades</CardTitle>
-            <div className="flex items-center gap-2">
+        <CardHeader className="pb-3 px-3 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="text-base sm:text-lg">Calendário de Trades</CardTitle>
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto">
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevMonth}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm font-medium min-w-[140px] text-center">
+              <span className="text-xs sm:text-sm font-medium min-w-[110px] sm:min-w-[140px] text-center">
                 {MONTHS[month]} {year}
               </span>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextMonth}>
@@ -167,7 +167,7 @@ export function TradeCalendar() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           {loading ? (
             <p className="text-muted-foreground text-sm text-center py-8">A carregar...</p>
           ) : (
@@ -229,14 +229,14 @@ export function TradeCalendar() {
                 })}
               </div>
 
-              <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-4 text-[10px] sm:text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-sm bg-emerald-500/20 border border-emerald-500/30" />
-                  <span>Dia positivo</span>
+                  <span>Positivo</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-sm bg-red-500/20 border border-red-500/30" />
-                  <span>Dia negativo</span>
+                  <span>Negativo</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-sm border border-primary bg-primary/10" />
@@ -249,7 +249,7 @@ export function TradeCalendar() {
       </Card>
 
       <Dialog open={!!selectedDate} onOpenChange={(open) => !open && setSelectedDate(null)}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[85vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base">
               Trades — {selectedDate && formatDate(selectedDate)}
