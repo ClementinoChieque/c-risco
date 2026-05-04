@@ -13,6 +13,15 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useTrade } from '@/context/TradeContext';
 import { useAuth } from '@/context/AuthContext';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useExecutionChecklist, ChecklistCategory } from '@/hooks/useExecutionChecklist';
+import { Brain, Globe2, LayoutGrid, Zap } from 'lucide-react';
+
+const RULE_CATEGORIES: { value: ChecklistCategory; label: string; icon: typeof Globe2 }[] = [
+  { value: 'context', label: 'Contexto do Mercado', icon: Globe2 },
+  { value: 'structure', label: 'Estrutura do Mercado', icon: LayoutGrid },
+  { value: 'triggers', label: 'Gatilhos de Entrada', icon: Zap },
+];
 
 interface TradeAnalysis {
   id: string;
