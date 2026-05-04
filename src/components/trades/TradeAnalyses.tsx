@@ -396,7 +396,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-            <CardContent className="pt-3 pb-3 space-y-2">
+            <CardContent className="pt-3 pb-3 px-3 sm:px-6 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={type === 'win' ? 'default' : 'destructive'} className="font-mono text-xs">
                   {type === 'win' ? '+' : '-'}${Math.abs(item.amount || 0).toFixed(2)}
