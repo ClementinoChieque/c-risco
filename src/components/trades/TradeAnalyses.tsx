@@ -439,7 +439,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 </p>
               )}
             </CardContent>
-            <div className="px-6 pb-3">
+            <div className="px-3 sm:px-6 pb-3">
               <p className="text-xs text-muted-foreground">
                 {new Date(item.created_at).toLocaleDateString('pt-AO')}
               </p>
