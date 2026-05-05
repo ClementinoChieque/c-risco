@@ -2,7 +2,15 @@ import { useTrade } from '@/context/TradeContext';
 import { useAuth } from '@/context/AuthContext';
 import { AlertTriangle, DollarSign, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import logo from '@/assets/logo.png';
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export function Header() {
   const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
@@ -20,12 +28,19 @@ export function Header() {
         <div className="flex items-center gap-2 md:gap-3 shrink-0 min-w-0">
           <img src={logo} alt="CRisco - Gestão de Trades" className="h-8 md:h-10 w-auto" />
           {displayName && (
-            <span
-              className="truncate text-xs md:text-sm font-medium text-foreground/90 max-w-[120px] md:max-w-none"
-              title={displayName}
-            >
-              {displayName}
-            </span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Avatar className="h-7 w-7 md:h-8 md:w-8 shrink-0">
+                <AvatarFallback className="bg-primary/15 text-primary text-[10px] md:text-xs font-semibold">
+                  {getInitials(displayName)}
+                </AvatarFallback>
+              </Avatar>
+              <span
+                className="truncate text-xs md:text-sm font-medium text-foreground/90 max-w-[100px] md:max-w-none"
+                title={displayName}
+              >
+                {displayName}
+              </span>
+            </div>
           )}
         </div>
 
