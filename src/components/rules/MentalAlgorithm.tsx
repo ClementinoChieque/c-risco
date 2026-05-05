@@ -168,8 +168,9 @@ function CategoryBlock({
                 <span
                   className={cn(
                     'flex-1 text-sm',
-                    item.checked && 'line-through text-muted-foreground',
+                    item.checked && 'line-through opacity-60',
                   )}
+                  style={{ color: '#558C43' }}
                 >
                   {item.text}
                 </span>
