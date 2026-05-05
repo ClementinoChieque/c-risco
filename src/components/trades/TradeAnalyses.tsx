@@ -264,7 +264,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
                             onCheckedChange={() => toggleRule(r.id)}
                             className="mt-0.5"
                           />
-                          <span>{r.text}</span>
+                          <span style={{ color: '#558C43' }}>{r.text}</span>
                         </label>
                       ))}
                     </div>
