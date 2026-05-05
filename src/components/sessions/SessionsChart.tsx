@@ -36,29 +36,48 @@ interface SessionBlock {
   opacity: number;
 }
 
+// Real market opening hours (in their local time):
+// Sydney: 07:00–16:00 AEST (UTC+10/+11 DST)
+// Tóquio: 09:00–18:00 JST (UTC+9, no DST)
+// Londres: 08:00–17:00 BST/GMT (UTC+0/+1 DST)
+// Nova Iorque: 08:00–17:00 EST/EDT (UTC-5/-4 DST)
+// Converted to WAT (UTC+1):
 function getSessionBlocks(): SessionBlock[] {
-  const londonDST = getTimezoneOffsetHours('Europe/London') !== 0;
-  const nyDST = getTimezoneOffsetHours('America/New_York') !== -5;
+  const londonOffset = getTimezoneOffsetHours('Europe/London'); // 0 or 1
+  const nyOffset = getTimezoneOffsetHours('America/New_York'); // -5 or -4
+  const tokyoOffset = getTimezoneOffsetHours('Asia/Tokyo'); // 9
+  const sydneyOffset = getTimezoneOffsetHours('Australia/Sydney'); // 10 or 11
+  const wat = 1;
 
-  const londonStart = londonDST ? 7 : 8;
-  const londonEnd = londonDST ? 16 : 17;
-  const nyStart = nyDST ? 12 : 13;
-  const nyEnd = nyDST ? 21 : 22;
+  // Local open/close (24h) → WAT
+  const toWat = (localHour: number, localOffset: number) =>
+    ((localHour - localOffset + wat) % 24 + 24) % 24;
+
+  const sydneyStart = toWat(7, sydneyOffset);
+  const sydneyEnd = toWat(16, sydneyOffset);
+  const tokyoStart = toWat(9, tokyoOffset);
+  const tokyoEnd = toWat(18, tokyoOffset);
+  const londonStart = toWat(8, londonOffset);
+  const londonEnd = toWat(17, londonOffset);
+  const nyStart = toWat(8, nyOffset);
+  const nyEnd = toWat(17, nyOffset);
   const overlapStart = Math.max(londonStart, nyStart);
   const overlapEnd = Math.min(londonEnd, nyEnd);
 
   return [
+    { name: 'Sydney', start: sydneyStart, end: sydneyEnd, color: '#f59e0b', opacity: 0.20 },
+    { name: 'Tóquio', start: tokyoStart, end: tokyoEnd, color: '#ef4444', opacity: 0.20 },
     { name: 'Londres', start: londonStart, end: londonEnd, color: '#0ea5e9', opacity: 0.25 },
     { name: 'Nova Iorque', start: nyStart, end: nyEnd, color: '#a855f7', opacity: 0.25 },
-    { name: 'Overlap', start: overlapStart, end: overlapEnd, color: '#22c55e', opacity: 0.35 },
+    { name: 'Overlap LDN/NY', start: overlapStart, end: overlapEnd, color: '#22c55e', opacity: 0.40 },
   ];
 }
 
-// Simulated volume profile per hour (0-23) representing typical activity
+// Volume profile per hour in WAT, weighted by real session activity
 const hourlyVolume: number[] = [
-  10, 8, 6, 5, 5, 6, 8, 12, // 00-07 (Tokyo winds down)
-  45, 60, 70, 65, 55, 80, 95, 90, // 08-15 (London + overlap peak)
-  75, 50, 40, 35, 30, 25, 15, 12, // 16-23 (NY winds down)
+  20, 18, 15, 12, 10, 12, 18, 25, // 00-07 Sydney/Tóquio ativos
+  55, 70, 75, 70, 65, 88, 98, 95, // 08-15 Londres + overlap NY (pico 13-15h WAT)
+  85, 70, 50, 35, 28, 22, 18, 15, // 16-23 NY fecha, mercado esfria
 ];
 
 export function SessionsChart() {
