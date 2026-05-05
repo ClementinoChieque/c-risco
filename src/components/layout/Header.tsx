@@ -28,12 +28,19 @@ export function Header() {
         <div className="flex items-center gap-2 md:gap-3 shrink-0 min-w-0">
           <img src={logo} alt="CRisco - Gestão de Trades" className="h-8 md:h-10 w-auto" />
           {displayName && (
-            <span
-              className="truncate text-xs md:text-sm font-medium text-foreground/90 max-w-[120px] md:max-w-none"
-              title={displayName}
-            >
-              {displayName}
-            </span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Avatar className="h-7 w-7 md:h-8 md:w-8 shrink-0">
+                <AvatarFallback className="bg-primary/15 text-primary text-[10px] md:text-xs font-semibold">
+                  {getInitials(displayName)}
+                </AvatarFallback>
+              </Avatar>
+              <span
+                className="truncate text-xs md:text-sm font-medium text-foreground/90 max-w-[100px] md:max-w-none"
+                title={displayName}
+              >
+                {displayName}
+              </span>
+            </div>
           )}
         </div>
 
