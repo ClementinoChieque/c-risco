@@ -1,11 +1,17 @@
-import { useEffect, useRef } from 'react';
-import { createChart, ColorType, IChartApi, HistogramSeries, LineSeries } from 'lightweight-charts';
+import { useEffect, useRef, useState } from 'react';
+import { createChart, ColorType, IChartApi, HistogramSeries } from 'lightweight-charts';
 
 function getWATHour(): number {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
   const wat = new Date(utc + 3600000);
   return wat.getHours() + wat.getMinutes() / 60;
+}
+
+function getWATDate(): Date {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utc + 3600000);
 }
 
 function getTimezoneOffsetHours(tz: string): number {
@@ -36,20 +42,13 @@ interface SessionBlock {
   opacity: number;
 }
 
-// Real market opening hours (in their local time):
-// Sydney: 07:00–16:00 AEST (UTC+10/+11 DST)
-// Tóquio: 09:00–18:00 JST (UTC+9, no DST)
-// Londres: 08:00–17:00 BST/GMT (UTC+0/+1 DST)
-// Nova Iorque: 08:00–17:00 EST/EDT (UTC-5/-4 DST)
-// Converted to WAT (UTC+1):
 function getSessionBlocks(): SessionBlock[] {
-  const londonOffset = getTimezoneOffsetHours('Europe/London'); // 0 or 1
-  const nyOffset = getTimezoneOffsetHours('America/New_York'); // -5 or -4
-  const tokyoOffset = getTimezoneOffsetHours('Asia/Tokyo'); // 9
-  const sydneyOffset = getTimezoneOffsetHours('Australia/Sydney'); // 10 or 11
+  const londonOffset = getTimezoneOffsetHours('Europe/London');
+  const nyOffset = getTimezoneOffsetHours('America/New_York');
+  const tokyoOffset = getTimezoneOffsetHours('Asia/Tokyo');
+  const sydneyOffset = getTimezoneOffsetHours('Australia/Sydney');
   const wat = 1;
 
-  // Local open/close (24h) → WAT
   const toWat = (localHour: number, localOffset: number) =>
     ((localHour - localOffset + wat) % 24 + 24) % 24;
 
@@ -73,23 +72,35 @@ function getSessionBlocks(): SessionBlock[] {
   ];
 }
 
-// Volume profile per hour in WAT, weighted by real session activity
+const fmtHour = (h: number) => `${String(Math.round(h)).padStart(2, '0')}:00`;
+
 const hourlyVolume: number[] = [
-  20, 18, 15, 12, 10, 12, 18, 25, // 00-07 Sydney/Tóquio ativos
-  55, 70, 75, 70, 65, 88, 98, 95, // 08-15 Londres + overlap NY (pico 13-15h WAT)
-  85, 70, 50, 35, 28, 22, 18, 15, // 16-23 NY fecha, mercado esfria
+  20, 18, 15, 12, 10, 12, 18, 25,
+  55, 70, 75, 70, 65, 88, 98, 95,
+  85, 70, 50, 35, 28, 22, 18, 15,
 ];
+
+interface TooltipState {
+  x: number;
+  y: number;
+  hour: number;
+  visible: boolean;
+}
 
 export function SessionsChart() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState>({ x: 0, y: 0, hour: 0, visible: false });
+
+  const sessions = getSessionBlocks();
+  const watNow = getWATDate();
+  const dateLabel = watNow.toLocaleDateString('pt-AO', {
+    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+  });
 
   useEffect(() => {
     if (!containerRef.current) return;
-
-    const bgColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--card')
-      .trim();
 
     const chart = createChart(containerRef.current, {
       width: containerRef.current.clientWidth,
@@ -104,10 +115,7 @@ export function SessionsChart() {
         vertLines: { color: 'rgba(255,255,255,0.04)' },
         horzLines: { color: 'rgba(255,255,255,0.04)' },
       },
-      rightPriceScale: {
-        visible: true,
-        borderColor: 'rgba(255,255,255,0.08)',
-      },
+      rightPriceScale: { visible: true, borderColor: 'rgba(255,255,255,0.08)' },
       timeScale: {
         visible: true,
         borderColor: 'rgba(255,255,255,0.08)',
@@ -123,7 +131,6 @@ export function SessionsChart() {
 
     chartRef.current = chart;
 
-    // Add session background markers using histogram series for each session
     const sessionBlocks = getSessionBlocks();
     sessionBlocks.forEach((session) => {
       const series = chart.addSeries(HistogramSeries, {
@@ -133,13 +140,11 @@ export function SessionsChart() {
         lastValueVisible: false,
         priceLineVisible: false,
       });
-
       const data = [];
       for (let h = 0; h < 24; h++) {
         const inSession = session.start < session.end
           ? h >= session.start && h < session.end
           : h >= session.start || h < session.end;
-
         if (inSession) {
           data.push({
             time: h as any,
@@ -151,7 +156,6 @@ export function SessionsChart() {
       series.setData(data);
     });
 
-    // Current hour marker - use a histogram bar with distinct color
     const currentHour = Math.floor(getWATHour());
     const markerSeries = chart.addSeries(HistogramSeries, {
       color: 'hsl(185, 100%, 50%)',
@@ -160,19 +164,30 @@ export function SessionsChart() {
       lastValueVisible: false,
       priceLineVisible: false,
     });
-
     markerSeries.setData([
       { time: currentHour as any, value: 100, color: 'rgba(0, 230, 230, 0.4)' },
     ]);
 
     chart.timeScale().fitContent();
 
+    chart.subscribeCrosshairMove((param) => {
+      if (!param.time || !param.point || !containerRef.current) {
+        setTooltip((t) => ({ ...t, visible: false }));
+        return;
+      }
+      setTooltip({
+        x: param.point.x,
+        y: param.point.y,
+        hour: Number(param.time),
+        visible: true,
+      });
+    });
+
     const handleResize = () => {
       if (containerRef.current) {
         chart.applyOptions({ width: containerRef.current.clientWidth });
       }
     };
-
     const observer = new ResizeObserver(handleResize);
     observer.observe(containerRef.current);
 
@@ -183,25 +198,80 @@ export function SessionsChart() {
     };
   }, []);
 
+  const hoverSessions = tooltip.visible
+    ? sessions.filter((s) => {
+        const h = tooltip.hour;
+        return s.start < s.end ? h >= s.start && h < s.end : h >= s.start || h < s.end;
+      })
+    : [];
+
   return (
     <div className="glass-card rounded-xl p-4 animate-fade-in space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
           Mapa de Sessões (WAT)
         </h3>
-        <div className="flex items-center gap-3">
-          {getSessionBlocks().map((s) => (
-            <div key={s.name} className="flex items-center gap-1.5">
+      </div>
+
+      {/* Legend with WAT open/close times */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        {sessions.map((s) => (
+          <div
+            key={s.name}
+            className="flex flex-col gap-1 p-2 rounded-lg bg-secondary/30 border border-border/40"
+          >
+            <div className="flex items-center gap-1.5">
               <span
-                className="w-2.5 h-2.5 rounded-full"
+                className="w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: s.color }}
               />
-              <span className="text-[10px] text-muted-foreground font-medium">{s.name}</span>
+              <span className="text-[11px] font-medium truncate">{s.name}</span>
             </div>
-          ))}
-        </div>
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {fmtHour(s.start)} – {fmtHour(s.end)}
+            </span>
+          </div>
+        ))}
       </div>
-      <div ref={containerRef} className="w-full rounded-lg overflow-hidden" />
+
+      <div ref={wrapperRef} className="relative w-full">
+        <div ref={containerRef} className="w-full rounded-lg overflow-hidden" />
+
+        {tooltip.visible && (
+          <div
+            className="pointer-events-none absolute z-10 glass-card rounded-lg p-2.5 shadow-lg border border-border/60 min-w-[180px]"
+            style={{
+              left: Math.min(tooltip.x + 12, (wrapperRef.current?.clientWidth ?? 0) - 200),
+              top: Math.max(tooltip.y - 10, 0),
+            }}
+          >
+            <p className="text-[10px] text-muted-foreground capitalize">{dateLabel}</p>
+            <p className="font-mono text-sm font-bold text-primary mt-0.5">
+              {fmtHour(tooltip.hour)} WAT
+            </p>
+            {hoverSessions.length > 0 ? (
+              <div className="mt-1.5 pt-1.5 border-t border-border/40 space-y-0.5">
+                {hoverSessions.map((s) => (
+                  <div key={s.name} className="flex items-center gap-1.5">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ backgroundColor: s.color }}
+                    />
+                    <span className="text-[10px]">{s.name}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground ml-auto">
+                      {fmtHour(s.start)}–{fmtHour(s.end)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[10px] text-muted-foreground mt-1.5 pt-1.5 border-t border-border/40">
+                Nenhuma sessão ativa
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
