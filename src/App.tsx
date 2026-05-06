@@ -13,6 +13,7 @@ import TradesPage from "./pages/TradesPage";
 import AnalysesPage from "./pages/AnalysesPage";
 import RulesPage from "./pages/RulesPage";
 import NotFound from "./pages/NotFound";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/diary" element={<ProtectedRoute><TradeProvider><DiaryPage /></TradeProvider></ProtectedRoute>} />
             <Route path="/analyses" element={<ProtectedRoute><TradeProvider><AnalysesPage /></TradeProvider></ProtectedRoute>} />
             <Route path="/rules" element={<ProtectedRoute><TradeProvider><RulesPage /></TradeProvider></ProtectedRoute>} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
