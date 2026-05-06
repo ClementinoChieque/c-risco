@@ -13,6 +13,7 @@ import TradesPage from "./pages/TradesPage";
 import AnalysesPage from "./pages/AnalysesPage";
 import RulesPage from "./pages/RulesPage";
 import NotFound from "./pages/NotFound";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
