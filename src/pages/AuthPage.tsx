@@ -81,7 +81,7 @@ export default function AuthPage() {
               <Label>Email</Label>
               <Input
                 type="email"
-                placeholder="seu@email.com"
+                placeholder="Trader@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
