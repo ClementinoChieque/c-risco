@@ -81,12 +81,19 @@ export function ExportPDF() {
     });
 
     // === Header ===
-    doc.setFillColor(15, 23, 42);
+    doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, pageWidth, 40, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('C-Risco', 20, 25);
+    try {
+      const logoData = await loadImageAsDataURL(logoCrisco);
+      // Logo aspect ~ 880x310 -> height 22mm, width ~62mm
+      doc.addImage(logoData, 'PNG', 20, 9, 62, 22);
+    } catch {
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('C-Risco', 20, 25);
+    }
+    doc.setTextColor(80, 80, 80);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Relatório gerado em ${format(new Date(), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}`, pageWidth - 20, 25, { align: 'right' });
