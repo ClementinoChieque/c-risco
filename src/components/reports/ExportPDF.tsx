@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 export function ExportPDF() {
-  const { riskSettings } = useTrade();
+  const { riskSettings, propFirmSettings } = useTrade();
 
   const generatePDF = async () => {
     // Fetch trade_analyses data
