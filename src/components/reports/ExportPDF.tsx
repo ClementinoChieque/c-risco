@@ -84,6 +84,7 @@ export function ExportPDF() {
     const accountData = [
       ['Saldo Forex', `$${riskSettings.accountBalance.toLocaleString()}`],
       ['Saldo Cripto', `$${riskSettings.cryptoAccountBalance.toLocaleString()}`],
+      [`Saldo PropFirm${propFirmSettings.name ? ` (${propFirmSettings.name})` : ''}`, `$${(propFirmSettings.fundedBalance || 0).toLocaleString()}`],
     ];
 
     autoTable(doc, {
