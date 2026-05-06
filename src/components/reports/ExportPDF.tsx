@@ -7,6 +7,24 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import logoCrisco from '@/assets/logo-crisco.png';
+
+const loadImageAsDataURL = (src: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject(new Error('canvas ctx'));
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
 
 export function ExportPDF() {
   const { riskSettings, propFirmSettings } = useTrade();
