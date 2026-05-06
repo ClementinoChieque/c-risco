@@ -57,12 +57,16 @@ export default function AuthPage() {
         <CardHeader className="text-center space-y-4">
           <img src="/logoctrader.png" alt="Logo" className="h-12 mx-auto" />
           <CardTitle className="text-xl">
-            {isLogin ? 'Entrar na sua conta' : 'Criar nova conta'}
+            {isForgot
+              ? 'Recuperar palavra-passe'
+              : isLogin
+              ? 'Entrar na sua conta'
+              : 'Criar nova conta'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {!isLogin && !isForgot && (
               <div className="space-y-2">
                 <Label>Nome completo</Label>
                 <Input
@@ -83,31 +87,49 @@ export default function AuthPage() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label>Palavra-passe</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe'}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            {!isForgot && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Palavra-passe</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => setIsForgot(true)}
+                      className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      Esqueci-me
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 'A processar...'
+              ) : isForgot ? (
+                <>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Enviar email de recuperação
+                </>
               ) : isLogin ? (
                 <>
                   <LogIn className="h-4 w-4 mr-2" />
@@ -123,18 +145,27 @@ export default function AuthPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <button
-              type="button"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin
-                ? 'Não tem conta? Criar agora'
-                : 'Já tem conta? Entrar'}
-            </button>
+            {isForgot ? (
+              <button
+                type="button"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                onClick={() => setIsForgot(false)}
+              >
+                Voltar ao login
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar'}
+              </button>
+            )}
           </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+
