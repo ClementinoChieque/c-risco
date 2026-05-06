@@ -7,6 +7,24 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import logoCrisco from '@/assets/logo-crisco.png';
+
+const loadImageAsDataURL = (src: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject(new Error('canvas ctx'));
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
 
 export function ExportPDF() {
   const { riskSettings, propFirmSettings } = useTrade();
@@ -63,12 +81,19 @@ export function ExportPDF() {
     });
 
     // === Header ===
-    doc.setFillColor(15, 23, 42);
+    doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, pageWidth, 40, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('C-Risco', 20, 25);
+    try {
+      const logoData = await loadImageAsDataURL(logoCrisco);
+      // Logo aspect ~ 880x310 -> height 22mm, width ~62mm
+      doc.addImage(logoData, 'PNG', 20, 9, 62, 22);
+    } catch {
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('C-Risco', 20, 25);
+    }
+    doc.setTextColor(80, 80, 80);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Relatório gerado em ${format(new Date(), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}`, pageWidth - 20, 25, { align: 'right' });
