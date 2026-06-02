@@ -278,7 +278,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
           <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
           {lightboxUrl && (
-            <img src={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
+            <SignedImage storedUrl={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
           )}
         </DialogContent>
       </Dialog>
