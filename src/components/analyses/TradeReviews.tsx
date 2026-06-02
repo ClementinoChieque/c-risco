@@ -293,8 +293,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                 {isBA ? (
                   <div className="grid grid-cols-2 gap-px bg-border/40">
                     <div className="relative">
-                      <img
-                        src={item.image_url}
+                      <SignedImage
+                        storedUrl={item.image_url}
                         alt="Antes"
                         className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         loading="lazy"
@@ -303,8 +303,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                       <Badge variant="outline" className="absolute top-2 left-2 text-xs bg-background/80 backdrop-blur-sm">Antes</Badge>
                     </div>
                     <div className="relative">
-                      <img
-                        src={item.image_url_after!}
+                      <SignedImage
+                        storedUrl={item.image_url_after!}
                         alt="Depois"
                         className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         loading="lazy"
@@ -314,8 +314,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                     </div>
                   </div>
                 ) : (
-                  <img
-                    src={item.image_url}
+                  <SignedImage
+                    storedUrl={item.image_url}
                     alt={`Análise ${item.type}`}
                     className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     loading="lazy"
