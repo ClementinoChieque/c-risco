@@ -87,9 +87,9 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from('trade-analyses')
-        .getPublicUrl(fileName);
+      // Store the storage path; signed URLs are generated on display.
+      const storedPath = fileName;
+
 
       const parsedAmount = parseFloat(amount);
 
