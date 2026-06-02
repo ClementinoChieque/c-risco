@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthContext';
+import { SignedImage } from '@/components/ui/SignedImage';
+import { extractStoragePath } from '@/hooks/useSignedImageUrl';
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 type ReviewType = 'win' | 'loss';
