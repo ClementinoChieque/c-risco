@@ -383,8 +383,8 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
         {items.map((item) => (
           <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
             <div className="relative">
-              <img
-                src={item.image_url}
+              <SignedImage
+                storedUrl={item.image_url}
                 alt={`Análise ${type}`}
                 className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                 loading="lazy"
