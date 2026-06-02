@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthContext';
+import { SignedImage } from '@/components/ui/SignedImage';
+import { extractStoragePath } from '@/hooks/useSignedImageUrl';
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 type ReviewType = 'win' | 'loss';
@@ -65,7 +67,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
     const fileName = `${user!.id}/reviews/${type}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error } = await supabase.storage.from('trade-analyses').upload(fileName, f);
     if (error) throw error;
-    return supabase.storage.from('trade-analyses').getPublicUrl(fileName).data.publicUrl;
+    return fileName;
   };
 
   const handleUpload = async () => {
@@ -228,11 +230,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   }, [type, refreshKey, marketFilter]);
 
   const handleDelete = async (item: TradeReview) => {
-    const removePath = (url: string) => {
-      const path = url.split('/trade-analyses/')[1];
-      return path ? decodeURIComponent(path) : null;
-    };
-    const paths = [removePath(item.image_url), item.image_url_after ? removePath(item.image_url_after) : null].filter(Boolean) as string[];
+    const paths = [extractStoragePath(item.image_url), item.image_url_after ? extractStoragePath(item.image_url_after) : null].filter(Boolean) as string[];
     if (paths.length) {
       await supabase.storage.from('trade-analyses').remove(paths);
     }
@@ -280,7 +278,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
           <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
           {lightboxUrl && (
-            <img src={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
+            <SignedImage storedUrl={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
           )}
         </DialogContent>
       </Dialog>
@@ -295,8 +293,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                 {isBA ? (
                   <div className="grid grid-cols-2 gap-px bg-border/40">
                     <div className="relative">
-                      <img
-                        src={item.image_url}
+                      <SignedImage
+                        storedUrl={item.image_url}
                         alt="Antes"
                         className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         loading="lazy"
@@ -305,8 +303,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                       <Badge variant="outline" className="absolute top-2 left-2 text-xs bg-background/80 backdrop-blur-sm">Antes</Badge>
                     </div>
                     <div className="relative">
-                      <img
-                        src={item.image_url_after!}
+                      <SignedImage
+                        storedUrl={item.image_url_after!}
                         alt="Depois"
                         className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         loading="lazy"
@@ -316,8 +314,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                     </div>
                   </div>
                 ) : (
-                  <img
-                    src={item.image_url}
+                  <SignedImage
+                    storedUrl={item.image_url}
                     alt={`Análise ${item.type}`}
                     className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     loading="lazy"

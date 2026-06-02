@@ -5,6 +5,7 @@ import { ArrowUpRight, ArrowDownRight, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
+import { SignedImage } from '@/components/ui/SignedImage';
 
 interface TradeAnalysis {
   id: string;
@@ -78,7 +79,7 @@ export function TradeDiary() {
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
           <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
           {lightboxUrl && (
-            <img src={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
+            <SignedImage storedUrl={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
           )}
         </DialogContent>
       </Dialog>
@@ -171,8 +172,8 @@ export function TradeDiary() {
             )}
 
             {trade.image_url && (
-              <img
-                src={trade.image_url}
+              <SignedImage
+                storedUrl={trade.image_url}
                 alt={`Análise ${trade.type}`}
                 className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                 loading="lazy"

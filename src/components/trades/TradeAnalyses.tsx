@@ -16,6 +16,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useExecutionChecklist, ChecklistCategory } from '@/hooks/useExecutionChecklist';
 import { Brain, Globe2, LayoutGrid, Zap } from 'lucide-react';
+import { SignedImage } from '@/components/ui/SignedImage';
+import { extractStoragePath } from '@/hooks/useSignedImageUrl';
 
 const RULE_CATEGORIES: { value: ChecklistCategory; label: string; icon: typeof Globe2 }[] = [
   { value: 'context', label: 'Contexto do Mercado', icon: Globe2 },
@@ -87,9 +89,9 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from('trade-analyses')
-        .getPublicUrl(fileName);
+      // Store the storage path; signed URLs are generated on display.
+      const storedPath = fileName;
+
 
       const parsedAmount = parseFloat(amount);
 
@@ -113,7 +115,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
         .insert({
           user_id: user!.id,
           type,
-          image_url: urlData.publicUrl,
+          image_url: storedPath,
           notes: notesWithRules || null,
           amount: parsedAmount,
           asset_pair: assetPair.trim(),
@@ -316,10 +318,11 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   }, [type]);
 
   const handleDelete = async (item: TradeAnalysis) => {
-    const path = item.image_url.split('/trade-analyses/')[1];
+    const path = extractStoragePath(item.image_url);
     if (path) {
-      await supabase.storage.from('trade-analyses').remove([decodeURIComponent(path)]);
+      await supabase.storage.from('trade-analyses').remove([path]);
     }
+
     await supabase.from('trade_analyses').delete().eq('id', item.id);
     toast.success('Análise removida');
     fetchItems();
@@ -371,7 +374,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
           <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
           {lightboxUrl && (
-            <img src={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
+            <SignedImage storedUrl={lightboxUrl} alt="Análise ampliada" className="w-full h-full max-h-[85vh] object-contain rounded-md" />
           )}
         </DialogContent>
       </Dialog>
@@ -380,8 +383,8 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
         {items.map((item) => (
           <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
             <div className="relative">
-              <img
-                src={item.image_url}
+              <SignedImage
+                storedUrl={item.image_url}
                 alt={`Análise ${type}`}
                 className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                 loading="lazy"
