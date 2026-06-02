@@ -172,8 +172,8 @@ export function TradeDiary() {
             )}
 
             {trade.image_url && (
-              <img
-                src={trade.image_url}
+              <SignedImage
+                storedUrl={trade.image_url}
                 alt={`Análise ${trade.type}`}
                 className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                 loading="lazy"
