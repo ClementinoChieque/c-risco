@@ -230,11 +230,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   }, [type, refreshKey, marketFilter]);
 
   const handleDelete = async (item: TradeReview) => {
-    const removePath = (url: string) => {
-      const path = url.split('/trade-analyses/')[1];
-      return path ? decodeURIComponent(path) : null;
-    };
-    const paths = [removePath(item.image_url), item.image_url_after ? removePath(item.image_url_after) : null].filter(Boolean) as string[];
+    const paths = [extractStoragePath(item.image_url), item.image_url_after ? extractStoragePath(item.image_url_after) : null].filter(Boolean) as string[];
     if (paths.length) {
       await supabase.storage.from('trade-analyses').remove(paths);
     }
