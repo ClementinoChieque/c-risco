@@ -4,8 +4,8 @@ import { RiskSettings } from '@/types/trade';
 import { useAuth } from '@/context/AuthContext';
 
 const defaultRiskSettings: RiskSettings = {
-  accountBalance: 10000,
-  cryptoAccountBalance: 10000,
+  accountBalance: 0,
+  cryptoAccountBalance: 0,
   maxRiskPerTrade: 2,
   maxDailyRisk: 6,
   maxOpenTrades: 5,
