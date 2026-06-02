@@ -316,10 +316,11 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   }, [type]);
 
   const handleDelete = async (item: TradeAnalysis) => {
-    const path = item.image_url.split('/trade-analyses/')[1];
+    const path = extractStoragePath(item.image_url);
     if (path) {
-      await supabase.storage.from('trade-analyses').remove([decodeURIComponent(path)]);
+      await supabase.storage.from('trade-analyses').remove([path]);
     }
+
     await supabase.from('trade_analyses').delete().eq('id', item.id);
     toast.success('Análise removida');
     fetchItems();
