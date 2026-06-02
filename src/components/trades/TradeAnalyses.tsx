@@ -113,7 +113,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
         .insert({
           user_id: user!.id,
           type,
-          image_url: urlData.publicUrl,
+          image_url: storedPath,
           notes: notesWithRules || null,
           amount: parsedAmount,
           asset_pair: assetPair.trim(),
