@@ -67,7 +67,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
     const fileName = `${user!.id}/reviews/${type}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error } = await supabase.storage.from('trade-analyses').upload(fileName, f);
     if (error) throw error;
-    return supabase.storage.from('trade-analyses').getPublicUrl(fileName).data.publicUrl;
+    return fileName;
   };
 
   const handleUpload = async () => {
