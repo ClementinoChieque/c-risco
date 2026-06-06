@@ -112,21 +112,21 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
     }
   };
 
-  const FilePicker = ({ label, previewUrl, which }: { label: string; previewUrl: string | null; which: 'before' | 'after' }) => (
+  const FilePicker = ({ label, previewUrl, which, disabled, hint }: { label: string; previewUrl: string | null; which: 'before' | 'after'; disabled?: boolean; hint?: string }) => (
     <div className="space-y-2">
-      <Label>{label}</Label>
-      <label className="block cursor-pointer">
-        <div className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border/60 p-6 hover:border-primary/50 transition-colors">
+      <Label className={disabled ? 'text-muted-foreground' : ''}>{label}</Label>
+      <label className={`block ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+        <div className={`flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border/60 p-6 transition-colors ${disabled ? '' : 'hover:border-primary/50'}`}>
           {previewUrl ? (
             <img src={previewUrl} alt="Preview" className="max-h-40 rounded-md object-contain" />
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <Upload className="h-8 w-8" />
-              <span className="text-sm">Clique para selecionar imagem</span>
+              <span className="text-sm text-center">{hint || 'Clique para selecionar imagem'}</span>
             </div>
           )}
         </div>
-        <Input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, which)} />
+        <Input type="file" accept="image/*" className="hidden" disabled={disabled} onChange={(e) => handleFileChange(e, which)} />
       </label>
     </div>
   );
