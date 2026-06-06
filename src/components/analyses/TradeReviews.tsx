@@ -410,15 +410,49 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                 </div>
 
                 {editingId === item.id ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Substituir Antes</Label>
+                        <label className="block cursor-pointer">
+                          <div className={`flex items-center justify-center rounded-md border border-dashed border-border/60 p-2 transition-colors hover:border-primary/50 ${editPreviewBefore ? 'h-24' : 'h-16'}`}>
+                            {editPreviewBefore ? (
+                              <img src={editPreviewBefore} alt="Novo Antes" className="h-full w-full object-contain rounded" />
+                            ) : (
+                              <span className="text-xs text-muted-foreground text-center">Clique para substituir</span>
+                            )}
+                          </div>
+                          <Input type="file" accept="image/*" className="hidden" onChange={(e) => onSelectReplace(e, 'before')} />
+                        </label>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Substituir Depois</Label>
+                        <label className={`block ${item.image_url_after ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                          <div className={`flex items-center justify-center rounded-md border border-dashed border-border/60 p-2 transition-colors hover:border-primary/50 ${editPreviewAfter ? 'h-24' : 'h-16'}`}>
+                            {editPreviewAfter ? (
+                              <img src={editPreviewAfter} alt="Novo Depois" className="h-full w-full object-contain rounded" />
+                            ) : (
+                              <span className="text-xs text-muted-foreground text-center">
+                                {item.image_url_after ? 'Clique para substituir' : 'N/A'}
+                              </span>
+                            )}
+                          </div>
+                          <Input type="file" accept="image/*" className="hidden" disabled={!item.image_url_after} onChange={(e) => onSelectReplace(e, 'after')} />
+                        </label>
+                      </div>
+                    </div>
+
                     <Textarea
                       value={editCaption}
                       onChange={(e) => setEditCaption(e.target.value)}
                       rows={3}
+                      placeholder="Legenda..."
                     />
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => handleEditSave(item.id)}>Guardar</Button>
-                      <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                      <Button size="sm" onClick={() => handleEditSave(item)} disabled={editUploading}>
+                        {editUploading ? 'A guardar...' : 'Guardar'}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={handleEditCancel}>
                         <X className="h-3 w-3 mr-1" /> Cancelar
                       </Button>
                     </div>
