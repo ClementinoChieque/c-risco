@@ -72,6 +72,10 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
 
   const handleUpload = async () => {
     if (!file) return;
+    if (isBeforeAfter && !fileAfter) {
+      toast.error('Selecione as duas imagens (antes e depois)');
+      return;
+    }
     setUploading(true);
 
     try {
@@ -190,7 +194,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
           />
         </div>
 
-        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full">
+        <Button onClick={handleUpload} disabled={!file || (isBeforeAfter && !fileAfter) || uploading} className="w-full">
           {uploading ? 'A enviar...' : 'Guardar Análise'}
         </Button>
       </CardContent>
@@ -205,11 +209,6 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState('');
-  const [editReplaceBefore, setEditReplaceBefore] = useState<File | null>(null);
-  const [editReplaceAfter, setEditReplaceAfter] = useState<File | null>(null);
-  const [editPreviewBefore, setEditPreviewBefore] = useState<string | null>(null);
-  const [editPreviewAfter, setEditPreviewAfter] = useState<string | null>(null);
-  const [editUploading, setEditUploading] = useState(false);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -246,78 +245,18 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
     fetchItems();
   };
 
-  const uploadOne = async (f: File) => {
-    const ext = f.name.split('.').pop();
-    const fileName = `${user!.id}/reviews/${type}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await supabase.storage.from('trade-analyses').upload(fileName, f);
-    if (error) throw error;
-    return fileName;
-  };
+  const handleEditSave = async (id: string) => {
+    const { error } = await supabase
+      .from('trade_reviews')
+      .update({ caption: editCaption || null })
+      .eq('id', id);
 
-  const handleEditSave = async (item: TradeReview) => {
-    setEditUploading(true);
-    try {
-      let newImageUrl = item.image_url;
-      let newImageUrlAfter = item.image_url_after;
-
-      if (editReplaceBefore) {
-        const uploaded = await uploadOne(editReplaceBefore);
-        const oldPath = extractStoragePath(item.image_url);
-        if (oldPath) await supabase.storage.from('trade-analyses').remove([oldPath]);
-        newImageUrl = uploaded;
-      }
-
-      if (editReplaceAfter) {
-        const uploaded = await uploadOne(editReplaceAfter);
-        if (item.image_url_after) {
-          const oldPath = extractStoragePath(item.image_url_after);
-          if (oldPath) await supabase.storage.from('trade-analyses').remove([oldPath]);
-        }
-        newImageUrlAfter = uploaded;
-      }
-
-      const { error } = await supabase
-        .from('trade_reviews')
-        .update({
-          caption: editCaption || null,
-          image_url: newImageUrl,
-          image_url_after: newImageUrlAfter,
-        })
-        .eq('id', item.id);
-
-      if (error) throw error;
-
-      toast.success('Análise atualizada!');
-      setEditingId(null);
-      setEditReplaceBefore(null);
-      setEditReplaceAfter(null);
-      setEditPreviewBefore(null);
-      setEditPreviewAfter(null);
-      fetchItems();
-    } catch (err: any) {
-      toast.error('Erro ao guardar: ' + err.message);
-    } finally {
-      setEditUploading(false);
-    }
-  };
-
-  const handleEditCancel = () => {
-    setEditingId(null);
-    setEditReplaceBefore(null);
-    setEditReplaceAfter(null);
-    setEditPreviewBefore(null);
-    setEditPreviewAfter(null);
-  };
-
-  const onSelectReplace = (e: React.ChangeEvent<HTMLInputElement>, which: 'before' | 'after') => {
-    const selected = e.target.files?.[0];
-    if (!selected) return;
-    if (which === 'before') {
-      setEditReplaceBefore(selected);
-      setEditPreviewBefore(URL.createObjectURL(selected));
+    if (error) {
+      toast.error('Erro ao guardar legenda');
     } else {
-      setEditReplaceAfter(selected);
-      setEditPreviewAfter(URL.createObjectURL(selected));
+      toast.success('Legenda atualizada!');
+      setEditingId(null);
+      fetchItems();
     }
   };
 
@@ -410,49 +349,15 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                 </div>
 
                 {editingId === item.id ? (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs">Substituir Antes</Label>
-                        <label className="block cursor-pointer">
-                          <div className={`flex items-center justify-center rounded-md border border-dashed border-border/60 p-2 transition-colors hover:border-primary/50 ${editPreviewBefore ? 'h-24' : 'h-16'}`}>
-                            {editPreviewBefore ? (
-                              <img src={editPreviewBefore} alt="Novo Antes" className="h-full w-full object-contain rounded" />
-                            ) : (
-                              <span className="text-xs text-muted-foreground text-center">Clique para substituir</span>
-                            )}
-                          </div>
-                          <Input type="file" accept="image/*" className="hidden" onChange={(e) => onSelectReplace(e, 'before')} />
-                        </label>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Substituir Depois</Label>
-                        <label className={`block ${item.image_url_after ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
-                          <div className={`flex items-center justify-center rounded-md border border-dashed border-border/60 p-2 transition-colors hover:border-primary/50 ${editPreviewAfter ? 'h-24' : 'h-16'}`}>
-                            {editPreviewAfter ? (
-                              <img src={editPreviewAfter} alt="Novo Depois" className="h-full w-full object-contain rounded" />
-                            ) : (
-                              <span className="text-xs text-muted-foreground text-center">
-                                {item.image_url_after ? 'Clique para substituir' : 'N/A'}
-                              </span>
-                            )}
-                          </div>
-                          <Input type="file" accept="image/*" className="hidden" disabled={!item.image_url_after} onChange={(e) => onSelectReplace(e, 'after')} />
-                        </label>
-                      </div>
-                    </div>
-
+                  <div className="space-y-2">
                     <Textarea
                       value={editCaption}
                       onChange={(e) => setEditCaption(e.target.value)}
                       rows={3}
-                      placeholder="Legenda..."
                     />
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => handleEditSave(item)} disabled={editUploading}>
-                        {editUploading ? 'A guardar...' : 'Guardar'}
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={handleEditCancel}>
+                      <Button size="sm" onClick={() => handleEditSave(item.id)}>Guardar</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
                         <X className="h-3 w-3 mr-1" /> Cancelar
                       </Button>
                     </div>
