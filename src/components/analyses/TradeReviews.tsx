@@ -72,10 +72,6 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
 
   const handleUpload = async () => {
     if (!file) return;
-    if (isBeforeAfter && !fileAfter) {
-      toast.error('Selecione as duas imagens (antes e depois)');
-      return;
-    }
     setUploading(true);
 
     try {
@@ -194,7 +190,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
           />
         </div>
 
-        <Button onClick={handleUpload} disabled={!file || (isBeforeAfter && !fileAfter) || uploading} className="w-full">
+        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full">
           {uploading ? 'A enviar...' : 'Guardar Análise'}
         </Button>
       </CardContent>
