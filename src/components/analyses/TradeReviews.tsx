@@ -205,6 +205,11 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState('');
+  const [editReplaceBefore, setEditReplaceBefore] = useState<File | null>(null);
+  const [editReplaceAfter, setEditReplaceAfter] = useState<File | null>(null);
+  const [editPreviewBefore, setEditPreviewBefore] = useState<string | null>(null);
+  const [editPreviewAfter, setEditPreviewAfter] = useState<string | null>(null);
+  const [editUploading, setEditUploading] = useState(false);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -241,18 +246,78 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
     fetchItems();
   };
 
-  const handleEditSave = async (id: string) => {
-    const { error } = await supabase
-      .from('trade_reviews')
-      .update({ caption: editCaption || null })
-      .eq('id', id);
+  const uploadOne = async (f: File) => {
+    const ext = f.name.split('.').pop();
+    const fileName = `${user!.id}/reviews/${type}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from('trade-analyses').upload(fileName, f);
+    if (error) throw error;
+    return fileName;
+  };
 
-    if (error) {
-      toast.error('Erro ao guardar legenda');
-    } else {
-      toast.success('Legenda atualizada!');
+  const handleEditSave = async (item: TradeReview) => {
+    setEditUploading(true);
+    try {
+      let newImageUrl = item.image_url;
+      let newImageUrlAfter = item.image_url_after;
+
+      if (editReplaceBefore) {
+        const uploaded = await uploadOne(editReplaceBefore);
+        const oldPath = extractStoragePath(item.image_url);
+        if (oldPath) await supabase.storage.from('trade-analyses').remove([oldPath]);
+        newImageUrl = uploaded;
+      }
+
+      if (editReplaceAfter) {
+        const uploaded = await uploadOne(editReplaceAfter);
+        if (item.image_url_after) {
+          const oldPath = extractStoragePath(item.image_url_after);
+          if (oldPath) await supabase.storage.from('trade-analyses').remove([oldPath]);
+        }
+        newImageUrlAfter = uploaded;
+      }
+
+      const { error } = await supabase
+        .from('trade_reviews')
+        .update({
+          caption: editCaption || null,
+          image_url: newImageUrl,
+          image_url_after: newImageUrlAfter,
+        })
+        .eq('id', item.id);
+
+      if (error) throw error;
+
+      toast.success('Análise atualizada!');
       setEditingId(null);
+      setEditReplaceBefore(null);
+      setEditReplaceAfter(null);
+      setEditPreviewBefore(null);
+      setEditPreviewAfter(null);
       fetchItems();
+    } catch (err: any) {
+      toast.error('Erro ao guardar: ' + err.message);
+    } finally {
+      setEditUploading(false);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditReplaceBefore(null);
+    setEditReplaceAfter(null);
+    setEditPreviewBefore(null);
+    setEditPreviewAfter(null);
+  };
+
+  const onSelectReplace = (e: React.ChangeEvent<HTMLInputElement>, which: 'before' | 'after') => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+    if (which === 'before') {
+      setEditReplaceBefore(selected);
+      setEditPreviewBefore(URL.createObjectURL(selected));
+    } else {
+      setEditReplaceAfter(selected);
+      setEditPreviewAfter(URL.createObjectURL(selected));
     }
   };
 
