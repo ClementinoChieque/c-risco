@@ -190,7 +190,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
           />
         </div>
 
-        <Button onClick={handleUpload} disabled={!file || (isBeforeAfter && !fileAfter) || uploading} className="w-full">
+        <Button onClick={handleUpload} disabled={!file || uploading} className="w-full">
           {uploading ? 'A enviar...' : 'Guardar Análise'}
         </Button>
       </CardContent>
