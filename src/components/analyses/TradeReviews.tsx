@@ -72,10 +72,6 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
 
   const handleUpload = async () => {
     if (!file) return;
-    if (isBeforeAfter && !fileAfter) {
-      toast.error('Selecione as duas imagens (antes e depois)');
-      return;
-    }
     setUploading(true);
 
     try {
