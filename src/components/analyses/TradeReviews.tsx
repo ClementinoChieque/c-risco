@@ -158,7 +158,13 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
         {isBeforeAfter ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FilePicker label="Antes (Entrada)" previewUrl={preview} which="before" />
-            <FilePicker label="Depois (Saída)" previewUrl={previewAfter} which="after" />
+            <FilePicker
+              label="Depois (Saída)"
+              previewUrl={previewAfter}
+              which="after"
+              disabled={!file}
+              hint={!file ? 'Adicione primeiro o "Antes"' : 'Clique para selecionar imagem'}
+            />
           </div>
         ) : (
           <FilePicker label="Imagem da Análise" previewUrl={preview} which="before" />
