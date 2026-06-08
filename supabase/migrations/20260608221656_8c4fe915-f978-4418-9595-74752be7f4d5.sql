@@ -1,0 +1,2 @@
+CREATE POLICY "Owner read trade-analyses by owner col" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'trade-analyses' AND owner = auth.uid());
+CREATE POLICY "Owner delete trade-analyses by owner col" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'trade-analyses' AND owner = auth.uid());
