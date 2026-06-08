@@ -1,6 +1,6 @@
 import { useTrade } from '@/context/TradeContext';
 import { useAuth } from '@/context/AuthContext';
-import { AlertTriangle, DollarSign, LogOut } from 'lucide-react';
+import { DollarSign, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import logo from '@/assets/logo.png';
