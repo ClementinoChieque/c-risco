@@ -1,6 +1,6 @@
 import { useTrade } from '@/context/TradeContext';
 import { useAuth } from '@/context/AuthContext';
-import { AlertTriangle, DollarSign, LogOut } from 'lucide-react';
+import { DollarSign, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import logo from '@/assets/logo.png';
@@ -13,7 +13,7 @@ function getInitials(name: string): string {
 }
 
 export function Header() {
-  const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const { riskSettings, propFirmSettings, getTodayRiskUsed } = useTrade();
   const { user, signOut } = useAuth();
   const todayRisk = getTodayRiskUsed();
   const displayName =
@@ -73,12 +73,6 @@ export function Header() {
           )}
 
 
-          {isBlocked && (
-            <div className="flex items-center gap-2 text-destructive animate-pulse">
-              <AlertTriangle className="h-5 w-5" />
-              <span className="text-sm font-medium">{blockReason}</span>
-            </div>
-          )}
           <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-8 w-8">
             <LogOut className="h-4 w-4" />
           </Button>
@@ -110,9 +104,6 @@ export function Header() {
           )}
 
 
-          {isBlocked && (
-            <AlertTriangle className="h-4 w-4 text-destructive animate-pulse shrink-0" />
-          )}
           <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-7 w-7">
             <LogOut className="h-3.5 w-3.5" />
           </Button>
