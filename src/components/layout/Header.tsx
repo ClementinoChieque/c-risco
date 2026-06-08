@@ -13,7 +13,7 @@ function getInitials(name: string): string {
 }
 
 export function Header() {
-  const { riskSettings, propFirmSettings, isBlocked, blockReason, getTodayRiskUsed } = useTrade();
+  const { riskSettings, propFirmSettings, getTodayRiskUsed } = useTrade();
   const { user, signOut } = useAuth();
   const todayRisk = getTodayRiskUsed();
   const displayName =
