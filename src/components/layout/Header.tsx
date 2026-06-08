@@ -73,12 +73,6 @@ export function Header() {
           )}
 
 
-          {isBlocked && (
-            <div className="flex items-center gap-2 text-destructive animate-pulse">
-              <AlertTriangle className="h-5 w-5" />
-              <span className="text-sm font-medium">{blockReason}</span>
-            </div>
-          )}
           <Button variant="ghost" size="icon" onClick={signOut} title="Sair" className="h-8 w-8">
             <LogOut className="h-4 w-4" />
           </Button>
