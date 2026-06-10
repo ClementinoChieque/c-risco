@@ -18,6 +18,14 @@ export default function AuthPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      toast.error('Sem ligação à internet', {
+        description: 'O login requer conexão. Tente novamente quando voltar à rede.',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -45,7 +53,15 @@ export default function AuthPage() {
         toast.success('Conta criada! Verifique o seu email para confirmar.');
       }
     } catch (err: any) {
-      toast.error(err.message || 'Erro na autenticação');
+      const msg = String(err?.message || '');
+      const lower = msg.toLowerCase();
+      if (lower.includes('failed to fetch') || lower.includes('networkerror') || lower.includes('network request failed')) {
+        toast.error('Sem ligação ao servidor', {
+          description: 'Verifique a sua conexão à internet e tente novamente.',
+        });
+      } else {
+        toast.error(msg || 'Erro na autenticação');
+      }
     } finally {
       setLoading(false);
     }
