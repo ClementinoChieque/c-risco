@@ -14,6 +14,7 @@ import AnalysesPage from "./pages/AnalysesPage";
 import RulesPage from "./pages/RulesPage";
 import NotFound from "./pages/NotFound";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <OfflineIndicator />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ProtectedRoute><TradeProvider><Index /></TradeProvider></ProtectedRoute>} />
