@@ -22,6 +22,8 @@ export default function Dashboard() {
           </div>
           <AnalysesSummary />
         </div>
+
+        <EquityCurve />
       </div>
     </MainLayout>
   );
