@@ -1,6 +1,7 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Statistics } from '@/components/stats/Statistics';
 import { AnalysesSummary } from '@/components/dashboard/AnalysesSummary';
+import { EquityCurve } from '@/components/dashboard/EquityCurve';
 import { ExportPDF } from '@/components/reports/ExportPDF';
 
 export default function Dashboard() {
