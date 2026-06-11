@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { 
-  TrendingUp, 
-  Target, 
-  Percent, 
-  DollarSign, 
-  Trophy, 
+import {
+  TrendingUp,
+  Target,
+  Percent,
+  DollarSign,
+  Trophy,
   AlertTriangle,
   Flame,
-  Scale
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format, subDays, isSameDay, parseISO } from 'date-fns';
@@ -56,8 +55,7 @@ export function Statistics() {
   const totalGains = wins.reduce((s, d) => s + (d.amount || 0), 0);
   const totalLosses = losses.reduce((s, d) => s + Math.abs(d.amount || 0), 0);
   const netPnL = totalGains - totalLosses;
-  const profitFactor = totalLosses > 0 ? totalGains / totalLosses : totalGains > 0 ? Infinity : 0;
-  
+
   const allRR = analyses.filter(d => (d.risk_reward || 0) > 0);
   const avgRR = allRR.length > 0 ? allRR.reduce((s, d) => s + (d.risk_reward || 0), 0) / allRR.length : 0;
 
@@ -148,12 +146,6 @@ export function Statistics() {
           value={`$${netPnL.toFixed(2)}`}
           icon={DollarSign}
           trend={netPnL >= 0 ? 'up' : 'down'}
-        />
-        <StatCard
-          label="Profit Factor"
-          value={profitFactor === Infinity ? '∞' : profitFactor.toFixed(2)}
-          icon={Scale}
-          trend={profitFactor >= 1 ? 'up' : 'down'}
         />
       </div>
 
