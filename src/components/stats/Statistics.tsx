@@ -55,8 +55,7 @@ export function Statistics() {
   const totalGains = wins.reduce((s, d) => s + (d.amount || 0), 0);
   const totalLosses = losses.reduce((s, d) => s + Math.abs(d.amount || 0), 0);
   const netPnL = totalGains - totalLosses;
-  const profitFactor = totalLosses > 0 ? totalGains / totalLosses : totalGains > 0 ? Infinity : 0;
-  
+
   const allRR = analyses.filter(d => (d.risk_reward || 0) > 0);
   const avgRR = allRR.length > 0 ? allRR.reduce((s, d) => s + (d.risk_reward || 0), 0) / allRR.length : 0;
 
