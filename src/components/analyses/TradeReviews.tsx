@@ -472,32 +472,25 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
           <DialogTitle>Partilhar Análise</DialogTitle>
           {shareItem && (
             <div className="space-y-4">
-              <div className="rounded-lg overflow-hidden border border-border/40 bg-black/40">
+              <div className="rounded-lg overflow-hidden border border-border/40 bg-black/40 flex items-center justify-center mx-auto" style={{ width: 432, height: 432 }}>
                 <div
                   style={{
-                    width: '100%',
-                    aspectRatio: '1 / 1',
-                    overflow: 'hidden',
-                    position: 'relative',
+                    width: 1080,
+                    height: 1080,
+                    transform: 'scale(0.4)',
+                    transformOrigin: 'center center',
+                    flexShrink: 0,
                   }}
                 >
-                  <div
-                    style={{
-                      transform: 'scale(0.4)',
-                      transformOrigin: 'top left',
-                      width: 1080,
-                    }}
-                  >
-                    <ShareReviewCard
-                      ref={shareCardRef}
-                      type={shareItem.type}
-                      market={shareItem.market}
-                      imageUrl={shareItem.image_url}
-                      imageUrlAfter={shareItem.image_url_after}
-                      caption={shareItem.caption}
-                      date={new Date(shareItem.created_at).toLocaleDateString('pt-AO')}
-                    />
-                  </div>
+                  <ShareReviewCard
+                    ref={shareCardRef}
+                    type={shareItem.type}
+                    market={shareItem.market}
+                    imageUrl={shareItem.image_url}
+                    imageUrlAfter={shareItem.image_url_after}
+                    caption={shareItem.caption}
+                    date={new Date(shareItem.created_at).toLocaleDateString('pt-AO')}
+                  />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground text-center">
