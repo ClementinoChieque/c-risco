@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { 
-  TrendingUp, 
-  Target, 
-  Percent, 
-  DollarSign, 
-  Trophy, 
+import {
+  TrendingUp,
+  Target,
+  Percent,
+  DollarSign,
+  Trophy,
   AlertTriangle,
   Flame,
-  Scale
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format, subDays, isSameDay, parseISO } from 'date-fns';
