@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,13 +7,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil, Share2, Download } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthContext';
 import { SignedImage } from '@/components/ui/SignedImage';
 import { extractStoragePath } from '@/hooks/useSignedImageUrl';
+import { toPng } from 'html-to-image';
+import { ShareReviewCard } from './ShareReviewCard';
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 type ReviewType = 'win' | 'loss';
@@ -209,6 +211,81 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState('');
+  const [shareItem, setShareItem] = useState<TradeReview | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
+
+  const waitForImages = (el: HTMLElement) =>
+    Promise.all(
+      Array.from(el.querySelectorAll('img')).map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((res) => {
+              img.addEventListener('load', () => res(), { once: true });
+              img.addEventListener('error', () => res(), { once: true });
+            })
+      )
+    );
+
+  const generatePng = async (): Promise<Blob | null> => {
+    const node = shareCardRef.current;
+    if (!node) return null;
+    await waitForImages(node);
+    await new Promise((r) => setTimeout(r, 300));
+    const dataUrl = await toPng(node, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: '#0b1020',
+    });
+    const res = await fetch(dataUrl);
+    return await res.blob();
+  };
+
+  const handleDownload = async () => {
+    if (!shareItem) return;
+    setGenerating(true);
+    try {
+      const blob = await generatePng();
+      if (!blob) throw new Error('Falha ao gerar imagem');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analise-${shareItem.type}-${shareItem.id.slice(0, 8)}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Imagem descarregada!');
+    } catch (err: any) {
+      toast.error('Erro ao gerar imagem: ' + (err.message || ''));
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (!shareItem) return;
+    setGenerating(true);
+    try {
+      const blob = await generatePng();
+      if (!blob) throw new Error('Falha ao gerar imagem');
+      const file = new File([blob], `analise-${shareItem.type}.png`, { type: 'image/png' });
+      const nav: any = navigator;
+      if (nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({
+          files: [file],
+          title: shareItem.type === 'win' ? 'Análise de Acerto' : 'Análise de Erro',
+          text: shareItem.caption || 'Partilhado via C-Risco',
+        });
+      } else {
+        await handleDownload();
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        toast.error('Erro ao partilhar');
+      }
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const fetchItems = async () => {
     setLoading(true);
@@ -328,14 +405,25 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                     onClick={() => setLightboxUrl(item.image_url)}
                   />
                 )}
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
-                  onClick={() => handleDelete(item)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setShareItem(item)}
+                    title="Partilhar"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleDelete(item)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <CardContent className="pt-3 pb-3 space-y-2">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -377,9 +465,62 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
           );
         })}
       </div>
+
+      {/* Share dialog */}
+      <Dialog open={!!shareItem} onOpenChange={(o) => !o && setShareItem(null)}>
+        <DialogContent className="max-w-2xl bg-background/95 backdrop-blur-sm border-border/50">
+          <DialogTitle>Partilhar Análise</DialogTitle>
+          {shareItem && (
+            <div className="space-y-4">
+              <div className="rounded-lg overflow-hidden border border-border/40 bg-black/40">
+                <div
+                  style={{
+                    width: '100%',
+                    aspectRatio: '1 / 1',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  <div
+                    style={{
+                      transform: 'scale(0.4)',
+                      transformOrigin: 'top left',
+                      width: 1080,
+                    }}
+                  >
+                    <ShareReviewCard
+                      ref={shareCardRef}
+                      type={shareItem.type}
+                      market={shareItem.market}
+                      imageUrl={shareItem.image_url}
+                      imageUrlAfter={shareItem.image_url_after}
+                      caption={shareItem.caption}
+                      date={new Date(shareItem.created_at).toLocaleDateString('pt-AO')}
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Pré-visualização · imagem final exportada em 1080×1080 (ideal para redes sociais)
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={handleNativeShare} disabled={generating} className="flex-1">
+                  <Share2 className="h-4 w-4 mr-2" />
+                  {generating ? 'A gerar...' : 'Partilhar'}
+                </Button>
+                <Button onClick={handleDownload} disabled={generating} variant="outline" className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  Descarregar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+
 
 export function TradeReviews() {
   const [refreshKey, setRefreshKey] = useState(0);
