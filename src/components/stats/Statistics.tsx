@@ -147,12 +147,6 @@ export function Statistics() {
           icon={DollarSign}
           trend={netPnL >= 0 ? 'up' : 'down'}
         />
-        <StatCard
-          label="Profit Factor"
-          value={profitFactor === Infinity ? '∞' : profitFactor.toFixed(2)}
-          icon={Scale}
-          trend={profitFactor >= 1 ? 'up' : 'down'}
-        />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
