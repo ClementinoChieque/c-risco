@@ -405,14 +405,25 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                     onClick={() => setLightboxUrl(item.image_url)}
                   />
                 )}
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
-                  onClick={() => handleDelete(item)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setShareItem(item)}
+                    title="Partilhar"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleDelete(item)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <CardContent className="pt-3 pb-3 space-y-2">
                 <div className="flex items-center gap-2 flex-wrap">
