@@ -85,11 +85,12 @@ export const ShareReviewCard = forwardRef<HTMLDivElement, ShareReviewCardProps>(
           style={{
             display: 'grid',
             gridTemplateColumns: isBA ? '1fr 1fr' : '1fr',
-            gap: 16,
+            gap: 0,
             background: 'rgba(255,255,255,0.04)',
-            padding: 16,
+            padding: 0,
             borderRadius: 24,
             border: '1px solid rgba(255,255,255,0.08)',
+            overflow: 'hidden',
           }}
         >
           <div style={{ position: 'relative' }}>
@@ -100,7 +101,6 @@ export const ShareReviewCard = forwardRef<HTMLDivElement, ShareReviewCardProps>(
                 width: '100%',
                 height: isBA ? 560 : 720,
                 objectFit: 'cover',
-                borderRadius: 16,
                 display: 'block',
               }}
               crossOrigin="anonymous"
@@ -118,7 +118,6 @@ export const ShareReviewCard = forwardRef<HTMLDivElement, ShareReviewCardProps>(
                   width: '100%',
                   height: 560,
                   objectFit: 'cover',
-                  borderRadius: 16,
                   display: 'block',
                 }}
                 crossOrigin="anonymous"
