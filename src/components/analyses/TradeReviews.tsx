@@ -211,6 +211,81 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState('');
+  const [shareItem, setShareItem] = useState<TradeReview | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
+
+  const waitForImages = (el: HTMLElement) =>
+    Promise.all(
+      Array.from(el.querySelectorAll('img')).map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((res) => {
+              img.addEventListener('load', () => res(), { once: true });
+              img.addEventListener('error', () => res(), { once: true });
+            })
+      )
+    );
+
+  const generatePng = async (): Promise<Blob | null> => {
+    const node = shareCardRef.current;
+    if (!node) return null;
+    await waitForImages(node);
+    await new Promise((r) => setTimeout(r, 300));
+    const dataUrl = await toPng(node, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: '#0b1020',
+    });
+    const res = await fetch(dataUrl);
+    return await res.blob();
+  };
+
+  const handleDownload = async () => {
+    if (!shareItem) return;
+    setGenerating(true);
+    try {
+      const blob = await generatePng();
+      if (!blob) throw new Error('Falha ao gerar imagem');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analise-${shareItem.type}-${shareItem.id.slice(0, 8)}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Imagem descarregada!');
+    } catch (err: any) {
+      toast.error('Erro ao gerar imagem: ' + (err.message || ''));
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (!shareItem) return;
+    setGenerating(true);
+    try {
+      const blob = await generatePng();
+      if (!blob) throw new Error('Falha ao gerar imagem');
+      const file = new File([blob], `analise-${shareItem.type}.png`, { type: 'image/png' });
+      const nav: any = navigator;
+      if (nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({
+          files: [file],
+          title: shareItem.type === 'win' ? 'Análise de Acerto' : 'Análise de Erro',
+          text: shareItem.caption || 'Partilhado via C-Risco',
+        });
+      } else {
+        await handleDownload();
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        toast.error('Erro ao partilhar');
+      }
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const fetchItems = async () => {
     setLoading(true);
