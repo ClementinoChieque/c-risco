@@ -465,9 +465,62 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
           );
         })}
       </div>
+
+      {/* Share dialog */}
+      <Dialog open={!!shareItem} onOpenChange={(o) => !o && setShareItem(null)}>
+        <DialogContent className="max-w-2xl bg-background/95 backdrop-blur-sm border-border/50">
+          <DialogTitle>Partilhar Análise</DialogTitle>
+          {shareItem && (
+            <div className="space-y-4">
+              <div className="rounded-lg overflow-hidden border border-border/40 bg-black/40">
+                <div
+                  style={{
+                    width: '100%',
+                    aspectRatio: '1 / 1',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  <div
+                    style={{
+                      transform: 'scale(0.4)',
+                      transformOrigin: 'top left',
+                      width: 1080,
+                    }}
+                  >
+                    <ShareReviewCard
+                      ref={shareCardRef}
+                      type={shareItem.type}
+                      market={shareItem.market}
+                      imageUrl={shareItem.image_url}
+                      imageUrlAfter={shareItem.image_url_after}
+                      caption={shareItem.caption}
+                      date={new Date(shareItem.created_at).toLocaleDateString('pt-AO')}
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Pré-visualização · imagem final exportada em 1080×1080 (ideal para redes sociais)
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={handleNativeShare} disabled={generating} className="flex-1">
+                  <Share2 className="h-4 w-4 mr-2" />
+                  {generating ? 'A gerar...' : 'Partilhar'}
+                </Button>
+                <Button onClick={handleDownload} disabled={generating} variant="outline" className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  Descarregar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+
 
 export function TradeReviews() {
   const [refreshKey, setRefreshKey] = useState(0);
