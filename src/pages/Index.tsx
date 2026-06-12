@@ -3,17 +3,21 @@ import { Statistics } from '@/components/stats/Statistics';
 import { AnalysesSummary } from '@/components/dashboard/AnalysesSummary';
 import { EquityCurve } from '@/components/dashboard/EquityCurve';
 import { ExportPDF } from '@/components/reports/ExportPDF';
+import { CsvToPdf } from '@/components/reports/CsvToPdf';
 
 export default function Dashboard() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold mb-1">DASHBOARD</h1>
             <p className="text-muted-foreground">Análise detalhada do seu desempenho</p>
           </div>
-          <ExportPDF />
+          <div className="flex items-center gap-2 flex-wrap">
+            <CsvToPdf />
+            <ExportPDF />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
