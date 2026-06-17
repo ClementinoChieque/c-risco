@@ -18,6 +18,7 @@ import { useExecutionChecklist, ChecklistCategory } from '@/hooks/useExecutionCh
 import { Brain, Globe2, LayoutGrid, Zap } from 'lucide-react';
 import { SignedImage } from '@/components/ui/SignedImage';
 import { extractStoragePath } from '@/hooks/useSignedImageUrl';
+import { useTradeSetups } from '@/hooks/useTradeSetups';
 
 const RULE_CATEGORIES: { value: ChecklistCategory; label: string; icon: typeof Globe2 }[] = [
   { value: 'context', label: 'Contexto do Mercado', icon: Globe2 },
@@ -37,6 +38,7 @@ interface TradeAnalysis {
   risk_percentage: number;
   market: string;
   broker_name: string;
+  setup_id: string | null;
   created_at: string;
 }
 
