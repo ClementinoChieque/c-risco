@@ -45,6 +45,8 @@ interface TradeAnalysis {
 function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings } = useTrade();
   const { user } = useAuth();
+  const { items: rulesItems } = useExecutionChecklist();
+  const { setups } = useTradeSetups();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
   const [amount, setAmount] = useState('');
@@ -54,10 +56,11 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
   const [riskPct, setRiskPct] = useState('');
   const [market, setMarket] = useState<string>('forex');
   const [brokerName, setBrokerName] = useState('');
+  const [setupId, setSetupId] = useState<string>('none');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-  const { items: rulesItems } = useExecutionChecklist();
   const [selectedRuleIds, setSelectedRuleIds] = useState<string[]>([]);
+  const marketSetups = setups.filter(s => s.market === market);
 
   const marketRules = rulesItems.filter(r => r.market === market);
 
