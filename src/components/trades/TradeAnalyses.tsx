@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, BookMarked } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useTrade } from '@/context/TradeContext';
@@ -18,6 +18,7 @@ import { useExecutionChecklist, ChecklistCategory } from '@/hooks/useExecutionCh
 import { Brain, Globe2, LayoutGrid, Zap } from 'lucide-react';
 import { SignedImage } from '@/components/ui/SignedImage';
 import { extractStoragePath } from '@/hooks/useSignedImageUrl';
+import { useTradeSetups } from '@/hooks/useTradeSetups';
 
 const RULE_CATEGORIES: { value: ChecklistCategory; label: string; icon: typeof Globe2 }[] = [
   { value: 'context', label: 'Contexto do Mercado', icon: Globe2 },
@@ -37,12 +38,15 @@ interface TradeAnalysis {
   risk_percentage: number;
   market: string;
   broker_name: string;
+  setup_id: string | null;
   created_at: string;
 }
 
 function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings } = useTrade();
   const { user } = useAuth();
+  const { items: rulesItems } = useExecutionChecklist();
+  const { setups } = useTradeSetups();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
   const [amount, setAmount] = useState('');
@@ -52,10 +56,11 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
   const [riskPct, setRiskPct] = useState('');
   const [market, setMarket] = useState<string>('forex');
   const [brokerName, setBrokerName] = useState('');
+  const [setupId, setSetupId] = useState<string>('none');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-  const { items: rulesItems } = useExecutionChecklist();
   const [selectedRuleIds, setSelectedRuleIds] = useState<string[]>([]);
+  const marketSetups = setups.filter(s => s.market === market);
 
   const marketRules = rulesItems.filter(r => r.market === market);
 
@@ -124,6 +129,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           risk_percentage: riskPct ? parseFloat(riskPct) : 0,
           market,
           broker_name: brokerName.trim() || '',
+          setup_id: setupId && setupId !== 'none' ? setupId : null,
         });
 
       if (dbError) throw dbError;
@@ -159,6 +165,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       setLotSize('');
       setRiskPct('');
       setBrokerName('');
+      setSetupId('none');
       setPreview(null);
       setSelectedRuleIds([]);
       onUploaded();
@@ -212,7 +219,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           </div>
           <div className="space-y-1">
             <Label>Mercado</Label>
-            <Select value={market} onValueChange={(v) => { setMarket(v); setSelectedRuleIds([]); }}>
+            <Select value={market} onValueChange={(v) => { setMarket(v); setSelectedRuleIds([]); setSetupId('none'); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -226,6 +233,23 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           <div className="space-y-1">
             <Label>Corretora</Label>
             <Input placeholder="Ex: IC Markets" value={brokerName} onChange={(e) => setBrokerName(e.target.value)} />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label>Setup (Playbook)</Label>
+            <Select value={setupId} onValueChange={setSetupId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sem setup" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem setup</SelectItem>
+                {marketSetups.map(s => (
+                  <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {marketSetups.length === 0 && (
+              <p className="text-[10px] text-muted-foreground">Crie setups na página "Playbook".</p>
+            )}
           </div>
         </div>
 
@@ -292,11 +316,14 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
 function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   const { user } = useAuth();
+  const { setups } = useTradeSetups();
   const [items, setItems] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState('');
+  const [filterSetup, setFilterSetup] = useState<string>('all');
+  const setupName = (id: string | null) => setups.find(s => s.id === id)?.name;
 
   const fetchItems = async () => {
     setLoading(true);
@@ -359,17 +386,42 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
     return <p className="text-muted-foreground text-sm text-center py-8">A carregar...</p>;
   }
 
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-        <ImageIcon className="h-10 w-10" />
-        <p className="text-sm">Nenhuma análise {type === 'win' ? 'win' : 'loss'} ainda</p>
-      </div>
-    );
-  }
+  const filteredItems = filterSetup === 'all'
+    ? items
+    : filterSetup === 'none'
+      ? items.filter(i => !i.setup_id)
+      : items.filter(i => i.setup_id === filterSetup);
+
+  const usedSetupIds = Array.from(new Set(items.map(i => i.setup_id).filter(Boolean) as string[]));
+  const availableSetups = setups.filter(s => usedSetupIds.includes(s.id));
 
   return (
     <>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Label className="text-xs text-muted-foreground">Filtrar por setup:</Label>
+        <Select value={filterSetup} onValueChange={setFilterSetup}>
+          <SelectTrigger className="h-8 w-auto min-w-[160px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos ({items.length})</SelectItem>
+            <SelectItem value="none">Sem setup</SelectItem>
+            {availableSetups.map(s => (
+              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {filteredItems.length === 0 && items.length > 0 && (
+          <span className="text-xs text-muted-foreground">Nenhum resultado</span>
+        )}
+      </div>
+
+      {items.length === 0 && (
+        <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+          <ImageIcon className="h-10 w-10" />
+          <p className="text-sm">Nenhuma análise {type === 'win' ? 'win' : 'loss'} ainda</p>
+        </div>
+      )}
       <Dialog open={!!lightboxUrl} onOpenChange={() => setLightboxUrl(null)}>
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
           <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
@@ -380,7 +432,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
       </Dialog>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
             <div className="relative">
               <SignedImage
@@ -419,6 +471,11 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 <Badge variant="secondary" className="text-xs">{marketLabel(item.market)}</Badge>
                 {item.broker_name && (
                   <Badge variant="outline" className="text-xs">{item.broker_name}</Badge>
+                )}
+                {item.setup_id && setupName(item.setup_id) && (
+                  <Badge variant="outline" className="text-xs border-primary/40 text-primary">
+                    <BookMarked className="h-3 w-3 mr-1" />{setupName(item.setup_id)}
+                  </Badge>
                 )}
               </div>
 
