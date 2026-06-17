@@ -316,11 +316,14 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
 function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
   const { user } = useAuth();
+  const { setups } = useTradeSetups();
   const [items, setItems] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState('');
+  const [filterSetup, setFilterSetup] = useState<string>('all');
+  const setupName = (id: string | null) => setups.find(s => s.id === id)?.name;
 
   const fetchItems = async () => {
     setLoading(true);
@@ -383,17 +386,42 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
     return <p className="text-muted-foreground text-sm text-center py-8">A carregar...</p>;
   }
 
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-        <ImageIcon className="h-10 w-10" />
-        <p className="text-sm">Nenhuma análise {type === 'win' ? 'win' : 'loss'} ainda</p>
-      </div>
-    );
-  }
+  const filteredItems = filterSetup === 'all'
+    ? items
+    : filterSetup === 'none'
+      ? items.filter(i => !i.setup_id)
+      : items.filter(i => i.setup_id === filterSetup);
+
+  const usedSetupIds = Array.from(new Set(items.map(i => i.setup_id).filter(Boolean) as string[]));
+  const availableSetups = setups.filter(s => usedSetupIds.includes(s.id));
 
   return (
     <>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Label className="text-xs text-muted-foreground">Filtrar por setup:</Label>
+        <Select value={filterSetup} onValueChange={setFilterSetup}>
+          <SelectTrigger className="h-8 w-auto min-w-[160px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos ({items.length})</SelectItem>
+            <SelectItem value="none">Sem setup</SelectItem>
+            {availableSetups.map(s => (
+              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {filteredItems.length === 0 && items.length > 0 && (
+          <span className="text-xs text-muted-foreground">Nenhum resultado</span>
+        )}
+      </div>
+
+      {items.length === 0 && (
+        <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+          <ImageIcon className="h-10 w-10" />
+          <p className="text-sm">Nenhuma análise {type === 'win' ? 'win' : 'loss'} ainda</p>
+        </div>
+      )}
       <Dialog open={!!lightboxUrl} onOpenChange={() => setLightboxUrl(null)}>
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-2 bg-background/95 backdrop-blur-sm border-border/50">
           <DialogTitle className="sr-only">Imagem ampliada</DialogTitle>
