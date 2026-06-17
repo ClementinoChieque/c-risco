@@ -219,7 +219,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           </div>
           <div className="space-y-1">
             <Label>Mercado</Label>
-            <Select value={market} onValueChange={(v) => { setMarket(v); setSelectedRuleIds([]); }}>
+            <Select value={market} onValueChange={(v) => { setMarket(v); setSelectedRuleIds([]); setSetupId('none'); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -233,6 +233,23 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           <div className="space-y-1">
             <Label>Corretora</Label>
             <Input placeholder="Ex: IC Markets" value={brokerName} onChange={(e) => setBrokerName(e.target.value)} />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label>Setup (Playbook)</Label>
+            <Select value={setupId} onValueChange={setSetupId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sem setup" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem setup</SelectItem>
+                {marketSetups.map(s => (
+                  <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {marketSetups.length === 0 && (
+              <p className="text-[10px] text-muted-foreground">Crie setups na página "Playbook".</p>
+            )}
           </div>
         </div>
 
