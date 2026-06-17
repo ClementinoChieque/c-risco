@@ -162,6 +162,7 @@ export type Database = {
           notes: string | null
           risk_percentage: number | null
           risk_reward: number | null
+          setup_id: string | null
           type: string
           user_id: string
         }
@@ -177,6 +178,7 @@ export type Database = {
           notes?: string | null
           risk_percentage?: number | null
           risk_reward?: number | null
+          setup_id?: string | null
           type: string
           user_id: string
         }
@@ -192,10 +194,19 @@ export type Database = {
           notes?: string | null
           risk_percentage?: number | null
           risk_reward?: number | null
+          setup_id?: string | null
           type?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trade_analyses_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "trade_setups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trade_reviews: {
         Row: {
@@ -226,6 +237,39 @@ export type Database = {
           image_url_after?: string | null
           market?: string
           type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trade_setups: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          market: string
+          name: string
+          rules: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          market: string
+          name: string
+          rules?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          market?: string
+          name?: string
+          rules?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
