@@ -129,6 +129,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           risk_percentage: riskPct ? parseFloat(riskPct) : 0,
           market,
           broker_name: brokerName.trim() || '',
+          setup_id: setupId && setupId !== 'none' ? setupId : null,
         });
 
       if (dbError) throw dbError;
@@ -164,6 +165,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       setLotSize('');
       setRiskPct('');
       setBrokerName('');
+      setSetupId('none');
       setPreview(null);
       setSelectedRuleIds([]);
       onUploaded();
