@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, BookMarked } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useTrade } from '@/context/TradeContext';
@@ -432,7 +432,7 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
       </Dialog>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <Card key={item.id} className="glass-card border-border/40 overflow-hidden group">
             <div className="relative">
               <SignedImage
@@ -471,6 +471,11 @@ function AnalysisGrid({ type }: { type: 'win' | 'loss' }) {
                 <Badge variant="secondary" className="text-xs">{marketLabel(item.market)}</Badge>
                 {item.broker_name && (
                   <Badge variant="outline" className="text-xs">{item.broker_name}</Badge>
+                )}
+                {item.setup_id && setupName(item.setup_id) && (
+                  <Badge variant="outline" className="text-xs border-primary/40 text-primary">
+                    <BookMarked className="h-3 w-3 mr-1" />{setupName(item.setup_id)}
+                  </Badge>
                 )}
               </div>
 
