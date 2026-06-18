@@ -1,5 +1,5 @@
 import { NavLink } from '@/components/NavLink';
-import { LayoutDashboard, BookOpen, Clock, FolderOpen, Search, Brain, BookMarked } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Clock, FolderOpen, Search, BookMarked } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -7,7 +7,6 @@ const navItems = [
   { to: '/trades', icon: FolderOpen, label: 'Negociações' },
   { to: '/analyses', icon: Search, label: 'Análises' },
   { to: '/playbook', icon: BookMarked, label: 'Playbook' },
-  { to: '/rules', icon: Brain, label: 'Regras' },
   { to: '/diary', icon: BookOpen, label: 'Diário' },
 ];
 
