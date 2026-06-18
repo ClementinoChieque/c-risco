@@ -11,7 +11,7 @@ import DiaryPage from "./pages/DiaryPage";
 import SessionsPage from "./pages/SessionsPage";
 import TradesPage from "./pages/TradesPage";
 import AnalysesPage from "./pages/AnalysesPage";
-import RulesPage from "./pages/RulesPage";
+
 import NotFound from "./pages/NotFound";
 import PlaybookPage from "./pages/PlaybookPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -33,7 +33,7 @@ const App = () => (
             <Route path="/trades" element={<ProtectedRoute><TradeProvider><TradesPage /></TradeProvider></ProtectedRoute>} />
             <Route path="/diary" element={<ProtectedRoute><TradeProvider><DiaryPage /></TradeProvider></ProtectedRoute>} />
             <Route path="/analyses" element={<ProtectedRoute><TradeProvider><AnalysesPage /></TradeProvider></ProtectedRoute>} />
-            <Route path="/rules" element={<ProtectedRoute><TradeProvider><RulesPage /></TradeProvider></ProtectedRoute>} />
+            
             <Route path="/playbook" element={<ProtectedRoute><TradeProvider><PlaybookPage /></TradeProvider></ProtectedRoute>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="*" element={<NotFound />} />
