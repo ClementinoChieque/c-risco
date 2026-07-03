@@ -13,18 +13,9 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useTrade } from '@/context/TradeContext';
 import { useAuth } from '@/context/AuthContext';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useExecutionChecklist, ChecklistCategory } from '@/hooks/useExecutionChecklist';
-import { Brain, Globe2, LayoutGrid, Zap } from 'lucide-react';
 import { SignedImage } from '@/components/ui/SignedImage';
 import { extractStoragePath } from '@/hooks/useSignedImageUrl';
 import { useTradeSetups } from '@/hooks/useTradeSetups';
-
-const RULE_CATEGORIES: { value: ChecklistCategory; label: string; icon: typeof Globe2 }[] = [
-  { value: 'context', label: 'Contexto do Mercado', icon: Globe2 },
-  { value: 'structure', label: 'Estrutura do Mercado', icon: LayoutGrid },
-  { value: 'triggers', label: 'Gatilhos de Entrada', icon: Zap },
-];
 
 interface TradeAnalysis {
   id: string;
@@ -45,7 +36,6 @@ interface TradeAnalysis {
 function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUploaded: () => void }) {
   const { riskSettings, updateRiskSettings, propFirmSettings, updatePropFirmSettings } = useTrade();
   const { user } = useAuth();
-  const { items: rulesItems } = useExecutionChecklist();
   const { setups } = useTradeSetups();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
@@ -59,13 +49,8 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
   const [setupId, setSetupId] = useState<string>('none');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-  const [selectedRuleIds, setSelectedRuleIds] = useState<string[]>([]);
   const marketSetups = setups.filter(s => s.market === market);
 
-  const marketRules = rulesItems.filter(r => r.market === market);
-
-  const toggleRule = (id: string) =>
-    setSelectedRuleIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,20 +85,6 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
 
       const parsedAmount = parseFloat(amount);
 
-      const selectedRules = rulesItems.filter(r => selectedRuleIds.includes(r.id));
-      let notesWithRules = notes.trim();
-      if (selectedRules.length > 0) {
-        const grouped = RULE_CATEGORIES.map(cat => {
-          const list = selectedRules.filter(r => r.category === cat.value);
-          if (list.length === 0) return null;
-          return `${cat.label}:\n${list.map(r => `• ${r.text}`).join('\n')}`;
-        })
-          .filter(Boolean)
-          .join('\n\n');
-        notesWithRules = notesWithRules
-          ? `${notesWithRules}\n\n— Regras de Execução —\n${grouped}`
-          : `— Regras de Execução —\n${grouped}`;
-      }
 
       const { error: dbError } = await supabase
         .from('trade_analyses')
@@ -121,7 +92,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           user_id: user!.id,
           type,
           image_url: storedPath,
-          notes: notesWithRules || null,
+          notes: notes.trim() || null,
           amount: parsedAmount,
           asset_pair: assetPair.trim(),
           risk_reward: parseFloat(riskReward),
@@ -167,7 +138,6 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
       setBrokerName('');
       setSetupId('none');
       setPreview(null);
-      setSelectedRuleIds([]);
       onUploaded();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + err.message);
@@ -219,7 +189,7 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
           </div>
           <div className="space-y-1">
             <Label>Mercado</Label>
-            <Select value={market} onValueChange={(v) => { setMarket(v); setSelectedRuleIds([]); setSetupId('none'); }}>
+            <Select value={market} onValueChange={(v) => { setMarket(v); setSetupId('none'); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -251,54 +221,6 @@ function AnalysisUploader({ type, onUploaded }: { type: 'win' | 'loss'; onUpload
               <p className="text-[10px] text-muted-foreground">Crie setups na página "Playbook".</p>
             )}
           </div>
-        </div>
-
-        <div className="space-y-3 rounded-lg border border-border/50 bg-secondary/10 p-3">
-          <div className="flex items-center gap-2">
-            <Brain className="h-4 w-4 text-primary" />
-            <Label className="text-sm font-semibold">Regras de Execução aplicadas</Label>
-            {selectedRuleIds.length > 0 && (
-              <span className="ml-auto text-xs font-mono text-muted-foreground">
-                {selectedRuleIds.length} selecionada(s)
-              </span>
-            )}
-          </div>
-          {marketRules.length === 0 ? (
-            <p className="text-xs text-muted-foreground">
-              Nenhuma regra cadastrada para este mercado. Adicione em "Regras".
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {RULE_CATEGORIES.map(cat => {
-                const list = marketRules.filter(r => r.category === cat.value);
-                if (list.length === 0) return null;
-                const Icon = cat.icon;
-                return (
-                  <div key={cat.value} className="space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                      <Icon className="h-3.5 w-3.5" />
-                      {cat.label}
-                    </div>
-                    <div className="space-y-1">
-                      {list.map(r => (
-                        <label
-                          key={r.id}
-                          className="flex items-start gap-2 p-1.5 rounded hover:bg-background/40 cursor-pointer text-sm"
-                        >
-                          <Checkbox
-                            checked={selectedRuleIds.includes(r.id)}
-                            onCheckedChange={() => toggleRule(r.id)}
-                            className="mt-0.5"
-                          />
-                          <span style={{ color: '#558C43' }}>{r.text}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         <div className="space-y-2">
