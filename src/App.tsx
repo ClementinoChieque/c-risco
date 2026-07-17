@@ -15,6 +15,7 @@ import AnalysesPage from "./pages/AnalysesPage";
 import NotFound from "./pages/NotFound";
 import PlaybookPage from "./pages/PlaybookPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import OAuthConsent from "./pages/OAuthConsent";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
             
             <Route path="/playbook" element={<ProtectedRoute><TradeProvider><PlaybookPage /></TradeProvider></ProtectedRoute>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
