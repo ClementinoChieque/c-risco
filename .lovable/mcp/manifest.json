@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "sdk_version": "0.23.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://abhojfnyeqgolsgphvhl.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "c-risco-mcp",
+      "version": "0.1.0",
+      "title": "C-RISCO — Gestão de Trades"
+    },
+    "tools": [
+      {
+        "name": "list_trades",
+        "title": "Listar negociações",
+        "description": "Lista as negociações do utilizador autenticado, opcionalmente filtradas por mercado (forex, crypto, propfirm) e/ou estado (open, closed).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "market": {
+              "type": "string",
+              "enum": [
+                "forex",
+                "crypto",
+                "propfirm"
+              ]
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_trade",
+        "title": "Criar negociação",
+        "description": "Cria uma nova negociação para o utilizador autenticado. O mercado deve ser forex, crypto ou propfirm.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "market": {
+              "type": "string",
+              "enum": [
+                "forex",
+                "crypto",
+                "propfirm"
+              ]
+            },
+            "pair": {
+              "type": "string",
+              "minLength": 1
+            },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "long",
+                "short"
+              ]
+            },
+            "entry_price": {
+              "type": "number"
+            },
+            "stop_loss": {
+              "type": "number"
+            },
+            "take_profit": {
+              "type": "number"
+            },
+            "position_size": {
+              "type": "number"
+            },
+            "risk_amount": {
+              "type": "number"
+            },
+            "risk_percentage": {
+              "type": "number"
+            },
+            "risk_reward_ratio": {
+              "type": "number"
+            },
+            "potential_profit": {
+              "type": "number"
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "market",
+            "pair",
+            "direction",
+            "entry_price",
+            "stop_loss",
+            "take_profit",
+            "position_size",
+            "risk_amount",
+            "risk_percentage",
+            "risk_reward_ratio",
+            "potential_profit"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_analyses",
+        "title": "Listar análises (win/loss)",
+        "description": "Lista as análises (Acertos e Erros) do utilizador autenticado, opcionalmente filtradas por mercado e tipo.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "market": {
+              "type": "string",
+              "enum": [
+                "forex",
+                "crypto",
+                "propfirm"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "win",
+                "loss"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_setups",
+        "title": "Listar setups do playbook",
+        "description": "Lista os setups do playbook do utilizador autenticado, opcionalmente filtrados por mercado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "market": {
+              "type": "string",
+              "enum": [
+                "forex",
+                "crypto",
+                "propfirm"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_balances",
+        "title": "Obter saldos das contas",
+        "description": "Retorna os saldos actuais das contas Forex, Cripto e PropFirm do utilizador autenticado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
