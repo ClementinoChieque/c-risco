@@ -56,6 +56,7 @@ export function CsvViewer() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const load = async () => {
     if (!user) return;
