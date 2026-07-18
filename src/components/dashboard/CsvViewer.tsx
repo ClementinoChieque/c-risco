@@ -80,9 +80,12 @@ export function CsvViewer() {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id, currentMarket]);
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
+  const uploadFile = async (file: File) => {
+    if (!user) return;
+    if (!/\.csv$/i.test(file.name) && file.type !== 'text/csv') {
+      toast.error('Apenas ficheiros .csv são suportados');
+      return;
+    }
     setUploading(true);
     try {
       const text = await file.text();
@@ -106,6 +109,18 @@ export function CsvViewer() {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';
     }
+  };
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) await uploadFile(file);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) await uploadFile(file);
   };
 
   const remove = async (id: string) => {
