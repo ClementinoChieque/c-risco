@@ -113,13 +113,13 @@ export function Statistics() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-2 flex-wrap">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex gap-1.5 md:gap-2 flex-wrap">
         {filterOptions.map(opt => (
           <button
             key={opt.value}
             onClick={() => setMarketFilter(opt.value)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
               marketFilter === opt.value
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground hover:bg-accent'
@@ -129,7 +129,7 @@ export function Statistics() {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-3 md:gap-4">
         <StatCard
           label="Total de Trades"
           value={totalTrades}
@@ -149,7 +149,7 @@ export function Statistics() {
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <StatCard
           label="R:R Médio"
           value={`1:${avgRR.toFixed(2)}`}
@@ -176,11 +176,11 @@ export function Statistics() {
 
       {analyses.length > 0 && (
         <>
-          <div className="glass-card rounded-xl p-6 animate-fade-in">
+          <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in">
             <h3 className="stat-label mb-4">P&L Acumulado (7 dias)</h3>
-            <div className="h-[300px]">
+            <div className="h-[220px] md:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={cumulativeData}>
+                <AreaChart data={cumulativeData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(185, 100%, 50%)" stopOpacity={0.3}/>
@@ -188,8 +188,8 @@ export function Statistics() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" />
-                  <XAxis dataKey="date" stroke="hsl(215, 20%, 55%)" fontSize={12} />
-                  <YAxis stroke="hsl(215, 20%, 55%)" fontSize={12} tickFormatter={(value) => `$${value}`} />
+                  <XAxis dataKey="date" stroke="hsl(215, 20%, 55%)" fontSize={11} />
+                  <YAxis stroke="hsl(215, 20%, 55%)" fontSize={11} width={45} tickFormatter={(value) => `$${value}`} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'hsl(222, 47%, 10%)', border: '1px solid hsl(222, 30%, 18%)', borderRadius: '8px' }}
                     labelStyle={{ color: 'hsl(210, 40%, 98%)' }}
@@ -201,10 +201,10 @@ export function Statistics() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="glass-card rounded-xl p-6 animate-fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in">
               <h3 className="stat-label mb-4">Gains vs Losses (7 dias)</h3>
-              <div className="h-[300px]">
+              <div className="h-[220px] md:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={last7Days}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" />
@@ -222,9 +222,9 @@ export function Statistics() {
             </div>
 
             {marketData.length > 0 && (
-              <div className="glass-card rounded-xl p-6 animate-fade-in">
+              <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in">
                 <h3 className="stat-label mb-4">Distribuição por Mercado</h3>
-                <div className="h-[250px] sm:h-[300px]">
+                <div className="h-[220px] md:h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={marketData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={5} dataKey="value" label={false}>

@@ -54,7 +54,7 @@ export function EquityCurve() {
   }, [rows]);
 
   return (
-    <div className="glass-card rounded-xl p-6 animate-fade-in">
+    <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in">
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp className="h-4 w-4 text-primary" />
         <h3 className="stat-label">Curva de Equity por Mercado</h3>
