@@ -29,6 +29,7 @@ export default function Dashboard() {
         </div>
 
         <EquityCurve />
+        <CsvViewer />
       </div>
     </MainLayout>
   );
