@@ -222,9 +222,9 @@ export function Statistics() {
             </div>
 
             {marketData.length > 0 && (
-              <div className="glass-card rounded-xl p-6 animate-fade-in">
+              <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in">
                 <h3 className="stat-label mb-4">Distribuição por Mercado</h3>
-                <div className="h-[250px] sm:h-[300px]">
+                <div className="h-[220px] md:h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={marketData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={5} dataKey="value" label={false}>
