@@ -12,14 +12,14 @@ interface StatCardProps {
 export function StatCard({ label, value, icon: Icon, trend, className }: StatCardProps) {
   return (
     <div className={cn(
-      "glass-card rounded-xl p-5 animate-fade-in",
+      "glass-card rounded-xl p-3 md:p-5 animate-fade-in",
       className
     )}>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="stat-label mb-2">{label}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="stat-label mb-1 md:mb-2 text-[10px] md:text-sm truncate">{label}</p>
           <p className={cn(
-            "stat-value",
+            "font-mono text-sm md:text-2xl font-bold tracking-tight break-all",
             trend === 'up' && "text-success",
             trend === 'down' && "text-destructive",
           )}>
@@ -27,14 +27,13 @@ export function StatCard({ label, value, icon: Icon, trend, className }: StatCar
           </p>
         </div>
         <div className={cn(
-          "p-3 rounded-lg",
+          "p-1.5 md:p-3 rounded-lg shrink-0",
           trend === 'up' && "bg-success/10 text-success",
           trend === 'down' && "bg-destructive/10 text-destructive",
           !trend && "bg-primary/10 text-primary",
         )}>
-          <Icon className="h-5 w-5" />
+          <Icon className="h-3.5 w-3.5 md:h-5 md:w-5" />
         </div>
-      </div>
     </div>
   );
 }
