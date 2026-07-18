@@ -9,11 +9,11 @@ import { CsvToPdf } from '@/components/reports/CsvToPdf';
 export default function Dashboard() {
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">DASHBOARD</h1>
-            <p className="text-muted-foreground">Análise detalhada do seu desempenho</p>
+      <div className="space-y-4 md:space-y-6">
+        <div className="flex items-start justify-between gap-2 flex-wrap">
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-2xl font-bold mb-1">DASHBOARD</h1>
+            <p className="text-xs md:text-sm text-muted-foreground">Análise detalhada do seu desempenho</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <CsvToPdf />
@@ -21,7 +21,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           <div className="lg:col-span-2">
             <Statistics />
           </div>
