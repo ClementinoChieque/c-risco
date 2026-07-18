@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      csv_datasets: {
+        Row: {
+          created_at: string
+          filename: string
+          headers: Json
+          id: string
+          market: string
+          rows: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filename: string
+          headers?: Json
+          id?: string
+          market: string
+          rows?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filename?: string
+          headers?: Json
+          id?: string
+          market?: string
+          rows?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       execution_checklist: {
         Row: {
           category: string
