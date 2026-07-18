@@ -201,12 +201,37 @@ export function CsvViewer() {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+            dragOver
+              ? 'border-[#558C43] bg-[#558C43]/10'
+              : 'border-border hover:border-[#558C43]/60 hover:bg-muted/30'
+          }`}
+        >
+          <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+          <p className="text-sm font-medium">
+            {uploading
+              ? 'A enviar...'
+              : `Arrasta um CSV aqui ou clica para carregar — ${marketLabel[currentMarket]}`}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Ficheiros .csv até ~5MB. Os dados ficam associados ao mercado actual.
+          </p>
+        </div>
+
         {loading ? (
           <p className="text-sm text-muted-foreground">A carregar...</p>
         ) : !current ? (
           <p className="text-sm text-muted-foreground">
-            Nenhum CSV carregado para {marketLabel[currentMarket]}. Envia um ficheiro para visualizar.
+            Nenhum CSV carregado para {marketLabel[currentMarket]}.
           </p>
+
         ) : (
           <>
             {chartData.data.length > 0 && (
