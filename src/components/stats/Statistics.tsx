@@ -113,13 +113,13 @@ export function Statistics() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-2 flex-wrap">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex gap-1.5 md:gap-2 flex-wrap">
         {filterOptions.map(opt => (
           <button
             key={opt.value}
             onClick={() => setMarketFilter(opt.value)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
               marketFilter === opt.value
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground hover:bg-accent'
@@ -129,7 +129,7 @@ export function Statistics() {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-3 md:gap-4">
         <StatCard
           label="Total de Trades"
           value={totalTrades}
@@ -149,7 +149,7 @@ export function Statistics() {
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <StatCard
           label="R:R Médio"
           value={`1:${avgRR.toFixed(2)}`}
