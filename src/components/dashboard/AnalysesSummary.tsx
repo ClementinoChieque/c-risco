@@ -54,7 +54,7 @@ export function AnalysesSummary() {
   const winRate = total > 0 ? (stats.winCount / total) * 100 : 0;
 
   return (
-    <div className="glass-card rounded-xl p-6 animate-fade-in">
+    <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in h-full">
       <h3 className="stat-label mb-4 flex items-center gap-2">
         <BarChart3 className="h-4 w-4" />
         Resumo de Negociações
