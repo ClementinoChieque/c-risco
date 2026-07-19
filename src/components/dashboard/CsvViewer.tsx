@@ -299,6 +299,16 @@ export function CsvViewer() {
             ref={inputRef} type="file" accept=".csv,text/csv"
             className="hidden" onChange={handleFile}
           />
+          <Select value={uploadMarket} onValueChange={setUploadMarket}>
+            <SelectTrigger className="h-8 w-[130px] text-xs">
+              <SelectValue placeholder="Mercado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="forex">Forex</SelectItem>
+              <SelectItem value="crypto">Cripto</SelectItem>
+              <SelectItem value="propfirm">PropFirm</SelectItem>
+            </SelectContent>
+          </Select>
           <Button size="sm" onClick={() => inputRef.current?.click()} disabled={uploading}>
             <Upload className="h-4 w-4 mr-1" />
             {uploading ? 'A enviar...' : 'Carregar CSV'}
