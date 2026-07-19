@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Upload, Trash2, FileSpreadsheet } from 'lucide-react';
+import { Upload, Trash2, FileSpreadsheet, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -48,6 +50,23 @@ const marketLabel: Record<string, string> = {
   forex: 'Forex', crypto: 'Cripto', propfirm: 'PropFirm',
 };
 
+function parseDate(v: string): Date | null {
+  if (!v) return null;
+  const s = v.trim();
+  // Try ISO / native
+  const iso = new Date(s);
+  if (!isNaN(iso.getTime())) return iso;
+  // Try dd/mm/yyyy or dd-mm-yyyy
+  const m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if (m) {
+    const [, d, mo, y] = m;
+    const year = y.length === 2 ? 2000 + Number(y) : Number(y);
+    const dt = new Date(year, Number(mo) - 1, Number(d));
+    if (!isNaN(dt.getTime())) return dt;
+  }
+  return null;
+}
+
 export function CsvViewer() {
   const { user } = useAuth();
   const { currentMarket } = useTrade();
@@ -57,6 +76,14 @@ export function CsvViewer() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+
+  // Filters
+  const [search, setSearch] = useState('');
+  const [assetCol, setAssetCol] = useState<string>('__none__');
+  const [assetVal, setAssetVal] = useState<string>('__all__');
+  const [dateCol, setDateCol] = useState<string>('__none__');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const load = async () => {
     if (!user) return;
@@ -135,10 +162,83 @@ export function CsvViewer() {
     [datasets, selectedId],
   );
 
-  // Detect first numeric column for chart
+  // Auto-detect date & asset columns whenever dataset changes
+  useEffect(() => {
+    if (!current) return;
+    const { headers, rows } = current;
+    const sample = rows.slice(0, 30);
+
+    // Date column: header hints + parseable
+    let detectedDate = '__none__';
+    const dateHints = /date|data|time|hora|timestamp/i;
+    for (let i = 0; i < headers.length; i++) {
+      const hint = dateHints.test(headers[i] ?? '');
+      const parseable = sample.filter(r => parseDate(r[i] ?? '')).length;
+      if ((hint && parseable > 0) || parseable / Math.max(sample.length, 1) > 0.6) {
+        detectedDate = String(i); break;
+      }
+    }
+
+    // Asset column: header hints + low cardinality
+    let detectedAsset = '__none__';
+    const assetHints = /asset|symbol|par|pair|ativo|instrument|ticker/i;
+    for (let i = 0; i < headers.length; i++) {
+      if (assetHints.test(headers[i] ?? '')) { detectedAsset = String(i); break; }
+    }
+    if (detectedAsset === '__none__') {
+      for (let i = 0; i < headers.length; i++) {
+        const vals = new Set(sample.map(r => (r[i] ?? '').trim()).filter(Boolean));
+        const numeric = sample.filter(r => !isNaN(Number((r[i] ?? '').replace(',', '.')))).length;
+        if (vals.size > 1 && vals.size <= 15 && numeric / Math.max(sample.length, 1) < 0.3) {
+          detectedAsset = String(i); break;
+        }
+      }
+    }
+
+    setDateCol(detectedDate);
+    setAssetCol(detectedAsset);
+    setAssetVal('__all__');
+    setDateFrom(''); setDateTo(''); setSearch('');
+  }, [current?.id]);
+
+  const assetOptions = useMemo(() => {
+    if (!current || assetCol === '__none__') return [] as string[];
+    const idx = Number(assetCol);
+    const set = new Set<string>();
+    for (const r of current.rows) {
+      const v = (r[idx] ?? '').trim();
+      if (v) set.add(v);
+    }
+    return Array.from(set).sort();
+  }, [current, assetCol]);
+
+  const filteredRows = useMemo(() => {
+    if (!current) return [] as string[][];
+    const q = search.trim().toLowerCase();
+    const dIdx = dateCol === '__none__' ? -1 : Number(dateCol);
+    const aIdx = assetCol === '__none__' ? -1 : Number(assetCol);
+    const from = dateFrom ? new Date(dateFrom) : null;
+    const to = dateTo ? new Date(dateTo) : null;
+    if (to) to.setHours(23, 59, 59, 999);
+
+    return current.rows.filter(r => {
+      if (q && !r.some(c => (c ?? '').toString().toLowerCase().includes(q))) return false;
+      if (aIdx >= 0 && assetVal !== '__all__' && (r[aIdx] ?? '').trim() !== assetVal) return false;
+      if (dIdx >= 0 && (from || to)) {
+        const d = parseDate(r[dIdx] ?? '');
+        if (!d) return false;
+        if (from && d < from) return false;
+        if (to && d > to) return false;
+      }
+      return true;
+    });
+  }, [current, search, assetCol, assetVal, dateCol, dateFrom, dateTo]);
+
+  // Chart uses filtered rows
   const chartData = useMemo(() => {
     if (!current) return { data: [] as any[], label: '', xLabel: '' };
-    const { headers, rows } = current;
+    const { headers } = current;
+    const rows = filteredRows;
     let numericIdx = -1;
     for (let c = 0; c < headers.length; c++) {
       const numericCount = rows.reduce((acc, r) => {
@@ -148,7 +248,7 @@ export function CsvViewer() {
       if (numericCount / Math.max(rows.length, 1) > 0.6) { numericIdx = c; break; }
     }
     if (numericIdx === -1) return { data: [], label: '', xLabel: '' };
-    const xIdx = numericIdx === 0 ? 1 : 0;
+    const xIdx = dateCol !== '__none__' ? Number(dateCol) : (numericIdx === 0 ? 1 : 0);
     let cumulative = 0;
     const data = rows.slice(0, 200).map((r, i) => {
       const raw = (r[numericIdx] ?? '').toString().replace(',', '.').replace(/[^\d.\-]/g, '');
@@ -161,7 +261,12 @@ export function CsvViewer() {
       };
     });
     return { data, label: headers[numericIdx] || 'Valor', xLabel: headers[xIdx] || '' };
-  }, [current]);
+  }, [current, filteredRows, dateCol]);
+
+  const clearFilters = () => {
+    setSearch(''); setAssetVal('__all__'); setDateFrom(''); setDateTo('');
+  };
+  const hasActiveFilters = !!(search || assetVal !== '__all__' || dateFrom || dateTo);
 
   return (
     <Card className="glass-effect">
@@ -231,9 +336,95 @@ export function CsvViewer() {
           <p className="text-sm text-muted-foreground">
             Nenhum CSV carregado para {marketLabel[currentMarket]}.
           </p>
-
         ) : (
           <>
+            {/* Filters */}
+            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Buscar</Label>
+                  <div className="relative">
+                    <Search className="h-3.5 w-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Procurar em todas as colunas..."
+                      className="h-9 pl-7 text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs">Coluna de Ativo</Label>
+                  <div className="flex gap-2">
+                    <Select value={assetCol} onValueChange={(v) => { setAssetCol(v); setAssetVal('__all__'); }}>
+                      <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">— nenhuma —</SelectItem>
+                        {current.headers.map((h, i) => (
+                          <SelectItem key={i} value={String(i)}>{h || `Col ${i + 1}`}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {assetCol !== '__none__' && (
+                      <Select value={assetVal} onValueChange={setAssetVal}>
+                        <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">Todos</SelectItem>
+                          {assetOptions.map(v => (
+                            <SelectItem key={v} value={v}>{v}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs">Coluna de Data</Label>
+                  <Select value={dateCol} onValueChange={setDateCol}>
+                    <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— nenhuma —</SelectItem>
+                      {current.headers.map((h, i) => (
+                        <SelectItem key={i} value={String(i)}>{h || `Col ${i + 1}`}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs">Intervalo de Datas</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="date" value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      disabled={dateCol === '__none__'}
+                      className="h-9 text-xs"
+                    />
+                    <Input
+                      type="date" value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      disabled={dateCol === '__none__'}
+                      className="h-9 text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <p className="text-xs text-muted-foreground">
+                  {filteredRows.length} de {current.rows.length} linhas
+                  {hasActiveFilters && ' (filtradas)'}
+                </p>
+                {hasActiveFilters && (
+                  <Button size="sm" variant="ghost" onClick={clearFilters} className="h-7 text-xs">
+                    <X className="h-3 w-3 mr-1" /> Limpar filtros
+                  </Button>
+                )}
+              </div>
+            </div>
+
             {chartData.data.length > 0 && (
               <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -268,7 +459,7 @@ export function CsvViewer() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {current.rows.slice(0, 500).map((r, ri) => (
+                  {filteredRows.slice(0, 500).map((r, ri) => (
                     <TableRow key={ri}>
                       {current.headers.map((_, ci) => (
                         <TableCell key={ci} className="text-xs whitespace-nowrap">
@@ -277,12 +468,19 @@ export function CsvViewer() {
                       ))}
                     </TableRow>
                   ))}
+                  {filteredRows.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={current.headers.length} className="text-center text-xs text-muted-foreground py-6">
+                        Nenhuma linha corresponde aos filtros.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
-            {current.rows.length > 500 && (
+            {filteredRows.length > 500 && (
               <p className="text-xs text-muted-foreground">
-                A mostrar 500 de {current.rows.length} linhas.
+                A mostrar 500 de {filteredRows.length} linhas.
               </p>
             )}
           </>
