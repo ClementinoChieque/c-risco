@@ -76,6 +76,11 @@ export function CsvViewer() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [uploadMarket, setUploadMarket] = useState<string>(currentMarket);
+
+  useEffect(() => {
+    setUploadMarket(currentMarket);
+  }, [currentMarket]);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -121,7 +126,7 @@ export function CsvViewer() {
       const [headers, ...body] = rows;
       const { error } = await supabase.from('csv_datasets').insert({
         user_id: user.id,
-        market: currentMarket,
+        market: uploadMarket,
         filename: file.name,
         headers,
         rows: body,
@@ -294,6 +299,16 @@ export function CsvViewer() {
             ref={inputRef} type="file" accept=".csv,text/csv"
             className="hidden" onChange={handleFile}
           />
+          <Select value={uploadMarket} onValueChange={setUploadMarket}>
+            <SelectTrigger className="h-8 w-[130px] text-xs">
+              <SelectValue placeholder="Mercado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="forex">Forex</SelectItem>
+              <SelectItem value="crypto">Cripto</SelectItem>
+              <SelectItem value="propfirm">PropFirm</SelectItem>
+            </SelectContent>
+          </Select>
           <Button size="sm" onClick={() => inputRef.current?.click()} disabled={uploading}>
             <Upload className="h-4 w-4 mr-1" />
             {uploading ? 'A enviar...' : 'Carregar CSV'}
@@ -319,14 +334,26 @@ export function CsvViewer() {
               : 'border-border hover:border-[#558C43]/60 hover:bg-muted/30'
           }`}
         >
+          <div className="mb-3">
+            <Select value={uploadMarket} onValueChange={setUploadMarket}>
+              <SelectTrigger className="h-8 w-[150px] mx-auto text-xs bg-card/50">
+                <SelectValue placeholder="Escolher mercado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="forex">Forex</SelectItem>
+                <SelectItem value="crypto">Cripto</SelectItem>
+                <SelectItem value="propfirm">PropFirm</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm font-medium">
             {uploading
               ? 'A enviar...'
-              : `Arrasta um CSV aqui ou clica para carregar — ${marketLabel[currentMarket]}`}
+              : `Arrasta um CSV aqui ou clica para carregar — ${marketLabel[uploadMarket]}`}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Ficheiros .csv até ~5MB. Os dados ficam associados ao mercado actual.
+            Ficheiros .csv até ~5MB. Os dados ficam associados ao mercado seleccionado.
           </p>
         </div>
 
