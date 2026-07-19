@@ -76,6 +76,11 @@ export function CsvViewer() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [uploadMarket, setUploadMarket] = useState(currentMarket);
+
+  useEffect(() => {
+    setUploadMarket(currentMarket);
+  }, [currentMarket]);
 
   // Filters
   const [search, setSearch] = useState('');
