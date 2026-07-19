@@ -126,7 +126,7 @@ export function CsvViewer() {
       const [headers, ...body] = rows;
       const { error } = await supabase.from('csv_datasets').insert({
         user_id: user.id,
-        market: currentMarket,
+        market: uploadMarket,
         filename: file.name,
         headers,
         rows: body,
