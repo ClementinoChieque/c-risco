@@ -116,7 +116,9 @@ export function CsvViewer() {
       created_at: d.created_at,
     })) as Dataset[];
     setDatasets(ds);
-    setSelectedId(ds[0]?.id ?? null);
+    const remembered = readLastSelected()[currentMarket];
+    const initial = ds.find(d => d.id === remembered)?.id ?? ds[0]?.id ?? null;
+    setSelectedId(initial);
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id, currentMarket]);
