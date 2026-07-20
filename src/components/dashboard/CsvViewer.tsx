@@ -67,9 +67,18 @@ function parseDate(v: string): Date | null {
   return null;
 }
 
+const LAST_SELECTED_KEY = 'csvViewer:lastSelectedByMarket';
+
+function readLastSelected(): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem(LAST_SELECTED_KEY) || '{}'); } catch { return {}; }
+}
+function writeLastSelected(map: Record<string, string>) {
+  try { localStorage.setItem(LAST_SELECTED_KEY, JSON.stringify(map)); } catch { /* ignore */ }
+}
+
 export function CsvViewer() {
   const { user } = useAuth();
-  const { currentMarket } = useTrade();
+  const { currentMarket, setCurrentMarket } = useTrade();
   const inputRef = useRef<HTMLInputElement>(null);
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
