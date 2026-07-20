@@ -508,12 +508,32 @@ export function CsvViewer() {
                         border: '1px solid hsl(var(--border))',
                         fontSize: 12,
                       }}
+                      content={({ active, payload, label }: any) => {
+                        if (!active || !payload || !payload.length) return null;
+                        const p = payload[0].payload;
+                        return (
+                          <div className="rounded-md border border-border bg-card p-2 text-xs space-y-1">
+                            <p className="font-medium">{label}</p>
+                            <p>Acumulado: <span className="font-mono">{p.cumulative}</span></p>
+                            {p.pnlNet !== null && (
+                              <p>{chartData.pnlNetLabel || 'Closed P&L Net'}: <span className="font-mono">{p.pnlNet}</span></p>
+                            )}
+                            {p.pnl !== null && (
+                              <p>{chartData.pnlLabel || 'Closed P&L'}: <span className="font-mono">{p.pnl}</span></p>
+                            )}
+                            {p.qty !== null && (
+                              <p>{chartData.qtyLabel || 'Qtde'}: <span className="font-mono">{p.qty}</span></p>
+                            )}
+                          </div>
+                        );
+                      }}
                     />
                     <Line
                       type="monotone" dataKey="cumulative"
                       stroke="#558C43" strokeWidth={2} dot={false}
                       name={`${chartData.label} (acumulado)`}
                     />
+
                   </LineChart>
                 </ResponsiveContainer>
               </div>
