@@ -67,9 +67,18 @@ function parseDate(v: string): Date | null {
   return null;
 }
 
+const LAST_SELECTED_KEY = 'csvViewer:lastSelectedByMarket';
+
+function readLastSelected(): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem(LAST_SELECTED_KEY) || '{}'); } catch { return {}; }
+}
+function writeLastSelected(map: Record<string, string>) {
+  try { localStorage.setItem(LAST_SELECTED_KEY, JSON.stringify(map)); } catch { /* ignore */ }
+}
+
 export function CsvViewer() {
   const { user } = useAuth();
-  const { currentMarket } = useTrade();
+  const { currentMarket, setCurrentMarket } = useTrade();
   const inputRef = useRef<HTMLInputElement>(null);
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -107,10 +116,19 @@ export function CsvViewer() {
       created_at: d.created_at,
     })) as Dataset[];
     setDatasets(ds);
-    setSelectedId(ds[0]?.id ?? null);
+    const remembered = readLastSelected()[currentMarket];
+    const initial = ds.find(d => d.id === remembered)?.id ?? ds[0]?.id ?? null;
+    setSelectedId(initial);
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id, currentMarket]);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const map = readLastSelected();
+    map[currentMarket] = selectedId;
+    writeLastSelected(map);
+  }, [selectedId, currentMarket]);
 
   const uploadFile = async (file: File) => {
     if (!user) return;
@@ -132,8 +150,13 @@ export function CsvViewer() {
         rows: body,
       });
       if (error) throw error;
-      toast.success('CSV carregado');
-      await load();
+      toast.success(`CSV carregado para ${marketLabel[uploadMarket]}`);
+      if (uploadMarket !== currentMarket) {
+        setCurrentMarket(uploadMarket as any);
+        // load() will run via the effect on currentMarket change
+      } else {
+        await load();
+      }
     } catch (err: any) {
       console.error(err);
       toast.error('Falha ao carregar CSV');
