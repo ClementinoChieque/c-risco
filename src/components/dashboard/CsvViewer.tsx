@@ -264,31 +264,51 @@ export function CsvViewer() {
 
   // Chart uses filtered rows
   const chartData = useMemo(() => {
-    if (!current) return { data: [] as any[], label: '', xLabel: '' };
+    if (!current) return { data: [] as any[], label: '', xLabel: '', pnlNetLabel: '', pnlLabel: '', qtyLabel: '' };
     const { headers } = current;
     const rows = filteredRows;
-    let numericIdx = -1;
-    for (let c = 0; c < headers.length; c++) {
-      const numericCount = rows.reduce((acc, r) => {
-        const v = (r[c] ?? '').toString().replace(',', '.').replace(/[^\d.\-]/g, '');
-        return acc + (v !== '' && !isNaN(Number(v)) ? 1 : 0);
-      }, 0);
-      if (numericCount / Math.max(rows.length, 1) > 0.6) { numericIdx = c; break; }
-    }
-    if (numericIdx === -1) return { data: [], label: '', xLabel: '' };
-    const xIdx = dateCol !== '__none__' ? Number(dateCol) : (numericIdx === 0 ? 1 : 0);
+
+    const findCol = (regex: RegExp) =>
+      headers.findIndex((h) => regex.test((h ?? '').toString().trim()));
+
+    const toNum = (v: any) => {
+      const s = (v ?? '').toString().replace(/\s/g, '').replace(',', '.').replace(/[^\d.\-]/g, '');
+      return s === '' || isNaN(Number(s)) ? 0 : Number(s);
+    };
+
+    const pnlNetIdx = findCol(/closed\s*p[&/]?l\s*net|p[&/]?l\s*net/i);
+    const pnlIdx = headers.findIndex((h, i) => {
+      const s = (h ?? '').toString().trim();
+      return i !== pnlNetIdx && /closed\s*p[&/]?l|^\s*p[&/]?l\s*$|pnl|profit|lucro|resultado/i.test(s);
+    });
+
+    const mainIdx = pnlNetIdx !== -1 ? pnlNetIdx : pnlIdx;
+    if (mainIdx === -1) return { data: [], label: '', xLabel: '', pnlNetLabel: '', pnlLabel: '', qtyLabel: '' };
+
+    const qtyIdx = findCol(/^qty$|qtde|quant|size|volume|amount/i);
+    const xIdx = dateCol !== '__none__' ? Number(dateCol) : (mainIdx === 0 ? 1 : 0);
+
     let cumulative = 0;
     const data = rows.slice(0, 200).map((r, i) => {
-      const raw = (r[numericIdx] ?? '').toString().replace(',', '.').replace(/[^\d.\-]/g, '');
-      const val = Number(raw) || 0;
+      const val = toNum(r[mainIdx]);
       cumulative += val;
       return {
         name: (r[xIdx] ?? `#${i + 1}`).toString().slice(0, 20),
-        value: val,
+        value: Number(val.toFixed(2)),
         cumulative: Number(cumulative.toFixed(2)),
+        pnlNet: pnlNetIdx >= 0 ? toNum(r[pnlNetIdx]) : null,
+        pnl: pnlIdx >= 0 ? toNum(r[pnlIdx]) : null,
+        qty: qtyIdx >= 0 ? toNum(r[qtyIdx]) : null,
       };
     });
-    return { data, label: headers[numericIdx] || 'Valor', xLabel: headers[xIdx] || '' };
+    return {
+      data,
+      label: headers[mainIdx] || 'P&L',
+      xLabel: headers[xIdx] || '',
+      pnlNetLabel: pnlNetIdx >= 0 ? headers[pnlNetIdx] : '',
+      pnlLabel: pnlIdx >= 0 ? headers[pnlIdx] : '',
+      qtyLabel: qtyIdx >= 0 ? headers[qtyIdx] : '',
+    };
   }, [current, filteredRows, dateCol]);
 
   const clearFilters = () => {
