@@ -123,6 +123,13 @@ export function CsvViewer() {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id, currentMarket]);
 
+  useEffect(() => {
+    if (!selectedId) return;
+    const map = readLastSelected();
+    map[currentMarket] = selectedId;
+    writeLastSelected(map);
+  }, [selectedId, currentMarket]);
+
   const uploadFile = async (file: File) => {
     if (!user) return;
     if (!/\.csv$/i.test(file.name) && file.type !== 'text/csv') {
