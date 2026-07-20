@@ -143,8 +143,13 @@ export function CsvViewer() {
         rows: body,
       });
       if (error) throw error;
-      toast.success('CSV carregado');
-      await load();
+      toast.success(`CSV carregado para ${marketLabel[uploadMarket]}`);
+      if (uploadMarket !== currentMarket) {
+        setCurrentMarket(uploadMarket as any);
+        // load() will run via the effect on currentMarket change
+      } else {
+        await load();
+      }
     } catch (err: any) {
       console.error(err);
       toast.error('Falha ao carregar CSV');
