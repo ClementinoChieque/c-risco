@@ -14,6 +14,8 @@ interface AnalysisStats {
   avgRR: number;
   csvClosedPnlNet: number;
   csvClosedPnl: number;
+  csvWinCount: number;
+  csvLossCount: number;
 }
 
 function toNum(v: any): number {
@@ -26,7 +28,7 @@ export function AnalysesSummary() {
   const { currentMarket } = useTrade();
   const [stats, setStats] = useState<AnalysisStats>({
     totalGains: 0, totalLosses: 0, netPnL: 0, winCount: 0, lossCount: 0, avgRR: 0,
-    csvClosedPnlNet: 0, csvClosedPnl: 0,
+    csvClosedPnlNet: 0, csvClosedPnl: 0, csvWinCount: 0, csvLossCount: 0,
   });
 
   useEffect(() => {
@@ -57,6 +59,8 @@ export function AnalysesSummary() {
 
       let csvClosedPnlNet = 0;
       let csvClosedPnl = 0;
+      let csvWinCount = 0;
+      let csvLossCount = 0;
 
       (csvDatasets ?? []).forEach((d: any) => {
         const headers: string[] = (d.headers ?? []) as string[];
@@ -70,9 +74,16 @@ export function AnalysesSummary() {
           return i !== pnlNetIdx && /closed\s*p[&/]?l|^\s*p[&/]?l\s*$|pnl|profit|lucro|resultado/i.test(s);
         });
 
+        const refIdx = pnlNetIdx >= 0 ? pnlNetIdx : pnlIdx;
+
         rows.forEach((row) => {
           if (pnlNetIdx >= 0) csvClosedPnlNet += toNum(row[pnlNetIdx]);
           if (pnlIdx >= 0) csvClosedPnl += toNum(row[pnlIdx]);
+          if (refIdx >= 0) {
+            const v = toNum(row[refIdx]);
+            if (v > 0) csvWinCount++;
+            else if (v < 0) csvLossCount++;
+          }
         });
       });
 
@@ -85,6 +96,8 @@ export function AnalysesSummary() {
         avgRR,
         csvClosedPnlNet,
         csvClosedPnl,
+        csvWinCount,
+        csvLossCount,
       });
     }
     fetch();
@@ -153,6 +166,28 @@ export function AnalysesSummary() {
             {stats.csvClosedPnl >= 0 ? '+' : ''}${stats.csvClosedPnl.toFixed(2)}
           </p>
         </div>
+        {(stats.csvWinCount + stats.csvLossCount) > 0 && (
+          <>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Vencedores (CSV)</p>
+              <p className="text-lg font-bold text-success font-mono">{stats.csvWinCount}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Derrotados (CSV)</p>
+              <p className="text-lg font-bold text-destructive font-mono">{stats.csvLossCount}</p>
+            </div>
+            <div className="col-span-2 space-y-1">
+              <p className="text-xs text-muted-foreground">Taxa de Acerto (CSV)</p>
+              <p className={cn(
+                "text-lg font-bold font-mono",
+                (stats.csvWinCount / (stats.csvWinCount + stats.csvLossCount)) * 100 >= 50
+                  ? "text-success" : "text-destructive"
+              )}>
+                {((stats.csvWinCount / (stats.csvWinCount + stats.csvLossCount)) * 100).toFixed(1)}%
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
