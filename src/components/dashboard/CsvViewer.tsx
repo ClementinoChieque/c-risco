@@ -497,12 +497,12 @@ export function CsvViewer() {
             </div>
 
             {chartData.data.length > 0 && (
-              <div className="h-56 w-full">
+              <div className="h-48 sm:h-56 w-full -mx-1 sm:mx-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData.data}>
+                  <LineChart data={chartData.data} margin={{ top: 5, right: 8, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} hide={chartData.data.length > 30} />
-                    <YAxis tick={{ fontSize: 10 }} />
+                    <YAxis tick={{ fontSize: 10 }} width={40} />
                     <Tooltip
                       contentStyle={{
                         background: 'hsl(var(--card))',
@@ -540,7 +540,8 @@ export function CsvViewer() {
               </div>
             )}
 
-            <div className="overflow-auto max-h-[420px] rounded border border-border">
+            <div className="overflow-auto max-h-[360px] sm:max-h-[420px] rounded border border-border -mx-1 sm:mx-0">
+
               <Table>
                 <TableHeader className="sticky top-0 bg-card">
                   <TableRow>
