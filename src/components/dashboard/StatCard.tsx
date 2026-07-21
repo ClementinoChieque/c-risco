@@ -19,7 +19,7 @@ export function StatCard({ label, value, icon: Icon, trend, className }: StatCar
         <div className="min-w-0">
           <p className="stat-label mb-1 md:mb-2 text-[10px] md:text-sm truncate">{label}</p>
           <p className={cn(
-            "font-mono text-sm md:text-2xl font-bold tracking-tight break-all",
+            "font-mono text-xs sm:text-sm md:text-2xl font-bold tracking-tight break-words",
             trend === 'up' && "text-success",
             trend === 'down' && "text-destructive",
           )}>

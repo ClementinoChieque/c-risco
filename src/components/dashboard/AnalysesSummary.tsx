@@ -100,7 +100,7 @@ export function AnalysesSummary() {
         Resumo de Negociações
       </h3>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Total Gains</p>
           <p className="text-lg font-bold text-success font-mono">+${stats.totalGains.toFixed(2)}</p>
