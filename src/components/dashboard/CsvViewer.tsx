@@ -318,15 +318,15 @@ export function CsvViewer() {
 
   return (
     <Card className="glass-effect">
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <CardTitle className="flex items-center gap-2">
-          <FileSpreadsheet className="h-5 w-5" />
-          Dados CSV — {marketLabel[currentMarket]}
+      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-3 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <FileSpreadsheet className="h-5 w-5 shrink-0" />
+          <span className="truncate">Dados CSV — {marketLabel[currentMarket]}</span>
         </CardTitle>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           {datasets.length > 0 && (
             <Select value={selectedId ?? ''} onValueChange={setSelectedId}>
-              <SelectTrigger className="w-[220px]">
+              <SelectTrigger className="h-9 w-full sm:w-[220px] text-xs">
                 <SelectValue placeholder="Escolher ficheiro" />
               </SelectTrigger>
               <SelectContent>
@@ -343,7 +343,7 @@ export function CsvViewer() {
             className="hidden" onChange={handleFile}
           />
           <Select value={uploadMarket} onValueChange={setUploadMarket}>
-            <SelectTrigger className="h-8 w-[130px] text-xs">
+            <SelectTrigger className="h-9 w-[110px] sm:w-[130px] text-xs">
               <SelectValue placeholder="Mercado" />
             </SelectTrigger>
             <SelectContent>
@@ -352,9 +352,10 @@ export function CsvViewer() {
               <SelectItem value="propfirm">PropFirm</SelectItem>
             </SelectContent>
           </Select>
-          <Button size="sm" onClick={() => inputRef.current?.click()} disabled={uploading}>
-            <Upload className="h-4 w-4 mr-1" />
-            {uploading ? 'A enviar...' : 'Carregar CSV'}
+          <Button size="sm" onClick={() => inputRef.current?.click()} disabled={uploading} className="flex-1 sm:flex-none">
+            <Upload className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">{uploading ? 'A enviar...' : 'Carregar CSV'}</span>
+            <span className="sm:hidden">{uploading ? '...' : 'CSV'}</span>
           </Button>
           {current && (
             <Button size="sm" variant="outline" onClick={() => remove(current.id)}>
@@ -363,7 +364,7 @@ export function CsvViewer() {
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-3 sm:px-6">
         <div
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
@@ -496,12 +497,12 @@ export function CsvViewer() {
             </div>
 
             {chartData.data.length > 0 && (
-              <div className="h-56 w-full">
+              <div className="h-48 sm:h-56 w-full -mx-1 sm:mx-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData.data}>
+                  <LineChart data={chartData.data} margin={{ top: 5, right: 8, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} hide={chartData.data.length > 30} />
-                    <YAxis tick={{ fontSize: 10 }} />
+                    <YAxis tick={{ fontSize: 10 }} width={40} />
                     <Tooltip
                       contentStyle={{
                         background: 'hsl(var(--card))',
@@ -539,7 +540,8 @@ export function CsvViewer() {
               </div>
             )}
 
-            <div className="overflow-auto max-h-[420px] rounded border border-border">
+            <div className="overflow-auto max-h-[360px] sm:max-h-[420px] rounded border border-border -mx-1 sm:mx-0">
+
               <Table>
                 <TableHeader className="sticky top-0 bg-card">
                   <TableRow>
