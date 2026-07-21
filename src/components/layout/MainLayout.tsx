@@ -10,9 +10,9 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="min-h-screen bg-background">
       <div className="flex">
         <Navigation />
-        <div className="flex-1 pb-20 md:pb-0">
+        <div className="flex-1 min-w-0 pb-20 md:pb-0">
           <Header />
-          <main className="p-4 md:p-6">
+          <main className="p-3 sm:p-4 md:p-6 overflow-x-hidden">
             {children}
           </main>
         </div>

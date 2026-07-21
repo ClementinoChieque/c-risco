@@ -81,7 +81,7 @@ export function EquityCurve() {
                   {finalEquity >= 0 ? '+' : ''}${finalEquity.toFixed(2)}
                 </span>
               </div>
-              <div className="h-64 w-full">
+              <div className="h-56 sm:h-64 w-full">
                 {loading ? (
                   <div className="h-full flex items-center justify-center text-muted-foreground text-sm">A carregar…</div>
                 ) : data.length === 0 ? (
