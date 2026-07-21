@@ -149,7 +149,7 @@ export function Statistics() {
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
         <StatCard
           label="R:R Médio"
           value={`1:${avgRR.toFixed(2)}`}
