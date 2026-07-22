@@ -5,6 +5,15 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useTrade } from '@/context/TradeContext';
 
+type Market = 'forex' | 'crypto' | 'propfirm';
+
+interface CsvTotals {
+  closedPnlNet: number;
+  closedPnl: number;
+  winCount: number;
+  lossCount: number;
+}
+
 interface AnalysisStats {
   totalGains: number;
   totalLosses: number;
@@ -12,15 +21,22 @@ interface AnalysisStats {
   winCount: number;
   lossCount: number;
   avgRR: number;
-  csvClosedPnlNet: number;
-  csvClosedPnl: number;
-  csvWinCount: number;
-  csvLossCount: number;
+  csvByMarket: Record<Market, CsvTotals>;
 }
+
+const MARKET_LABELS: Record<Market, string> = {
+  forex: 'Forex',
+  crypto: 'Cripto',
+  propfirm: 'PropFirm',
+};
 
 function toNum(v: any): number {
   const s = (v ?? '').toString().replace(/\s/g, '').replace(',', '.').replace(/[^\d.\-]/g, '');
   return s === '' || isNaN(Number(s)) ? 0 : Number(s);
+}
+
+function emptyTotals(): CsvTotals {
+  return { closedPnlNet: 0, closedPnl: 0, winCount: 0, lossCount: 0 };
 }
 
 export function AnalysesSummary() {
@@ -28,7 +44,7 @@ export function AnalysesSummary() {
   const { currentMarket } = useTrade();
   const [stats, setStats] = useState<AnalysisStats>({
     totalGains: 0, totalLosses: 0, netPnL: 0, winCount: 0, lossCount: 0, avgRR: 0,
-    csvClosedPnlNet: 0, csvClosedPnl: 0, csvWinCount: 0, csvLossCount: 0,
+    csvByMarket: { forex: emptyTotals(), crypto: emptyTotals(), propfirm: emptyTotals() },
   });
 
   useEffect(() => {
@@ -43,9 +59,8 @@ export function AnalysesSummary() {
 
       const { data: csvDatasets } = await supabase
         .from('csv_datasets')
-        .select('headers, rows')
-        .eq('user_id', user.id)
-        .eq('market', currentMarket);
+        .select('headers, rows, market')
+        .eq('user_id', user.id);
 
       const wins = (analyses ?? []).filter((d: any) => d.type === 'win');
       const losses = (analyses ?? []).filter((d: any) => d.type === 'loss');
@@ -57,12 +72,13 @@ export function AnalysesSummary() {
         ? allRR.reduce((s: number, d: any) => s + d.risk_reward, 0) / allRR.length
         : 0;
 
-      let csvClosedPnlNet = 0;
-      let csvClosedPnl = 0;
-      let csvWinCount = 0;
-      let csvLossCount = 0;
+      const csvByMarket: Record<Market, CsvTotals> = {
+        forex: emptyTotals(), crypto: emptyTotals(), propfirm: emptyTotals(),
+      };
 
       (csvDatasets ?? []).forEach((d: any) => {
+        const market = (d.market as Market) ?? 'forex';
+        if (!csvByMarket[market]) return;
         const headers: string[] = (d.headers ?? []) as string[];
         const rows: string[][] = (d.rows ?? []) as string[][];
 
@@ -75,14 +91,15 @@ export function AnalysesSummary() {
         });
 
         const refIdx = pnlNetIdx >= 0 ? pnlNetIdx : pnlIdx;
+        const bucket = csvByMarket[market];
 
         rows.forEach((row) => {
-          if (pnlNetIdx >= 0) csvClosedPnlNet += toNum(row[pnlNetIdx]);
-          if (pnlIdx >= 0) csvClosedPnl += toNum(row[pnlIdx]);
+          if (pnlNetIdx >= 0) bucket.closedPnlNet += toNum(row[pnlNetIdx]);
+          if (pnlIdx >= 0) bucket.closedPnl += toNum(row[pnlIdx]);
           if (refIdx >= 0) {
             const v = toNum(row[refIdx]);
-            if (v > 0) csvWinCount++;
-            else if (v < 0) csvLossCount++;
+            if (v > 0) bucket.winCount++;
+            else if (v < 0) bucket.lossCount++;
           }
         });
       });
@@ -94,10 +111,7 @@ export function AnalysesSummary() {
         winCount: wins.length,
         lossCount: losses.length,
         avgRR,
-        csvClosedPnlNet,
-        csvClosedPnl,
-        csvWinCount,
-        csvLossCount,
+        csvByMarket,
       });
     }
     fetch();
@@ -148,46 +162,72 @@ export function AnalysesSummary() {
             {stats.avgRR.toFixed(1)}
           </p>
         </div>
-        <div className="col-span-2 space-y-1">
-          <p className="text-xs text-muted-foreground">Closed P&L Net</p>
-          <p className={cn(
-            "text-lg font-bold font-mono",
-            stats.csvClosedPnlNet >= 0 ? "text-success" : "text-destructive"
-          )}>
-            {stats.csvClosedPnlNet >= 0 ? '+' : ''}${stats.csvClosedPnlNet.toFixed(2)}
-          </p>
-        </div>
-        <div className="col-span-2 space-y-1">
-          <p className="text-xs text-muted-foreground">Closed P&L</p>
-          <p className={cn(
-            "text-lg font-bold font-mono",
-            stats.csvClosedPnl >= 0 ? "text-success" : "text-destructive"
-          )}>
-            {stats.csvClosedPnl >= 0 ? '+' : ''}${stats.csvClosedPnl.toFixed(2)}
-          </p>
-        </div>
-        {(stats.csvWinCount + stats.csvLossCount) > 0 && (
-          <>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Vencedores (CSV)</p>
-              <p className="text-lg font-bold text-success font-mono">{stats.csvWinCount}</p>
+      </div>
+
+      <div className="mt-6 space-y-4">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Dados CSV por Mercado
+        </p>
+        {(Object.keys(MARKET_LABELS) as Market[]).map((m) => {
+          const t = stats.csvByMarket[m];
+          const totalCsv = t.winCount + t.lossCount;
+          const csvWinRate = totalCsv > 0 ? (t.winCount / totalCsv) * 100 : 0;
+          const hasData = totalCsv > 0 || t.closedPnl !== 0 || t.closedPnlNet !== 0;
+
+          return (
+            <div
+              key={m}
+              className={cn(
+                "rounded-lg border border-border/50 p-3 space-y-2",
+                m === currentMarket && "border-primary/50 bg-primary/5"
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">{MARKET_LABELS[m]}</p>
+                {!hasData && <span className="text-xs text-muted-foreground">Sem dados</span>}
+              </div>
+              {hasData && (
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <p className="text-muted-foreground">P&L Net</p>
+                    <p className={cn(
+                      "font-mono font-bold text-sm",
+                      t.closedPnlNet >= 0 ? "text-success" : "text-destructive"
+                    )}>
+                      {t.closedPnlNet >= 0 ? '+' : ''}${t.closedPnlNet.toFixed(2)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">P&L</p>
+                    <p className={cn(
+                      "font-mono font-bold text-sm",
+                      t.closedPnl >= 0 ? "text-success" : "text-destructive"
+                    )}>
+                      {t.closedPnl >= 0 ? '+' : ''}${t.closedPnl.toFixed(2)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Vencedores</p>
+                    <p className="font-mono font-bold text-sm text-success">{t.winCount}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Derrotados</p>
+                    <p className="font-mono font-bold text-sm text-destructive">{t.lossCount}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-muted-foreground">Taxa de Acerto</p>
+                    <p className={cn(
+                      "font-mono font-bold text-sm",
+                      csvWinRate >= 50 ? "text-success" : "text-destructive"
+                    )}>
+                      {csvWinRate.toFixed(1)}%
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Derrotados (CSV)</p>
-              <p className="text-lg font-bold text-destructive font-mono">{stats.csvLossCount}</p>
-            </div>
-            <div className="col-span-2 space-y-1">
-              <p className="text-xs text-muted-foreground">Taxa de Acerto (CSV)</p>
-              <p className={cn(
-                "text-lg font-bold font-mono",
-                (stats.csvWinCount / (stats.csvWinCount + stats.csvLossCount)) * 100 >= 50
-                  ? "text-success" : "text-destructive"
-              )}>
-                {((stats.csvWinCount / (stats.csvWinCount + stats.csvLossCount)) * 100).toFixed(1)}%
-              </p>
-            </div>
-          </>
-        )}
+          );
+        })}
       </div>
     </div>
   );
