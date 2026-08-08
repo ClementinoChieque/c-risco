@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useTrade } from '@/context/TradeContext';
@@ -12,6 +12,9 @@ interface CsvTotals {
   closedPnl: number;
   winCount: number;
   lossCount: number;
+  filename?: string;
+  updatedAt?: string;
+  rowCount?: number;
 }
 
 interface AnalysisStats {
@@ -59,7 +62,7 @@ export function AnalysesSummary() {
 
       const { data: csvDatasets } = await supabase
         .from('csv_datasets')
-        .select('id, headers, rows, market, created_at')
+        .select('id, headers, rows, market, created_at, updated_at, filename')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -117,6 +120,10 @@ export function AnalysesSummary() {
 
         const refIdx = pnlNetIdx >= 0 ? pnlNetIdx : pnlIdx;
         const bucket = csvByMarket[market];
+        bucket.filename = d.filename;
+        bucket.updatedAt = d.updated_at ?? d.created_at;
+        bucket.rowCount = rows.length;
+
 
         rows.forEach((row) => {
           if (pnlNetIdx >= 0) bucket.closedPnlNet += toNum(row[pnlNetIdx]);
@@ -198,6 +205,12 @@ export function AnalysesSummary() {
           const totalCsv = t.winCount + t.lossCount;
           const csvWinRate = totalCsv > 0 ? (t.winCount / totalCsv) * 100 : 0;
           const hasData = totalCsv > 0 || t.closedPnl !== 0 || t.closedPnlNet !== 0;
+          const updatedLabel = t.updatedAt
+            ? new Date(t.updatedAt).toLocaleString('pt-PT', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit',
+              })
+            : null;
 
           return (
             <div
@@ -207,10 +220,23 @@ export function AnalysesSummary() {
                 m === currentMarket && "border-primary/50 bg-primary/5"
               )}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{MARKET_LABELS[m]}</p>
-                {!hasData && <span className="text-xs text-muted-foreground">Sem dados</span>}
+                {!t.filename && <span className="text-xs text-muted-foreground">Sem ficheiro</span>}
               </div>
+              {t.filename && (
+                <div className="flex items-start gap-1.5 rounded-md bg-muted/30 px-2 py-1.5">
+                  <FileText className="h-3.5 w-3.5 shrink-0 mt-0.5 text-primary" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium truncate" title={t.filename}>{t.filename}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {t.rowCount ?? 0} linhas
+                      {updatedLabel && <> · actualizado {updatedLabel}</>}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {hasData && (
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
