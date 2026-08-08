@@ -62,7 +62,7 @@ export function AnalysesSummary() {
 
       const { data: csvDatasets } = await supabase
         .from('csv_datasets')
-        .select('id, headers, rows, market, created_at')
+        .select('id, headers, rows, market, created_at, updated_at, filename')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
