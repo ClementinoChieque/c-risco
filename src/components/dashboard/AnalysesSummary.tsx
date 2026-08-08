@@ -120,6 +120,10 @@ export function AnalysesSummary() {
 
         const refIdx = pnlNetIdx >= 0 ? pnlNetIdx : pnlIdx;
         const bucket = csvByMarket[market];
+        bucket.filename = d.filename;
+        bucket.updatedAt = d.updated_at ?? d.created_at;
+        bucket.rowCount = rows.length;
+
 
         rows.forEach((row) => {
           if (pnlNetIdx >= 0) bucket.closedPnlNet += toNum(row[pnlNetIdx]);
