@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { TradeProvider } from "@/context/TradeContext";
+import { DateRangeProvider } from "@/context/DateRangeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import DiaryPage from "./pages/DiaryPage";
@@ -27,6 +28,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <OfflineIndicator />
+        <DateRangeProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ProtectedRoute><TradeProvider><Index /></TradeProvider></ProtectedRoute>} />
@@ -41,6 +43,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </DateRangeProvider>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

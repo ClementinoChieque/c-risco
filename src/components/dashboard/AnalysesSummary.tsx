@@ -4,6 +4,7 @@ import { BarChart3, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { useTrade } from '@/context/TradeContext';
+import { useDateRange } from '@/context/DateRangeContext';
 
 type Market = 'forex' | 'crypto' | 'propfirm';
 
@@ -15,6 +16,7 @@ interface CsvTotals {
   filename?: string;
   updatedAt?: string;
   rowCount?: number;
+  dateFiltered?: boolean;
 }
 
 interface AnalysisStats {
@@ -38,6 +40,21 @@ function toNum(v: any): number {
   return s === '' || isNaN(Number(s)) ? 0 : Number(s);
 }
 
+function parseCsvDate(v: string): Date | null {
+  if (!v) return null;
+  const s = v.trim();
+  const iso = new Date(s);
+  if (!isNaN(iso.getTime())) return iso;
+  const m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if (m) {
+    const [, d, mo, y] = m;
+    const year = y.length === 2 ? 2000 + Number(y) : Number(y);
+    const dt = new Date(year, Number(mo) - 1, Number(d));
+    if (!isNaN(dt.getTime())) return dt;
+  }
+  return null;
+}
+
 function emptyTotals(): CsvTotals {
   return { closedPnlNet: 0, closedPnl: 0, winCount: 0, lossCount: 0 };
 }
@@ -45,6 +62,7 @@ function emptyTotals(): CsvTotals {
 export function AnalysesSummary() {
   const { user } = useAuth();
   const { currentMarket } = useTrade();
+  const { inRange, hasRange, from, to } = useDateRange();
   const [stats, setStats] = useState<AnalysisStats>({
     totalGains: 0, totalLosses: 0, netPnL: 0, winCount: 0, lossCount: 0, avgRR: 0,
     csvByMarket: { forex: emptyTotals(), crypto: emptyTotals(), propfirm: emptyTotals() },
@@ -56,7 +74,7 @@ export function AnalysesSummary() {
 
       const { data: analyses } = await supabase
         .from('trade_analyses')
-        .select('type, amount, risk_reward')
+        .select('type, amount, risk_reward, created_at')
         .eq('user_id', user.id)
         .eq('market', currentMarket);
 
@@ -66,12 +84,13 @@ export function AnalysesSummary() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      const wins = (analyses ?? []).filter((d: any) => d.type === 'win');
-      const losses = (analyses ?? []).filter((d: any) => d.type === 'loss');
+      const scoped = (analyses ?? []).filter((d: any) => inRange(d.created_at));
+      const wins = scoped.filter((d: any) => d.type === 'win');
+      const losses = scoped.filter((d: any) => d.type === 'loss');
 
       const totalGains = wins.reduce((s: number, d: any) => s + (d.amount || 0), 0);
       const totalLosses = losses.reduce((s: number, d: any) => s + Math.abs(d.amount || 0), 0);
-      const allRR = (analyses ?? []).filter((d: any) => (d.risk_reward || 0) > 0);
+      const allRR = scoped.filter((d: any) => (d.risk_reward || 0) > 0);
       const avgRR = allRR.length > 0
         ? allRR.reduce((s: number, d: any) => s + d.risk_reward, 0) / allRR.length
         : 0;
@@ -118,14 +137,30 @@ export function AnalysesSummary() {
           return i !== pnlNetIdx && /closed\s*p[&/]?l|^\s*p[&/]?l\s*$|pnl|profit|lucro|resultado/i.test(s);
         });
 
+        const sample = rows.slice(0, 30);
+        let dateIdx = -1;
+        const dateHints = /date|data|time|hora|timestamp/i;
+        for (let i = 0; i < headers.length; i++) {
+          const parseable = sample.filter((r) => parseCsvDate(r[i] ?? '')).length;
+          if (dateHints.test(headers[i] ?? '') && parseable > sample.length * 0.4) { dateIdx = i; break; }
+        }
+        if (dateIdx < 0) {
+          for (let i = 0; i < headers.length; i++) {
+            const parseable = sample.filter((r) => parseCsvDate(r[i] ?? '')).length;
+            if (parseable > sample.length * 0.6) { dateIdx = i; break; }
+          }
+        }
+
         const refIdx = pnlNetIdx >= 0 ? pnlNetIdx : pnlIdx;
         const bucket = csvByMarket[market];
         bucket.filename = d.filename;
         bucket.updatedAt = d.updated_at ?? d.created_at;
-        bucket.rowCount = rows.length;
+        const scopedRows = dateIdx >= 0 ? rows.filter((r) => inRange(parseCsvDate(r[dateIdx] ?? ''))) : rows;
+        bucket.rowCount = scopedRows.length;
+        bucket.dateFiltered = dateIdx >= 0;
 
 
-        rows.forEach((row) => {
+        scopedRows.forEach((row) => {
           if (pnlNetIdx >= 0) bucket.closedPnlNet += toNum(row[pnlNetIdx]);
           if (pnlIdx >= 0) bucket.closedPnl += toNum(row[pnlIdx]);
           if (refIdx >= 0) {
@@ -147,7 +182,7 @@ export function AnalysesSummary() {
       });
     }
     fetch();
-  }, [user, currentMarket]);
+  }, [user, currentMarket, from, to]);
 
   const total = stats.winCount + stats.lossCount;
   const winRate = total > 0 ? (stats.winCount / total) * 100 : 0;
@@ -230,7 +265,7 @@ export function AnalysesSummary() {
                   <div className="min-w-0">
                     <p className="text-xs font-medium truncate" title={t.filename}>{t.filename}</p>
                     <p className="text-[10px] text-muted-foreground">
-                      {t.rowCount ?? 0} linhas
+                      {t.rowCount ?? 0} linhas{hasRange && t.dateFiltered ? ' no período' : ''}
                       {updatedLabel && <> · actualizado {updatedLabel}</>}
                     </p>
                   </div>

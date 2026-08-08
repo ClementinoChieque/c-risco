@@ -5,6 +5,7 @@ import { ArrowUpRight, ArrowDownRight, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
+import { useDateRange } from '@/context/DateRangeContext';
 import { SignedImage } from '@/components/ui/SignedImage';
 
 interface TradeAnalysis {
@@ -31,6 +32,7 @@ const marketLabel = (m: string) => {
 
 export function TradeDiary() {
   const { user } = useAuth();
+  const { inRange } = useDateRange();
   const [analyses, setAnalyses] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -61,11 +63,13 @@ export function TradeDiary() {
     );
   }
 
-  if (analyses.length === 0) {
+  const visible = analyses.filter(a => inRange(a.created_at));
+
+  if (visible.length === 0) {
     return (
       <div className="glass-card rounded-xl p-12 text-center animate-fade-in">
         <ImageIcon className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
-        <p className="text-muted-foreground">Nenhum trade registrado ainda</p>
+        <p className="text-muted-foreground">Nenhum trade no período seleccionado</p>
         <p className="text-sm text-muted-foreground mt-2">
           Use a secção Negociações para registrar o seu primeiro trade
         </p>
@@ -85,7 +89,7 @@ export function TradeDiary() {
       </Dialog>
 
       <div className="space-y-4">
-        {analyses.map((trade, index) => (
+        {visible.map((trade, index) => (
           <div
             key={trade.id}
             className="glass-card rounded-xl p-5 animate-fade-in"

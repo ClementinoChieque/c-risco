@@ -14,6 +14,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { format, subDays, isSameDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '@/context/AuthContext';
+import { useDateRange } from '@/context/DateRangeContext';
 
 interface TradeAnalysis {
   id: string;
@@ -30,6 +31,7 @@ interface TradeAnalysis {
 
 export function Statistics() {
   const { user } = useAuth();
+  const { inRange } = useDateRange();
   const [allAnalyses, setAllAnalyses] = useState<TradeAnalysis[]>([]);
   const [marketFilter, setMarketFilter] = useState<string>('all');
 
@@ -46,7 +48,8 @@ export function Statistics() {
     fetchData();
   }, []);
 
-  const analyses = marketFilter === 'all' ? allAnalyses : allAnalyses.filter(a => a.market === marketFilter);
+  const analyses = (marketFilter === 'all' ? allAnalyses : allAnalyses.filter(a => a.market === marketFilter))
+    .filter(a => inRange(a.created_at));
 
   const wins = analyses.filter(a => a.type === 'win');
   const losses = analyses.filter(a => a.type === 'loss');

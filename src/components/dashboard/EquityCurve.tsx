@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useDateRange } from '@/context/DateRangeContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -17,6 +18,7 @@ const MARKETS: { key: Market; label: string; color: string }[] = [
 
 export function EquityCurve() {
   const { user } = useAuth();
+  const { inRange } = useDateRange();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ export function EquityCurve() {
     };
     (['forex', 'crypto', 'propfirm'] as Market[]).forEach((m) => {
       let equity = 0;
-      const filtered = rows.filter(r => (r.market || 'forex') === m);
+      const filtered = rows.filter(r => (r.market || 'forex') === m && inRange(r.created_at));
       result[m] = filtered.map(r => {
         const pnl = r.type === 'win' ? Number(r.amount || 0) : -Math.abs(Number(r.amount || 0));
         equity += pnl;
@@ -51,7 +53,7 @@ export function EquityCurve() {
       });
     });
     return result;
-  }, [rows]);
+  }, [rows, inRange]);
 
   return (
     <div className="glass-card rounded-xl p-4 md:p-6 animate-fade-in">
