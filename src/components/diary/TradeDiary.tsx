@@ -5,6 +5,7 @@ import { ArrowUpRight, ArrowDownRight, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
+import { useDateRange } from '@/context/DateRangeContext';
 import { SignedImage } from '@/components/ui/SignedImage';
 
 interface TradeAnalysis {
@@ -31,6 +32,7 @@ const marketLabel = (m: string) => {
 
 export function TradeDiary() {
   const { user } = useAuth();
+  const { inRange } = useDateRange();
   const [analyses, setAnalyses] = useState<TradeAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
