@@ -12,6 +12,9 @@ interface CsvTotals {
   closedPnl: number;
   winCount: number;
   lossCount: number;
+  filename?: string;
+  updatedAt?: string;
+  rowCount?: number;
 }
 
 interface AnalysisStats {
