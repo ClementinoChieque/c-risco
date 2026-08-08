@@ -59,8 +59,9 @@ export function AnalysesSummary() {
 
       const { data: csvDatasets } = await supabase
         .from('csv_datasets')
-        .select('headers, rows, market')
-        .eq('user_id', user.id);
+        .select('id, headers, rows, market, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       const wins = (analyses ?? []).filter((d: any) => d.type === 'win');
       const losses = (analyses ?? []).filter((d: any) => d.type === 'loss');
@@ -76,9 +77,33 @@ export function AnalysesSummary() {
         forex: emptyTotals(), crypto: emptyTotals(), propfirm: emptyTotals(),
       };
 
+      // Um único dataset por mercado (o seleccionado no CsvViewer, senão o mais recente)
+      let selectedByMarket: Record<string, string> = {};
+      try {
+        selectedByMarket = JSON.parse(localStorage.getItem('csvViewer:lastSelectedByMarket') || '{}');
+      } catch { /* ignore */ }
+
+      const activeByMarket: Partial<Record<Market, any>> = {};
       (csvDatasets ?? []).forEach((d: any) => {
-        const market = (d.market as Market) ?? 'forex';
+        const market = (d.market as Market);
         if (!csvByMarket[market]) return;
+        const chosenId = selectedByMarket[market];
+        if (chosenId) {
+          if (d.id === chosenId) activeByMarket[market] = d;
+        } else if (!activeByMarket[market]) {
+          activeByMarket[market] = d; // mais recente (ordenado desc)
+        }
+      });
+      // fallback: se o id guardado já não existe, usa o mais recente
+      (csvDatasets ?? []).forEach((d: any) => {
+        const market = (d.market as Market);
+        if (!csvByMarket[market]) return;
+        if (!activeByMarket[market]) activeByMarket[market] = d;
+      });
+
+      (Object.keys(csvByMarket) as Market[]).forEach((market) => {
+        const d = activeByMarket[market];
+        if (!d) return;
         const headers: string[] = (d.headers ?? []) as string[];
         const rows: string[][] = (d.rows ?? []) as string[][];
 
