@@ -2,6 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { TradeAnalyses } from '@/components/trades/TradeAnalyses';
 import { BalanceManager } from '@/components/trades/BalanceManager';
 import { TradeCalendar } from '@/components/trades/TradeCalendar';
+import { CsvTradeCalendar } from '@/components/trades/CsvTradeCalendar';
 
 export default function TradesPage() {
   return (
