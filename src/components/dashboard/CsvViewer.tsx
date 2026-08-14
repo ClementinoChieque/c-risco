@@ -195,6 +195,7 @@ export function CsvViewer() {
     if (error) { toast.error('Falha ao apagar'); return; }
     toast.success('Removido');
     await load();
+    window.dispatchEvent(new CustomEvent('csv-datasets:changed', { detail: { market: currentMarket } }));
   };
 
   const current = useMemo(
