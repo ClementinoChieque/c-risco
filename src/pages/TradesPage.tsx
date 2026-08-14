@@ -2,6 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { TradeAnalyses } from '@/components/trades/TradeAnalyses';
 import { BalanceManager } from '@/components/trades/BalanceManager';
 import { TradeCalendar } from '@/components/trades/TradeCalendar';
+import { CsvTradeCalendar } from '@/components/trades/CsvTradeCalendar';
 
 export default function TradesPage() {
   return (
@@ -12,6 +13,7 @@ export default function TradesPage() {
           <p className="text-sm sm:text-base text-muted-foreground">Faça upload das suas análises de wins e losses</p>
         </div>
         <BalanceManager />
+        <CsvTradeCalendar />
         <TradeCalendar />
         <TradeAnalyses />
       </div>
