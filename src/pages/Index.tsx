@@ -5,7 +5,7 @@ import { EquityCurve } from '@/components/dashboard/EquityCurve';
 import { CsvViewer } from '@/components/dashboard/CsvViewer';
 import { ExportPDF } from '@/components/reports/ExportPDF';
 import { CsvToPdf } from '@/components/reports/CsvToPdf';
-import { DashboardDateFilter } from '@/components/dashboard/DashboardDateFilter';
+
 
 export default function Dashboard() {
   return (
@@ -22,7 +22,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <DashboardDateFilter />
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
           <div className="xl:col-span-2 min-w-0">
