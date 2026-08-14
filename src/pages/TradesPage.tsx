@@ -13,6 +13,7 @@ export default function TradesPage() {
           <p className="text-sm sm:text-base text-muted-foreground">Faça upload das suas análises de wins e losses</p>
         </div>
         <BalanceManager />
+        <CsvTradeCalendar />
         <TradeCalendar />
         <TradeAnalyses />
       </div>
