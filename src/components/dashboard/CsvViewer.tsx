@@ -126,8 +126,10 @@ export function CsvViewer() {
   useEffect(() => {
     if (!selectedId) return;
     const map = readLastSelected();
+    if (map[currentMarket] === selectedId) return;
     map[currentMarket] = selectedId;
     writeLastSelected(map);
+    window.dispatchEvent(new CustomEvent('csv-datasets:changed', { detail: { market: currentMarket } }));
   }, [selectedId, currentMarket]);
 
   const uploadFile = async (file: File) => {
