@@ -190,7 +190,7 @@ export function AnalysesSummary() {
       });
     }
     fetch();
-  }, [user, currentMarket, from, to]);
+  }, [user, currentMarket, from, to, refreshKey]);
 
   const total = stats.winCount + stats.lossCount;
   const winRate = total > 0 ? (stats.winCount / total) * 100 : 0;
