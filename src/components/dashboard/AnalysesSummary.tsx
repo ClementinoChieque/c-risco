@@ -68,6 +68,14 @@ export function AnalysesSummary() {
     csvByMarket: { forex: emptyTotals(), crypto: emptyTotals(), propfirm: emptyTotals() },
   });
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const onChanged = () => setRefreshKey((k) => k + 1);
+    window.addEventListener('csv-datasets:changed', onChanged);
+    return () => window.removeEventListener('csv-datasets:changed', onChanged);
+  }, []);
+
   useEffect(() => {
     async function fetch() {
       if (!user) return;
