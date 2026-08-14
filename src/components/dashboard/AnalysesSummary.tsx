@@ -68,6 +68,14 @@ export function AnalysesSummary() {
     csvByMarket: { forex: emptyTotals(), crypto: emptyTotals(), propfirm: emptyTotals() },
   });
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const onChanged = () => setRefreshKey((k) => k + 1);
+    window.addEventListener('csv-datasets:changed', onChanged);
+    return () => window.removeEventListener('csv-datasets:changed', onChanged);
+  }, []);
+
   useEffect(() => {
     async function fetch() {
       if (!user) return;
@@ -182,7 +190,7 @@ export function AnalysesSummary() {
       });
     }
     fetch();
-  }, [user, currentMarket, from, to]);
+  }, [user, currentMarket, from, to, refreshKey]);
 
   const total = stats.winCount + stats.lossCount;
   const winRate = total > 0 ? (stats.winCount / total) * 100 : 0;
