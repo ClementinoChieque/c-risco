@@ -142,14 +142,22 @@ export function CsvViewer() {
       const rows = parseCSV(text);
       if (rows.length === 0) { toast.error('CSV vazio'); return; }
       const [headers, ...body] = rows;
-      const { error } = await supabase.from('csv_datasets').insert({
+      const { data: inserted, error } = await supabase.from('csv_datasets').insert({
         user_id: user.id,
         market: uploadMarket,
         filename: file.name,
         headers,
         rows: body,
-      });
+      }).select('id').single();
       if (error) throw error;
+
+      // O novo ficheiro passa a ser o activo desse mercado
+      if (inserted?.id) {
+        const map = readLastSelected();
+        map[uploadMarket] = inserted.id;
+        writeLastSelected(map);
+      }
+
       toast.success(`CSV carregado para ${marketLabel[uploadMarket]}`);
       if (uploadMarket !== currentMarket) {
         setCurrentMarket(uploadMarket as any);
@@ -157,6 +165,8 @@ export function CsvViewer() {
       } else {
         await load();
       }
+      // Notifica outros componentes (ex.: Resumo de Negociações) para recalcular
+      window.dispatchEvent(new CustomEvent('csv-datasets:changed', { detail: { market: uploadMarket } }));
     } catch (err: any) {
       console.error(err);
       toast.error('Falha ao carregar CSV');
