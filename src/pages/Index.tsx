@@ -2,6 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Statistics } from '@/components/stats/Statistics';
 import { AnalysesSummary } from '@/components/dashboard/AnalysesSummary';
 import { EquityCurve } from '@/components/dashboard/EquityCurve';
+import { CsvEquityCurve } from '@/components/dashboard/CsvEquityCurve';
 import { CsvViewer } from '@/components/dashboard/CsvViewer';
 import { ExportPDF } from '@/components/reports/ExportPDF';
 import { CsvToPdf } from '@/components/reports/CsvToPdf';
@@ -33,7 +34,9 @@ export default function Dashboard() {
         </div>
 
         <EquityCurve />
+        <CsvEquityCurve />
         <CsvViewer />
+
       </div>
     </MainLayout>
   );
