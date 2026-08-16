@@ -16,6 +16,8 @@ import { SignedImage } from '@/components/ui/SignedImage';
 import { extractStoragePath } from '@/hooks/useSignedImageUrl';
 import { toPng } from 'html-to-image';
 import { ShareReviewCard } from './ShareReviewCard';
+import { generateBeforeAfterVideo } from '@/lib/beforeAfterVideo';
+
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 type ReviewType = 'win' | 'loss';
@@ -213,6 +215,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   const [editCaption, setEditCaption] = useState('');
   const [shareItem, setShareItem] = useState<TradeReview | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [generatingVideo, setGeneratingVideo] = useState(false);
+
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const waitForImages = (el: HTMLElement) =>
