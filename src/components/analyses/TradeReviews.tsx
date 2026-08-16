@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil, Share2, Download } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil, Share2, Download, Video } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -536,9 +536,22 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                 </div>
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Pré-visualização · imagem final exportada em 1080×1080 (ideal para redes sociais)
+                Pré-visualização · imagem 1080×1080{shareItem.image_url_after ? ' · vídeo 1080×1080 (7s) com transição Antes → Depois' : ''}
               </p>
+              {shareItem.image_url_after && (
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button onClick={() => handleVideo(true)} disabled={generatingVideo} className="flex-1">
+                    <Video className="h-4 w-4 mr-2" />
+                    {generatingVideo ? 'A gerar vídeo...' : 'Partilhar Vídeo'}
+                  </Button>
+                  <Button onClick={() => handleVideo(false)} disabled={generatingVideo} variant="outline" className="flex-1">
+                    <Download className="h-4 w-4 mr-2" />
+                    Descarregar MP4
+                  </Button>
+                </div>
+              )}
               <div className="flex gap-2">
+
                 <Button onClick={handleNativeShare} disabled={generating} className="flex-1">
                   <Share2 className="h-4 w-4 mr-2" />
                   {generating ? 'A gerar...' : 'Partilhar'}
