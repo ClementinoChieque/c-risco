@@ -261,6 +261,43 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
     }
   };
 
+  const handleVideo = async (share: boolean) => {
+    if (!shareItem || !shareItem.image_url_after) return;
+    setGeneratingVideo(true);
+    try {
+      const { blob, ext } = await generateBeforeAfterVideo({
+        type: shareItem.type,
+        market: shareItem.market,
+        imageUrl: shareItem.image_url,
+        imageUrlAfter: shareItem.image_url_after,
+        caption: shareItem.caption,
+        date: new Date(shareItem.created_at).toLocaleDateString('pt-AO'),
+      });
+      const name = `analise-${shareItem.type}-${shareItem.id.slice(0, 8)}.${ext}`;
+      const file = new File([blob], name, { type: blob.type });
+      const nav: any = navigator;
+      if (share && nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({
+          files: [file],
+          title: shareItem.type === 'win' ? 'Análise de Acerto' : 'Análise de Erro',
+          text: shareItem.caption || 'Partilhado via C-Risco',
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success(ext === 'mp4' ? 'Vídeo MP4 descarregado!' : 'Vídeo descarregado (WebM)');
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') toast.error('Erro ao gerar vídeo: ' + (err?.message || ''));
+    } finally {
+      setGeneratingVideo(false);
+    }
+  };
+
   const handleNativeShare = async () => {
     if (!shareItem) return;
     setGenerating(true);
@@ -286,6 +323,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
       setGenerating(false);
     }
   };
+
 
   const fetchItems = async () => {
     setLoading(true);
