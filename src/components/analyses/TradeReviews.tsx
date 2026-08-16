@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil, Share2, Download } from 'lucide-react';
+import { Upload, Trash2, TrendingUp, TrendingDown, ImageIcon, X, Pencil, Share2, Download, Video } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,6 +16,8 @@ import { SignedImage } from '@/components/ui/SignedImage';
 import { extractStoragePath } from '@/hooks/useSignedImageUrl';
 import { toPng } from 'html-to-image';
 import { ShareReviewCard } from './ShareReviewCard';
+import { generateBeforeAfterVideo } from '@/lib/beforeAfterVideo';
+
 
 type MarketFilter = 'all' | 'forex' | 'crypto' | 'propfirm';
 type ReviewType = 'win' | 'loss';
@@ -213,6 +215,8 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
   const [editCaption, setEditCaption] = useState('');
   const [shareItem, setShareItem] = useState<TradeReview | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [generatingVideo, setGeneratingVideo] = useState(false);
+
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const waitForImages = (el: HTMLElement) =>
@@ -261,6 +265,43 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
     }
   };
 
+  const handleVideo = async (share: boolean) => {
+    if (!shareItem || !shareItem.image_url_after) return;
+    setGeneratingVideo(true);
+    try {
+      const { blob, ext } = await generateBeforeAfterVideo({
+        type: shareItem.type,
+        market: shareItem.market,
+        imageUrl: shareItem.image_url,
+        imageUrlAfter: shareItem.image_url_after,
+        caption: shareItem.caption,
+        date: new Date(shareItem.created_at).toLocaleDateString('pt-AO'),
+      });
+      const name = `analise-${shareItem.type}-${shareItem.id.slice(0, 8)}.${ext}`;
+      const file = new File([blob], name, { type: blob.type });
+      const nav: any = navigator;
+      if (share && nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({
+          files: [file],
+          title: shareItem.type === 'win' ? 'Análise de Acerto' : 'Análise de Erro',
+          text: shareItem.caption || 'Partilhado via C-Risco',
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success(ext === 'mp4' ? 'Vídeo MP4 descarregado!' : 'Vídeo descarregado (WebM)');
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') toast.error('Erro ao gerar vídeo: ' + (err?.message || ''));
+    } finally {
+      setGeneratingVideo(false);
+    }
+  };
+
   const handleNativeShare = async () => {
     if (!shareItem) return;
     setGenerating(true);
@@ -286,6 +327,7 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
       setGenerating(false);
     }
   };
+
 
   const fetchItems = async () => {
     setLoading(true);
@@ -494,9 +536,22 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                 </div>
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Pré-visualização · imagem final exportada em 1080×1080 (ideal para redes sociais)
+                Pré-visualização · imagem 1080×1080{shareItem.image_url_after ? ' · vídeo 1080×1080 (7s) com transição Antes → Depois' : ''}
               </p>
+              {shareItem.image_url_after && (
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button onClick={() => handleVideo(true)} disabled={generatingVideo} className="flex-1">
+                    <Video className="h-4 w-4 mr-2" />
+                    {generatingVideo ? 'A gerar vídeo...' : 'Partilhar Vídeo'}
+                  </Button>
+                  <Button onClick={() => handleVideo(false)} disabled={generatingVideo} variant="outline" className="flex-1">
+                    <Download className="h-4 w-4 mr-2" />
+                    Descarregar MP4
+                  </Button>
+                </div>
+              )}
               <div className="flex gap-2">
+
                 <Button onClick={handleNativeShare} disabled={generating} className="flex-1">
                   <Share2 className="h-4 w-4 mr-2" />
                   {generating ? 'A gerar...' : 'Partilhar'}
