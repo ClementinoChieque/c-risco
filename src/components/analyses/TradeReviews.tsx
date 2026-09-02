@@ -71,7 +71,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
 
   const uploadOne = async (f: File) => {
     const ext = f.name.split('.').pop();
-    const fileName = `${user!.id}/reviews/${type}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const fileName = `${user!.id}/reviews/${finalType}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error } = await supabase.storage.from('trade-analyses').upload(fileName, f);
     if (error) throw error;
     return fileName;
@@ -93,7 +93,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
         .from('trade_reviews')
         .insert({
           user_id: user!.id,
-          type,
+          type: finalType,
           image_url: beforeUrl,
           image_url_after: afterUrl,
           caption: caption || null,
@@ -103,7 +103,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
       if (dbError) throw dbError;
 
       toast.success(
-        type === 'win' ? 'Análise de acerto adicionada!' : 'Análise de erro adicionada!'
+        finalType === 'win' ? 'Análise de acerto adicionada!' : 'Análise de erro adicionada!'
       );
       setFile(null);
       setFileAfter(null);
@@ -111,6 +111,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
       setPreview(null);
       setPreviewAfter(null);
       setMarket('forex');
+      setResultType(type);
       onUploaded();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + err.message);
@@ -172,6 +173,36 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
               disabled={!file}
               hint={!file ? 'Adicione primeiro o "Antes"' : 'Clique para selecionar imagem'}
             />
+            {file && (
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Resultado desta operação</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={resultType === 'win' ? 'default' : 'outline'}
+                    onClick={() => setResultType('win')}
+                    className="flex-1 gap-2"
+                  >
+                    <TrendingUp className="h-4 w-4" /> Win (Acerto)
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={resultType === 'loss' ? 'destructive' : 'outline'}
+                    onClick={() => setResultType('loss')}
+                    className="flex-1 gap-2"
+                  >
+                    <TrendingDown className="h-4 w-4" /> Loss (Erro)
+                  </Button>
+                </div>
+                {resultType !== type && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Esta análise será guardada no separador "{resultType === 'win' ? 'Acertos' : 'Erros'}".
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <FilePicker label="Imagem da Análise" previewUrl={preview} which="before" />
@@ -192,9 +223,9 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
         </div>
 
         <div className="space-y-2">
-          <Label>{type === 'win' ? 'Motivo do Acerto' : 'Motivo do Erro'}</Label>
+          <Label>{finalType === 'win' ? 'Motivo do Acerto' : 'Motivo do Erro'}</Label>
           <Textarea
-            placeholder={type === 'win' ? 'Descreva porque acertou nesta operação...' : 'Descreva o que correu mal nesta operação...'}
+            placeholder={finalType === 'win' ? 'Descreva porque acertou nesta operação...' : 'Descreva o que correu mal nesta operação...'}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             rows={3}
