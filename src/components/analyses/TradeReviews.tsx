@@ -98,6 +98,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
           image_url_after: afterUrl,
           caption: caption || null,
           market,
+          result_amount: resultAmount.trim() !== '' ? parseFloat(resultAmount) : null,
         });
 
       if (dbError) throw dbError;
@@ -108,9 +109,11 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
       setFile(null);
       setFileAfter(null);
       setCaption('');
+      setResultAmount('');
       setPreview(null);
       setPreviewAfter(null);
       setMarket('forex');
+
       onUploaded();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + err.message);
