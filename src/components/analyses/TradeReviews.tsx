@@ -500,6 +500,15 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                   <Badge variant="outline" className="text-xs">
                     {MARKET_LABELS[item.market] || item.market}
                   </Badge>
+                  {item.result_amount != null && (
+                    <Badge
+                      variant={item.type === 'win' ? 'default' : 'destructive'}
+                      className="text-xs font-mono"
+                    >
+                      {item.type === 'win' ? '+' : '-'}${Math.abs(item.result_amount).toFixed(2)}
+                    </Badge>
+                  )}
+
                   <span className="text-xs text-muted-foreground">
                     {new Date(item.created_at).toLocaleDateString('pt-AO')}
                   </span>
