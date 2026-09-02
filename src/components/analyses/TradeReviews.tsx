@@ -37,6 +37,7 @@ interface TradeReview {
   image_url_after: string | null;
   caption: string | null;
   market: string;
+  result_amount: number | null;
   created_at: string;
 }
 
@@ -47,9 +48,11 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
   const [fileAfter, setFileAfter] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
   const [market, setMarket] = useState<string>('forex');
+  const [resultAmount, setResultAmount] = useState('');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [previewAfter, setPreviewAfter] = useState<string | null>(null);
+
 
   const isBeforeAfter = mode === 'before_after';
 
