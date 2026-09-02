@@ -50,8 +50,11 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [previewAfter, setPreviewAfter] = useState<string | null>(null);
+  const [resultType, setResultType] = useState<ReviewType>(type);
 
   const isBeforeAfter = mode === 'before_after';
+  const finalType: ReviewType = isBeforeAfter ? resultType : type;
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, which: 'before' | 'after') => {
     const selected = e.target.files?.[0];
