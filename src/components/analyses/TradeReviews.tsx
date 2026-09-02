@@ -37,6 +37,7 @@ interface TradeReview {
   image_url_after: string | null;
   caption: string | null;
   market: string;
+  result_amount: number | null;
   created_at: string;
 }
 
@@ -47,9 +48,11 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
   const [fileAfter, setFileAfter] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
   const [market, setMarket] = useState<string>('forex');
+  const [resultAmount, setResultAmount] = useState('');
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [previewAfter, setPreviewAfter] = useState<string | null>(null);
+
 
   const isBeforeAfter = mode === 'before_after';
 
@@ -95,6 +98,7 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
           image_url_after: afterUrl,
           caption: caption || null,
           market,
+          result_amount: resultAmount.trim() !== '' ? parseFloat(resultAmount) : null,
         });
 
       if (dbError) throw dbError;
@@ -105,9 +109,11 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
       setFile(null);
       setFileAfter(null);
       setCaption('');
+      setResultAmount('');
       setPreview(null);
       setPreviewAfter(null);
       setMarket('forex');
+
       onUploaded();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + err.message);
@@ -173,6 +179,27 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
         ) : (
           <FilePicker label="Imagem da Análise" previewUrl={preview} which="before" />
         )}
+
+        {isBeforeAfter && file && (
+          <div className="space-y-2">
+            <Label>
+              {type === 'win' ? 'Lucro final (TP em dinheiro) $' : 'Prejuízo final (SL em dinheiro) $'}
+            </Label>
+            <Input
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              placeholder="Ex: 250.00"
+              value={resultAmount}
+              onChange={(e) => setResultAmount(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Valor final da operação após a saída (Depois).
+            </p>
+          </div>
+        )}
+
+
 
         <div className="space-y-2">
           <Label>Mercado</Label>
@@ -473,6 +500,15 @@ function ReviewGrid({ type, refreshKey, marketFilter }: { type: ReviewType; refr
                   <Badge variant="outline" className="text-xs">
                     {MARKET_LABELS[item.market] || item.market}
                   </Badge>
+                  {item.result_amount != null && (
+                    <Badge
+                      variant={item.type === 'win' ? 'default' : 'destructive'}
+                      className="text-xs font-mono"
+                    >
+                      {item.type === 'win' ? '+' : '-'}${Math.abs(item.result_amount).toFixed(2)}
+                    </Badge>
+                  )}
+
                   <span className="text-xs text-muted-foreground">
                     {new Date(item.created_at).toLocaleDateString('pt-AO')}
                   </span>
