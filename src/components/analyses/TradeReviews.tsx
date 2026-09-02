@@ -180,6 +180,27 @@ function ReviewUploader({ type, onUploaded }: { type: ReviewType; onUploaded: ()
           <FilePicker label="Imagem da Análise" previewUrl={preview} which="before" />
         )}
 
+        {isBeforeAfter && file && (
+          <div className="space-y-2">
+            <Label>
+              {type === 'win' ? 'Lucro final (TP em dinheiro) $' : 'Prejuízo final (SL em dinheiro) $'}
+            </Label>
+            <Input
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              placeholder="Ex: 250.00"
+              value={resultAmount}
+              onChange={(e) => setResultAmount(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Valor final da operação após a saída (Depois).
+            </p>
+          </div>
+        )}
+
+
+
         <div className="space-y-2">
           <Label>Mercado</Label>
           <Select value={market} onValueChange={setMarket}>
