@@ -249,6 +249,7 @@ export type Database = {
           image_url: string
           image_url_after: string | null
           market: string
+          result_amount: number | null
           type: string
           user_id: string
         }
@@ -259,6 +260,7 @@ export type Database = {
           image_url: string
           image_url_after?: string | null
           market?: string
+          result_amount?: number | null
           type: string
           user_id: string
         }
@@ -269,6 +271,7 @@ export type Database = {
           image_url?: string
           image_url_after?: string | null
           market?: string
+          result_amount?: number | null
           type?: string
           user_id?: string
         }

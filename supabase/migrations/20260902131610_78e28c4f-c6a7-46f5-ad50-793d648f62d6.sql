@@ -1,0 +1,1 @@
+ALTER TABLE public.trade_reviews ADD COLUMN IF NOT EXISTS result_amount numeric;
